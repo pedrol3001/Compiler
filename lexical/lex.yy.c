@@ -362,10 +362,10 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[34] =
     {   0,
-        5,    5,    8,    6,    5,    6,    6,    6,    6,    6,
-        5,    6,    6,    6,    2,    6,    1,    6,    6,    0,
-        6,    6,    0,    6,    0,    4,    3,    4,    6,    0,
-        6,    0,    0
+        6,    6,    8,    5,    6,    5,    5,    5,    5,    5,
+        6,    5,    5,    5,    2,    5,    1,    5,    5,    0,
+        5,    3,    5,    0,    5,    0,    4,    4,    5,    0,
+        5,    0,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -407,9 +407,9 @@ static const YY_CHAR yy_meta[10] =
 
 static const flex_int16_t yy_base[41] =
     {   0,
-        0,    0,   24,    0,   21,    6,   19,   12,   18,    0,
-       19,    0,    0,   26,   72,   11,   72,    0,   28,   13,
-       30,   35,   40,   45,   12,    0,   72,   72,   47,    9,
+        0,    0,   23,    0,   20,    6,   18,   12,   18,    0,
+       16,    0,    0,   26,   72,   28,   72,    0,   34,   13,
+       36,   72,    0,   40,   45,   12,    0,   72,   47,    9,
        49,   53,   72,   10,   59,   61,   63,   65,   67,   69
     } ;
 
@@ -417,19 +417,19 @@ static const flex_int16_t yy_def[41] =
     {   0,
        33,    1,   33,   34,   33,   34,   34,   34,   34,   34,
        33,    6,    8,   35,   33,   34,   33,    9,   35,   36,
-       37,   34,   38,   39,   40,   34,   33,   33,   39,   40,
+       37,   33,   16,   38,   39,   40,   34,   33,   39,   40,
        37,   38,    0,   33,   33,   33,   33,   33,   33,   33
     } ;
 
 static const flex_int16_t yy_nxt[82] =
     {   0,
         4,    5,    4,    6,    4,    7,    8,    9,    4,   12,
-       10,   32,   13,   15,   32,   23,   16,   22,   13,   17,
-       11,   14,   11,   33,   18,   18,   18,   20,   21,   20,
-       21,   25,   21,   33,   33,   26,   27,   33,   33,   33,
-       33,   22,   23,   33,   33,   28,   30,   31,   30,   31,
-       25,   31,   33,   33,   26,   32,   33,   33,   28,   19,
-       19,   20,   20,   24,   24,   25,   25,   29,   29,   30,
+       10,   32,   13,   15,   32,   24,   16,   11,   13,   17,
+       14,   11,   33,   33,   18,   18,   18,   20,   21,   22,
+       33,   33,   33,   33,   23,   20,   21,   26,   21,   33,
+       33,   27,   24,   33,   33,   28,   30,   31,   30,   31,
+       26,   31,   33,   33,   27,   32,   33,   33,   28,   19,
+       19,   20,   20,   25,   25,   26,   26,   29,   29,   30,
        30,    3,   33,   33,   33,   33,   33,   33,   33,   33,
        33
     } ;
@@ -437,10 +437,10 @@ static const flex_int16_t yy_nxt[82] =
 static const flex_int16_t yy_chk[82] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    6,
-       34,   30,    6,    8,   25,   20,    8,   16,    8,    9,
-       11,    7,    5,    3,    9,    9,    9,   14,   14,   19,
-       19,   21,   21,    0,    0,   21,   22,    0,    0,    0,
-        0,   22,   23,    0,    0,   23,   24,   24,   29,   29,
+       34,   30,    6,    8,   26,   20,    8,   11,    8,    9,
+        7,    5,    3,    0,    9,    9,    9,   14,   14,   16,
+        0,    0,    0,    0,   16,   19,   19,   21,   21,    0,
+        0,   21,   24,    0,    0,   24,   25,   25,   29,   29,
        31,   31,    0,    0,   31,   32,    0,    0,   32,   35,
        35,   36,   36,   37,   37,   38,   38,   39,   39,   40,
        40,   33,   33,   33,   33,   33,   33,   33,   33,   33,
@@ -749,36 +749,36 @@ case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
 #line 15 "lexical.l"
-{fprintf(yyout,"[Identificador, %s]\n",yytext);}//printf("Identificador\n"); {fprintf(yyout,"[Identificador, %s]\n",yytext);}
+{fprintf(yyout,"[Identificador, %s]\n",yytext);}
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
 #line 17 "lexical.l"
-{fprintf(yyout,"[Inteiro, %s]\n",yytext);}//printf("Inteiro\n");
+{fprintf(yyout,"[Inteiro, %s]\n",yytext);}
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
 #line 19 "lexical.l"
-{fprintf(yyout,"[Ponto flutuante, %s]\n",yytext);}//printf("Ponto flutuante\n");
+{fprintf(yyout,"[Ponto flutuante, %s]\n",yytext);}
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
 #line 21 "lexical.l"
-{fprintf(yyout,"[Comentario, %s]\n",yytext);} //\/\*.*\*\/{fprintf(yyout,"[Comentario, %s]\n",yytext);}//printf("Comentario\n");
+{fprintf(yyout,"[Comentario, %s]\n",yytext);}
 	YY_BREAK
 case 5:
-/* rule 5 can match eol */
 YY_RULE_SETUP
-#line 24 "lexical.l"
-/*Ignora*/
+#line 23 "lexical.l"
+{fprintf(yyout,"[Invalido, %s]\n",yytext);}
 	YY_BREAK
 case 6:
+/* rule 6 can match eol */
 YY_RULE_SETUP
-#line 26 "lexical.l"
-{fprintf(yyout,"[Invalido, %s]\n",yytext);} //printf("Invalido\n");
+#line 25 "lexical.l"
+{;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP

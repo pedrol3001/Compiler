@@ -12,18 +12,18 @@ NotSpace [^\n\t ]
 
 /*Rules*/
 %%
-{Letra}({Digito}|{Letra}|_)*{Space} {fprintf(yyout,"[Identificador, %s]\n",yytext);}//printf("Identificador\n"); {fprintf(yyout,"[Identificador, %s]\n",yytext);}
+{Letra}({Digito}|{Letra}|_)*{Space} {fprintf(yyout,"[Identificador, %s]\n",yytext);}
 
-{Sinal}*{Digito}+{Space}		{fprintf(yyout,"[Inteiro, %s]\n",yytext);}//printf("Inteiro\n");
+{Sinal}*{Digito}+{Space}		{fprintf(yyout,"[Inteiro, %s]\n",yytext);}
 
-{Sinal}*{Digito}+\.{Digito}+{Space}	{fprintf(yyout,"[Ponto flutuante, %s]\n",yytext);}//printf("Ponto flutuante\n");
+{Sinal}*{Digito}+\.{Digito}*{Space}	{fprintf(yyout,"[Ponto flutuante, %s]\n",yytext);}
 
-[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]      {fprintf(yyout,"[Comentario, %s]\n",yytext);} //\/\*.*\*\/{fprintf(yyout,"[Comentario, %s]\n",yytext);}//printf("Comentario\n");
+[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]      {fprintf(yyout,"[Comentario, %s]\n",yytext);}
 
+{NotSpace}+				{fprintf(yyout,"[Invalido, %s]\n",yytext);}
 
-{Space}*				/*Ignora*/
+{Space}*				{;}
 
-{NotSpace}+				{fprintf(yyout,"[Invalido, %s]\n",yytext);} //printf("Invalido\n");
 %%
 
 int yywrap ();
