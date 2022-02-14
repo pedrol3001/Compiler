@@ -10,26 +10,35 @@ Sinal [-+]
 Space [\n\t ]
 NotSpace [^\n\t ]
 
+%x INVALIDO_VARIAS_LINHAS
+%x INVALIDO_UMA_LINHA
+
 /*Rules*/
 %%
-{Letra}({Digito}|{Letra}|_)*{Space} {fprintf(yyout,"[Identificador, %s]\n",yytext);}
+{Letra}({Digito}|{Letra}|_)* {fprintf(yyout,"[Identificador, %s]\n",yytext);}
 
-{Sinal}*{Digito}+{Space}		{fprintf(yyout,"[Inteiro, %s]\n",yytext);}
+{Sinal}*{Digito}+		{fprintf(yyout,"[Inteiro, %s]\n",yytext);}
 
-{Sinal}*{Digito}+\.{Digito}*{Space}	{fprintf(yyout,"[Ponto flutuante, %s]\n",yytext);}
+{Sinal}*{Digito}+\.{Digito}*	{fprintf(yyout,"[Ponto flutuante, %s]\n",yytext);}
+
+\"((\\\")|[^\"\n])*\"      {fprintf(yyout,"[String, %s]\n",yytext);}
 
 [/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]      {fprintf(yyout,"[Comentario, %s]\n",yytext);}
 
-{NotSpace}+				{fprintf(yyout,"[Invalido, %s]\n",yytext);}
-
 {Space}*				{;}
+
+"/*"                      { BEGIN(INVALIDO_VARIAS_LINHAS); yyless(yyleng-2); }
+<INVALIDO_VARIAS_LINHAS>(.|\n)+         { fprintf(yyout,"[Invalido, %s]\n",yytext); BEGIN(INITIAL); }
+
+.                 { BEGIN(INVALIDO_UMA_LINHA); yyless(yyleng-1); }
+<INVALIDO_UMA_LINHA>.+  { fprintf(yyout,"[Invalido, %s]\n",yytext); BEGIN(INITIAL); }
 
 %%
 
 int yywrap ();
 
 /*User*/
-main(argc, argv)
+int main(argc, argv)
     int argc;
     char **argv;
         {

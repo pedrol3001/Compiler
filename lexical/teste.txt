@@ -1,0 +1,26 @@
+123
+casa
+casa123
+123.
+123.456
+/* comentario */
+casa/*comentario*/
+123.456/*comentario*/
+/* comentario de
+varias
+linhas */
+"uma string"
+casa "123"
+"string com \" "
+
+
+123.45.78
+123asd
+123"asd"
+123.45"asd"
+abc"asd"
+"string de
+duas linhas"
+/*comentario
+sem
+fim
