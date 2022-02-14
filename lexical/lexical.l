@@ -14,24 +14,68 @@ NotSpace [^\n\t ]
 %x INVALIDO_UMA_LINHA
 
 /*Rules*/
+%{
+	void match(char* tipo) {
+		fprintf(yyout,"[%s: %s]\n",tipo,yytext);
+	} 
+%}
 %%
-{Letra}({Digito}|{Letra}|_)* {fprintf(yyout,"[Identificador, %s]\n",yytext);}
 
-{Sinal}*{Digito}+		{fprintf(yyout,"[Inteiro, %s]\n",yytext);}
+"+" {
+	match("Soma");
+}
 
-{Sinal}*{Digito}+\.{Digito}*	{fprintf(yyout,"[Ponto flutuante, %s]\n",yytext);}
+"-" {
+	match("Subtracao");
+}
 
-\"((\\\")|[^\"\n])*\"      {fprintf(yyout,"[String, %s]\n",yytext);}
+"*" {
+	match("Multiplicacao");
+}
 
-[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]      {fprintf(yyout,"[Comentario, %s]\n",yytext);}
+"/" {
+	match("Divisao");
+}
 
-{Space}*				{;}
+{Letra}({Digito}|{Letra}|_)* {
+	match("Identificador");
+}
 
-"/*"                      { BEGIN(INVALIDO_VARIAS_LINHAS); yyless(yyleng-2); }
-<INVALIDO_VARIAS_LINHAS>(.|\n)+         { fprintf(yyout,"[Invalido, %s]\n",yytext); BEGIN(INITIAL); }
+{Digito}+ {
+	match("Inteiro");
+}
 
-.                 { BEGIN(INVALIDO_UMA_LINHA); yyless(yyleng-1); }
-<INVALIDO_UMA_LINHA>.+  { fprintf(yyout,"[Invalido, %s]\n",yytext); BEGIN(INITIAL); }
+({Digito}+"."{Digito}*)|({Digito}*"."{Digito}+) {
+	match("Ponto flutuante");
+}
+
+\"(\\\"|[^\"\n])*\" {
+	match("String");
+}
+
+"/*"[^*]*[*]+([^*/][^*]*[*]+)*"/" {
+	match("Comentario");
+}
+
+{Space}* {
+	
+}
+
+"/*" { 
+	BEGIN(INVALIDO_VARIAS_LINHAS); 
+	yyless(yyleng-2); 
+}
+<INVALIDO_VARIAS_LINHAS>(.|\n)+ { 
+	fprintf(yyout,"[Invalido, %s]\n",yytext); BEGIN(INITIAL); 
+}
+
+. { 
+	BEGIN(INVALIDO_UMA_LINHA); yyless(yyleng-1); 
+}
+
+<INVALIDO_UMA_LINHA>.+ { 
+	fprintf(yyout,"[Invalido, %s]\n",yytext); BEGIN(INITIAL); 
+}
 
 %%
 
