@@ -3,12 +3,18 @@ casa
 casa123
 123.
 123.456
+.123
++123.
++123.456
++.123
+123. + 123.456 - .123
 /* comentario */
 casa/*comentario*/
 123.456/*comentario*/
 /* comentario de
 varias
 linhas */
+/*/*comentario dentro de comentario*/
 "uma string"
 casa "123"
 "string com \" "
