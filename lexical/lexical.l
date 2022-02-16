@@ -66,7 +66,8 @@ NotSpace [^\n\t ]
 	yyless(yyleng-2); 
 }
 <INVALIDO_VARIAS_LINHAS>(.|\n)+ { 
-	fprintf(yyout,"[Invalido, %s]\n",yytext); BEGIN(INITIAL); 
+	match("Invalido");
+	BEGIN(INITIAL); 
 }
 
 . { 
@@ -74,7 +75,8 @@ NotSpace [^\n\t ]
 }
 
 <INVALIDO_UMA_LINHA>.+ { 
-	fprintf(yyout,"[Invalido, %s]\n",yytext); BEGIN(INITIAL); 
+	match("Invalido");
+	BEGIN(INITIAL); 
 }
 
 %%

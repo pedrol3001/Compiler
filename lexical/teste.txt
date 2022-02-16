@@ -1,30 +1,30 @@
+comentario sem abertura */
 123
 casa
-casa123
-123.
-123.456
-.123
-+123.
-+123.456
-+.123
-123. + 123.456 - .123
+rua32
+333.
+456.456
+.111
++222.
++567.567
++.777
+888. + 888.888 - .888
 /* comentario */
-casa/*comentario*/
-123.456/*comentario*/
+dia/*comentario do dia dentro do/
+9999.9999/*comentario com 9999.9999*/
 /* comentario de
 varias
 linhas */
-/*/*comentario dentro de comentario*/
 "uma string"
-casa "123"
-"string com \" "
+porta "porta000"
+"string com \" e \ "
 
 
-123.45.78
-123asd
-123"asd"
-123.45"asd"
-abc"asd"
+7878.78.78
+321asd321
+432"asd432"
+543.54"asd54"
+abc"efg"
 "string de
 duas linhas"
 /*comentario
