@@ -37,6 +37,66 @@ NotSpace [^\n\t ]
 	match("Divisao");
 }
 
+"<" {
+	match("Menor");
+}
+
+">" {
+	match("Maior");
+}
+
+"<=" {
+	match("Menor ou igual");
+}
+
+">=" {
+	match("Maior ou igual");
+}
+
+"==" {
+	match("Igualdade");
+}
+
+"!=" {
+	match("Diferenca");
+}
+
+"=" {
+	match("Atribuicao");
+}
+
+";" {
+	match("Ponto e virgula");
+}
+
+"," {
+	match("Virgula");
+}
+
+"if" {
+	match("if");
+}
+
+"else" {
+	match("else");
+}
+
+"else if" {
+	match("else if");
+}
+
+"return" {
+	match("return");
+}
+
+"while" {
+	match("while");
+}
+
+"void" {
+	match("void");
+}
+
 {Letra}({Digito}|{Letra}|_)* {
 	match("Identificador");
 }
