@@ -81,10 +81,6 @@ NotSpace [^\n\t ]
 	match("else");
 }
 
-"else if" {
-	match("else if");
-}
-
 "return" {
 	match("return");
 }
@@ -95,6 +91,46 @@ NotSpace [^\n\t ]
 
 "void" {
 	match("void");
+}
+
+"int" {
+	match("int");
+}
+
+"float" {
+	match("float");
+}
+
+"double" {
+	match("double");
+}
+
+"char" {
+	match("char");
+}
+
+"(" {
+	match("(");
+}
+
+")" {
+	match(")");
+}
+
+"[" {
+	match("[");
+}
+
+"]" {
+	match("]");
+}
+
+"{" {
+	match("{");
+}
+
+"}" {
+	match("}");
 }
 
 {Letra}({Digito}|{Letra}|_)* {
