@@ -1,10 +1,14 @@
 lex.yy.c: lexical.l
 	flex lexical.l
-	
-lex_test: lex.yy.c
-	gcc lex.yy.c -o lex_test
 
 TESTE = teste.txt
-test: lex_test $(TESTE)
+test: lex.yy.c $(TESTE)
+	gcc lex.yy.c -o lex_test
 	./lex_test $(TESTE)
+	
+build: lex.yy.c
+	gcc lex.yy.c -o lex
+	
+all: build
+	rm lex.yy.c
 	
