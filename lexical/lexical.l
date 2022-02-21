@@ -37,6 +37,102 @@ NotSpace [^\n\t ]
 	match("Divisao");
 }
 
+"<" {
+	match("Menor");
+}
+
+">" {
+	match("Maior");
+}
+
+"<=" {
+	match("Menor ou igual");
+}
+
+">=" {
+	match("Maior ou igual");
+}
+
+"==" {
+	match("Igualdade");
+}
+
+"!=" {
+	match("Diferenca");
+}
+
+"=" {
+	match("Atribuicao");
+}
+
+";" {
+	match("Ponto e virgula");
+}
+
+"," {
+	match("Virgula");
+}
+
+"if" {
+	match("if");
+}
+
+"else" {
+	match("else");
+}
+
+"return" {
+	match("return");
+}
+
+"while" {
+	match("while");
+}
+
+"void" {
+	match("void");
+}
+
+"int" {
+	match("int");
+}
+
+"float" {
+	match("float");
+}
+
+"double" {
+	match("double");
+}
+
+"char" {
+	match("char");
+}
+
+"(" {
+	match("(");
+}
+
+")" {
+	match(")");
+}
+
+"[" {
+	match("[");
+}
+
+"]" {
+	match("]");
+}
+
+"{" {
+	match("{");
+}
+
+"}" {
+	match("}");
+}
+
 {Letra}({Digito}|{Letra}|_)* {
 	match("Identificador");
 }
