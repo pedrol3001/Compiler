@@ -1028,7 +1028,7 @@ YY_RULE_SETUP
 #line 160 "./lexical/lexer.l"
 {
 	match("Identificador");
-	return IDENTIFIER;
+	return ID;
 }
 	YY_BREAK
 case 30:
@@ -2141,4 +2141,3 @@ void yyfree (void * ptr )
 //int yywrap() {
 //	return 1;
 //}
-//

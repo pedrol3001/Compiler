@@ -159,7 +159,7 @@ NotSpace [^\n\t ]
 
 {Letra}({Digito}|{Letra}|_)* {
 	match("Identificador");
-	return IDENTIFIER;
+	return ID;
 }
 
 {Digito}+ {
@@ -228,4 +228,3 @@ NotSpace [^\n\t ]
 //int yywrap() {
 //	return 1;
 //}
-//

@@ -14,7 +14,7 @@ void debug(char *s) {
 %}
 
 /* declare tokens */
-%token IDENTIFIER
+%token ID
 
 %token INTEGER FLOAT
 
@@ -40,17 +40,17 @@ declaration-list: declaration-list declaration | declaration ;
 
 declaration: var-declaration | fun-declaration ;
 
-var-declaration: type-specifier IDENTIFIER SEMICOLON | type-specifier IDENTIFIER LBRACKET INTEGER RBRACKET SEMICOLON ;
+var-declaration: type-specifier ID SEMICOLON | type-specifier ID LBRACKET INTEGER RBRACKET SEMICOLON ;
 
 type-specifier: INT | VOID ;
 
-fun-declaration: type-specifier IDENTIFIER LPAREN params RPAREN compound-stmt ;
+fun-declaration: type-specifier ID LPAREN params RPAREN compound-stmt ;
 
 params: param-list | VOID ;
 
 param-list: param-list COMMA param | param ;
 
-param: type-specifier IDENTIFIER | type-specifier IDENTIFIER LBRACKET RBRACKET ;
+param: type-specifier ID | type-specifier ID LBRACKET RBRACKET ;
 
 compound-stmt: LBRACE local-declarations statement-list RBRACE ;
 
@@ -70,11 +70,11 @@ return-stmt: RETURN SEMICOLON | RETURN expression SEMICOLON ;
 
 expression: var ASSIGN expression | simple-expression ;
 
-var: IDENTIFIER | IDENTIFIER LBRACKET expression RBRACKET ;
+var: ID | ID LBRACKET expression RBRACKET ;
 
 simple-expression: additive-expression relop additive-expression | additive-expression ;
 
-relop: LESSEQUAL | LESS | GREATER | GREATEREQUAL | EQUAL | NOTEQUAL;
+relop: LESS | LESSEQUAL | GREATER | GREATEREQUAL | EQUAL | NOTEQUAL;
 
 additive-expression: additive-expression addop term | term ;
 
@@ -86,9 +86,9 @@ mulop: MUL | DIV ;
 
 factor: LPAREN expression RPAREN | var | call | NUM ;
 
-call: IDENTIFIER LPAREN RPAREN | IDENTIFIER LPAREN args RPAREN ;
+call: ID LPAREN args RPAREN ;
 
-args: arg-list ;
+args: arg-list | %empty ;
 
 arg-list: arg-list COMMA expression | expression | %empty;
 
