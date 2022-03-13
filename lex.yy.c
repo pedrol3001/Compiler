@@ -806,7 +806,7 @@ case 1:
 YY_RULE_SETUP
 #line 23 "./lexical/lexer.l"
 {
-	//match("Soma");
+	match("Soma");
 	return SUM;
 }
 	YY_BREAK
@@ -814,7 +814,7 @@ case 2:
 YY_RULE_SETUP
 #line 28 "./lexical/lexer.l"
 {
-	//match("Subtracao");
+	match("Subtracao");
 	return SUB;
 }
 	YY_BREAK
@@ -822,7 +822,7 @@ case 3:
 YY_RULE_SETUP
 #line 33 "./lexical/lexer.l"
 {
-	//match("Multiplicacao");
+	match("Multiplicacao");
 	return MUL;
 }
 	YY_BREAK
@@ -830,7 +830,7 @@ case 4:
 YY_RULE_SETUP
 #line 38 "./lexical/lexer.l"
 {
-	//match("Divisao");
+	match("Divisao");
 	return DIV;
 }
 	YY_BREAK
@@ -838,7 +838,7 @@ case 5:
 YY_RULE_SETUP
 #line 43 "./lexical/lexer.l"
 {
-	//match("Menor");
+	match("Menor");
 	return LESS;
 }
 	YY_BREAK
@@ -846,7 +846,7 @@ case 6:
 YY_RULE_SETUP
 #line 48 "./lexical/lexer.l"
 {
-	//match("Maior");
+	match("Maior");
 	return GREATER;
 }
 	YY_BREAK
@@ -854,7 +854,7 @@ case 7:
 YY_RULE_SETUP
 #line 53 "./lexical/lexer.l"
 {
-	//match("Menor ou igual");
+	match("Menor ou igual");
 	return LESSEQUAL;
 }
 	YY_BREAK
@@ -862,7 +862,7 @@ case 8:
 YY_RULE_SETUP
 #line 58 "./lexical/lexer.l"
 {
-	//match("Maior ou igual");
+	match("Maior ou igual");
 	return GREATEREQUAL;
 }
 	YY_BREAK
@@ -870,7 +870,7 @@ case 9:
 YY_RULE_SETUP
 #line 63 "./lexical/lexer.l"
 {
-	//match("Igualdade");
+	match("Igualdade");
 	return EQUAL;
 }
 	YY_BREAK
@@ -878,7 +878,7 @@ case 10:
 YY_RULE_SETUP
 #line 68 "./lexical/lexer.l"
 {
-	//match("Diferenca");
+	match("Diferenca");
 	return NOTEQUAL;
 }
 	YY_BREAK
@@ -886,7 +886,7 @@ case 11:
 YY_RULE_SETUP
 #line 73 "./lexical/lexer.l"
 {
-	//match("Atribuicao");
+	match("Atribuicao");
 	return ASSIGN;
 }
 	YY_BREAK
@@ -894,7 +894,7 @@ case 12:
 YY_RULE_SETUP
 #line 78 "./lexical/lexer.l"
 {
-	//match("Ponto e virgula");
+	match("Ponto e virgula");
 	return SEMICOLON;
 }
 	YY_BREAK
@@ -902,7 +902,7 @@ case 13:
 YY_RULE_SETUP
 #line 83 "./lexical/lexer.l"
 {
-	//match("Virgula");
+	match("Virgula");
 	return COMMA;
 }
 	YY_BREAK
@@ -910,7 +910,7 @@ case 14:
 YY_RULE_SETUP
 #line 88 "./lexical/lexer.l"
 {
-	//match("if");
+	match("if");
 	return IF;
 }
 	YY_BREAK
@@ -918,7 +918,7 @@ case 15:
 YY_RULE_SETUP
 #line 93 "./lexical/lexer.l"
 {
-	//match("else");
+	match("else");
 	return ELSE;
 }
 	YY_BREAK
@@ -926,7 +926,7 @@ case 16:
 YY_RULE_SETUP
 #line 98 "./lexical/lexer.l"
 {
-	//match("return");
+	match("return");
 	return RETURN;
 }
 	YY_BREAK
@@ -934,7 +934,7 @@ case 17:
 YY_RULE_SETUP
 #line 103 "./lexical/lexer.l"
 {
-	//match("while");
+	match("while");
 	return WHILE;
 }
 	YY_BREAK
@@ -942,7 +942,7 @@ case 18:
 YY_RULE_SETUP
 #line 108 "./lexical/lexer.l"
 {
-	//match("void");
+	match("void");
 	return VOID;
 }
 	YY_BREAK
@@ -950,7 +950,7 @@ case 19:
 YY_RULE_SETUP
 #line 113 "./lexical/lexer.l"
 {
-	//match("int");
+	match("int");
 	return INT;
 }
 	YY_BREAK
@@ -958,28 +958,28 @@ case 20:
 YY_RULE_SETUP
 #line 118 "./lexical/lexer.l"
 {
-	//match("float");
+	match("float");
 }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 122 "./lexical/lexer.l"
 {
-	//match("double");
+	match("double");
 }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 126 "./lexical/lexer.l"
 {
-	//match("char");
+	match("char");
 }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 130 "./lexical/lexer.l"
 {
-	//match("(");
+	match("(");
 	return LPAREN;
 }
 	YY_BREAK
@@ -987,7 +987,7 @@ case 24:
 YY_RULE_SETUP
 #line 135 "./lexical/lexer.l"
 {
-	//match(")");
+	match(")");
 	return RPAREN;
 }
 	YY_BREAK
@@ -995,7 +995,7 @@ case 25:
 YY_RULE_SETUP
 #line 140 "./lexical/lexer.l"
 {
-	//match("[");
+	match("[");
 	return LBRACKET;
 }
 	YY_BREAK
@@ -1003,7 +1003,7 @@ case 26:
 YY_RULE_SETUP
 #line 145 "./lexical/lexer.l"
 {
-	//match("]");
+	match("]");
 	return RBRACKET;
 }
 	YY_BREAK
@@ -1011,7 +1011,7 @@ case 27:
 YY_RULE_SETUP
 #line 150 "./lexical/lexer.l"
 {
-	//match("{");
+	match("{");
 	return LBRACE;
 }
 	YY_BREAK
@@ -1019,7 +1019,7 @@ case 28:
 YY_RULE_SETUP
 #line 155 "./lexical/lexer.l"
 {
-	//match("}");
+	match("}");
 	return RBRACE;
 }
 	YY_BREAK
@@ -1027,15 +1027,15 @@ case 29:
 YY_RULE_SETUP
 #line 160 "./lexical/lexer.l"
 {
-	//match("Identificador");
-	return ID;
+	match("Identificador");
+	return IDENTIFIER;
 }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 165 "./lexical/lexer.l"
 {
-	//match("Inteiro");
+	match("Inteiro");
 	return INTEGER;
 }
 	YY_BREAK
@@ -1043,7 +1043,7 @@ case 31:
 YY_RULE_SETUP
 #line 170 "./lexical/lexer.l"
 {
-	//match("Ponto flutuante");
+	match("Ponto flutuante");
 	return FLOAT;
 }
 	YY_BREAK
@@ -1051,7 +1051,7 @@ case 32:
 YY_RULE_SETUP
 #line 175 "./lexical/lexer.l"
 {
-	//match("String");
+	match("String");
 }
 	YY_BREAK
 case 33:
@@ -1059,7 +1059,7 @@ case 33:
 YY_RULE_SETUP
 #line 179 "./lexical/lexer.l"
 {
-	//match("Comentario");
+	match("Comentario");
 }
 	YY_BREAK
 case 34:
@@ -1083,7 +1083,7 @@ case 36:
 YY_RULE_SETUP
 #line 191 "./lexical/lexer.l"
 {
-	//match("Invalido");
+	match("Invalido");
 	BEGIN(INITIAL);
 }
 	YY_BREAK
@@ -1098,7 +1098,7 @@ case 38:
 YY_RULE_SETUP
 #line 200 "./lexical/lexer.l"
 {
-	//match("Invalido");
+	match("Invalido");
 	BEGIN(INITIAL);
 }
 	YY_BREAK

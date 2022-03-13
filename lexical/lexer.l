@@ -21,163 +21,163 @@ NotSpace [^\n\t ]
 %%
 
 "+" {
-	//match("Soma");
+	match("Soma");
 	return SUM;
 }
 
 "-" {
-	//match("Subtracao");
+	match("Subtracao");
 	return SUB;
 }
 
 "*" {
-	//match("Multiplicacao");
+	match("Multiplicacao");
 	return MUL;
 }
 
 "/" {
-	//match("Divisao");
+	match("Divisao");
 	return DIV;
 }
 
 "<" {
-	//match("Menor");
+	match("Menor");
 	return LESS;
 }
 
 ">" {
-	//match("Maior");
+	match("Maior");
 	return GREATER;
 }
 
 "<=" {
-	//match("Menor ou igual");
+	match("Menor ou igual");
 	return LESSEQUAL;
 }
 
 ">=" {
-	//match("Maior ou igual");
+	match("Maior ou igual");
 	return GREATEREQUAL;
 }
 
 "==" {
-	//match("Igualdade");
+	match("Igualdade");
 	return EQUAL;
 }
 
 "!=" {
-	//match("Diferenca");
+	match("Diferenca");
 	return NOTEQUAL;
 }
 
 "=" {
-	//match("Atribuicao");
+	match("Atribuicao");
 	return ASSIGN;
 }
 
 ";" {
-	//match("Ponto e virgula");
+	match("Ponto e virgula");
 	return SEMICOLON;
 }
 
 "," {
-	//match("Virgula");
+	match("Virgula");
 	return COMMA;
 }
 
 "if" {
-	//match("if");
+	match("if");
 	return IF;
 }
 
 "else" {
-	//match("else");
+	match("else");
 	return ELSE;
 }
 
 "return" {
-	//match("return");
+	match("return");
 	return RETURN;
 }
 
 "while" {
-	//match("while");
+	match("while");
 	return WHILE;
 }
 
 "void" {
-	//match("void");
+	match("void");
 	return VOID;
 }
 
 "int" {
-	//match("int");
+	match("int");
 	return INT;
 }
 
 "float" {
-	//match("float");
+	match("float");
 }
 
 "double" {
-	//match("double");
+	match("double");
 }
 
 "char" {
-	//match("char");
+	match("char");
 }
 
 "(" {
-	//match("(");
+	match("(");
 	return LPAREN;
 }
 
 ")" {
-	//match(")");
+	match(")");
 	return RPAREN;
 }
 
 "[" {
-	//match("[");
+	match("[");
 	return LBRACKET;
 }
 
 "]" {
-	//match("]");
+	match("]");
 	return RBRACKET;
 }
 
 "{" {
-	//match("{");
+	match("{");
 	return LBRACE;
 }
 
 "}" {
-	//match("}");
+	match("}");
 	return RBRACE;
 }
 
 {Letra}({Digito}|{Letra}|_)* {
-	//match("Identificador");
-	return ID;
+	match("Identificador");
+	return IDENTIFIER;
 }
 
 {Digito}+ {
-	//match("Inteiro");
+	match("Inteiro");
 	return INTEGER;
 }
 
 ({Digito}+"."{Digito}*)|({Digito}*"."{Digito}+) {
-	//match("Ponto flutuante");
+	match("Ponto flutuante");
 	return FLOAT;
 }
 
 \"(\\\"|[^\"\n])*\" {
-	//match("String");
+	match("String");
 }
 
 "/*"[^*]*"*"+([^/][^*]*"*"+)*"/" {
-	//match("Comentario");
+	match("Comentario");
 }
 
 {Space}* {
@@ -189,7 +189,7 @@ NotSpace [^\n\t ]
 	yyless(yyleng-2);
 }
 <INVALIDO_VARIAS_LINHAS>(.|\n)+ {
-	//match("Invalido");
+	match("Invalido");
 	BEGIN(INITIAL);
 }
 
@@ -198,7 +198,7 @@ NotSpace [^\n\t ]
 }
 
 <INVALIDO_UMA_LINHA>.+ {
-	//match("Invalido");
+	match("Invalido");
 	BEGIN(INITIAL);
 }
 
