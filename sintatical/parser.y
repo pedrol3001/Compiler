@@ -34,7 +34,7 @@ void debug(char *s) {
 
 %%
 
-program: declaration-list ;
+program: declaration-list { YYACCEPT; }  ;
 
 declaration-list: declaration-list declaration | declaration ;
 
@@ -84,7 +84,7 @@ term: term mulop factor | factor ;
 
 mulop: MUL | DIV ;
 
-factor: LPAREN expression RPAREN | var | call | num ;
+factor: LPAREN expression RPAREN | var | call | NUM ;
 
 call: IDENTIFIER LPAREN RPAREN | IDENTIFIER LPAREN args RPAREN ;
 
@@ -92,7 +92,7 @@ args: arg-list ;
 
 arg-list: arg-list COMMA expression | expression | %empty;
 
-num: INTEGER | FLOAT ;
+NUM: INTEGER | FLOAT ;
 
 %%
 void main(int argc, char **argv){
@@ -107,10 +107,11 @@ void main(int argc, char **argv){
       yyout = stdout;
 
   yyparse();
+  printf("Finished: %llu erros", erros);
+
   fclose(yyin);
   fclose(yyout);
 
-  printf("Finished: %llu", erros);
 }
 
 void yyerror(char *s)

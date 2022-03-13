@@ -171,7 +171,7 @@ enum yysymbol_kind_t
   YYSYMBOL_call = 58,                      /* call  */
   YYSYMBOL_args = 59,                      /* args  */
   YYSYMBOL_60_arg_list = 60,               /* arg-list  */
-  YYSYMBOL_num = 61                        /* num  */
+  YYSYMBOL_NUM = 61                        /* NUM  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -586,7 +586,7 @@ static const char *const yytname[] =
   "compound-stmt", "local-declarations", "statement-list", "statement",
   "expression-stmt", "selection-stmt", "iteration-stmt", "return-stmt",
   "expression", "var", "simple-expression", "relop", "additive-expression",
-  "addop", "term", "mulop", "factor", "call", "args", "arg-list", "num", YY_NULLPTR
+  "addop", "term", "mulop", "factor", "call", "args", "arg-list", "NUM", YY_NULLPTR
 };
 
 static const char *
@@ -1209,8 +1209,14 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 2: /* program: declaration-list  */
+#line 37 "./sintatical/parser.y"
+                          { YYACCEPT; }
+#line 1216 "parser.tab.c"
+    break;
 
-#line 1214 "parser.tab.c"
+
+#line 1220 "parser.tab.c"
 
       default: break;
     }
@@ -1418,10 +1424,11 @@ void main(int argc, char **argv){
       yyout = stdout;
 
   yyparse();
+  printf("Finished: %llu erros", erros);
+
   fclose(yyin);
   fclose(yyout);
 
-  printf("Finished: %llu", erros);
 }
 
 void yyerror(char *s)
