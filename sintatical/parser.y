@@ -46,7 +46,7 @@ type-specifier: INT | VOID ;
 
 fun-declaration: type-specifier IDENTIFIER LPAREN params RPAREN compound-stmt ;
 
-params: param-list VOID ;
+params: param-list | VOID ;
 
 param-list: param-list COMMA param | param ;
 
