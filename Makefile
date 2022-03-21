@@ -11,16 +11,22 @@ SINTATICAL_DIR = ./sintatical/
 SINTATICAL_NAME = parser.y
 
 TEST_DIR = ./tests/
-TEST_NAME = test1.txt
+TEST_NAMES = test1.txt test2.txt
+TESTS = $(foreach TEST_NAME,$(TEST_NAMES),$(TEST_DIR)$(TEST_NAME))
 
 # Regras a serem usadas
 
 all: build clear
 
-test: all
-	./compiler $(TEST_DIR)$(TEST_NAME)
+test: all $(foreach TEST,$(TESTS),rule_$(TEST))
 
 # Regras auxiliares
+define execute_test
+rule_$(1): $(1)
+	./compiler $(1)
+endef
+$(foreach TEST,$(TESTS),$(eval $(call execute_test,$(TEST))))
+
 LEX = lex.yy
 PARSER = parser.tab
 
