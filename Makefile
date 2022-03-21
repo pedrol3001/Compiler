@@ -11,8 +11,7 @@ SINTATICAL_DIR = ./sintatical/
 SINTATICAL_NAME = parser.y
 
 TEST_DIR = ./tests/
-TEST_NAMES = test1.txt test2.txt
-TESTS = $(foreach TEST_NAME,$(TEST_NAMES),$(TEST_DIR)$(TEST_NAME))
+TESTS = $(wildcard $(TEST_DIR)*.txt)
 
 # Regras a serem usadas
 
