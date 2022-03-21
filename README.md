@@ -28,11 +28,11 @@ Para adicionar testes, apenas crie arquivos .txt no diretório de testes.
     .
     ├── tests
     └── ├── {test_1}.txt
-		├── {test_2}.txt
-		├── {test_3}.txt
-		├── {test_4}.txt
-		├── ...
-		└── {test_n}.txt
+	├── {test_2}.txt
+	├── {test_3}.txt
+	├── {test_4}.txt
+	├── ...
+	└── {test_n}.txt
 
 ## Analisador léxico
 ## Analisador sintático
