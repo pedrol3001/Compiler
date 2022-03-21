@@ -1,5 +1,6 @@
 
 
+
 # Compiler
 
 ## Geral
@@ -18,11 +19,20 @@ Será gerado o executável "compiler". Para executar o programa:
 De modo que {file} corresponde ao nome do arquivo de entrada a ser compilado.
 
 ### Teste
-Use:
+Para compilar e executar os testes, use:
 
 	make test
 	
-Para compilar e executar os testes.
+Para adicionar testes, apenas crie arquivos .txt no diretório de testes.
+
+    .
+    ├── tests
+    └── ├── {test_1}.txt
+		├── {test_2}.txt
+		├── {test_3}.txt
+		├── {test_4}.txt
+		├── ...
+		└── {test_n}.txt
 
 ## Analisador léxico
 ## Analisador sintático
