@@ -1,17 +1,30 @@
+
+
 # Compiler
-## Execução
+
+## Geral
+### Requisitos
+- GNU Make 4.2.1 (Não sei se versões menores funcionam)
+- Flex v2.6.4 (Não sei se versões menores funcionam)
+- GNU Bison v3.8 (Não sei se versões menores funcionam, mas não funciounou para a versão v3.5)
+### Execução
 Ao usar GNU Make:
 
-    make all
+	make all
+
 Será gerado o executável "compiler". Para executar o programa:
 
-    ./compiler {test}.txt
-De modo que {test} corresponde ao nome do arquivo de entrada a ser compilado.
+    ./compiler {file}.txt
+De modo que {file} corresponde ao nome do arquivo de entrada a ser compilado.
+
+### Teste
+Use:
+
+	make test
+	
+Para compilar e executar os testes.
 
 ## Analisador léxico
-### Requisitos
- - Flex v2.6.4 (Não sei se versões menores funcionam)
 ## Analisador sintático
-### Requisitos
-- GNU Bison v3.8 (Não sei se versões menores funcionam, mas não funciounou para a versão v3.5)
+
 
