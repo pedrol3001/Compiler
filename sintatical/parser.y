@@ -34,7 +34,7 @@ void debug(char *s) {
 
 %%
 
-program: declaration-list { YYACCEPT; }  ;
+program: declaration-list ;
 
 declaration-list: declaration-list declaration | declaration ;
 

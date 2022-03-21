@@ -15,7 +15,7 @@ TEST_NAME = test1.txt
 
 # Regras a serem usadas
 
-all: build clear		
+all: build clear
 
 test: all
 	./compiler $(TEST_DIR)$(TEST_NAME)
@@ -29,9 +29,9 @@ build: $(LEX).c $(PARSER).c $(PARSER).h
 	gcc -o compiler $(LEX).c $(PARSER).c -lfl
 
 # Remocao dos arquivos .c e .h gerados
-clear: 
+clear:
 	rm -f $(LEX).c $(PARSER).c $(PARSER).h
-	
+
 # Construcao do analisador lexico
 LEXICAL = $(LEXICAL_DIR)$(LEXICAL_NAME)
 $(info $(LEXICAL))
@@ -44,5 +44,5 @@ SINTATICAL = $(SINTATICAL_DIR)$(SINTATICAL_NAME)
 $(PARSER).c: $(SINTATICAL)
 	bison -d $(SINTATICAL) $(SINTATICAL_FLAGS)
 
-	
+
 
