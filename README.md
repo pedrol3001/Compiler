@@ -29,11 +29,12 @@ Para adicionar testes, apenas crie arquivos .txt no diretório de testes.
     ├── lexical
     ├── sintatical
     └── tests
-    │   ├── test1.txt
-    │   ├── test2.txt
-    │   ├── test3.txt
-    │   ├── test4.txt
-    │   └── test5.txt
+    │   ├── test_1.txt
+    │   ├── test_2.txt
+    │   ├── test_3.txt
+    │   ├── test_4.txt
+    │   ├── ...
+    │   └── test_n.txt
     ...
 
 
