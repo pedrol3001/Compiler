@@ -132,6 +132,16 @@ NotSpace [^\n\t ]
 	return LPAREN;
 }
 
+"print" {
+	match("print");
+	return OUTPUT;
+}
+
+"input" {
+	match("input");
+	return INPUT;
+}
+
 ")" {
 	match(")");
 	return RPAREN;
