@@ -32,6 +32,8 @@ void debug(char *s) {
 
 %token LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 
+%token OUTPUT INPUT
+
 %%
 
 program: declaration-list ;
@@ -58,7 +60,11 @@ local-declarations: local-declarations var-declaration | %empty ;
 
 statement-list: statement-list statement | %empty ;
 
-statement: expression-stmt | compound-stmt | selection-stmt | iteration-stmt | return-stmt ;
+statement: expression-stmt | compound-stmt | selection-stmt | iteration-stmt | return-stmt | output-stmt | input-stmt;
+
+input-stmt: INPUT LPAREN ID RPAREN SEMICOLON ;
+
+output-stmt: OUTPUT LPAREN expression RPAREN SEMICOLON ;
 
 expression-stmt: expression SEMICOLON | SEMICOLON ;
 
