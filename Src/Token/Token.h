@@ -4,11 +4,12 @@
 #include "../TabelaDeSimbolos/TabelaDeSimbolos.h"
 
 struct Token {	
-	Token(Tipo tipo, long long int index);
+	Token(const Token& token);
+	Token(Tipo _tipo, long long int _index);
 	
 	long long id() const;	// Obter índice, mas pode ser desnecessário de qualquer forma.
 	
-	Tipo operator()();		// Facilitar comparações
+	Tipo operator()() const;	// Facilitar comparações
 	void operator=(Token& token);	// Apenas copia tudo
 	
 	private:

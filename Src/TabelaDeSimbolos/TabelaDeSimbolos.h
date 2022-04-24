@@ -26,6 +26,7 @@ struct TabelaDeSimbolos: public std::vector<Simbolo> {
 	// Herda metodos e atributos de std::vector
 	static TabelaDeSimbolos& getInstance();	// Caso seja usada como Singleton
 	Token insert(Tipo tipo);			// Insere token, dado o tipo
+	~TabelaDeSimbolos();
 	private:
 		TabelaDeSimbolos();
 };
@@ -35,12 +36,12 @@ struct TabelaDeSimbolos: public std::vector<Simbolo> {
 */
 struct Simbolo: public std::map<std::string,Atributo*> {
 	void insert(Atributo* att);	
-	~Simbolo();
+	void free();
 };
 
 struct Atributo{
 	std::string nome;
-	Atributo(std::string nome);
+	Atributo(std::string _nome);
 };
 
 

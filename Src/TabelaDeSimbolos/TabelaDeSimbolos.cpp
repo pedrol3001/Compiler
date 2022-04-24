@@ -3,6 +3,7 @@
 
 using namespace std;
 
+
 /* A tabela de símbolos é um vetor de conjuntos de atributos, com nome em forma de string*/
 TabelaDeSimbolos& TabelaDeSimbolos::getInstance() {	// Caso seja usada como Singleton
 	static TabelaDeSimbolos instance;
@@ -11,7 +12,7 @@ TabelaDeSimbolos& TabelaDeSimbolos::getInstance() {	// Caso seja usada como Sing
 TabelaDeSimbolos::TabelaDeSimbolos(): vector<Simbolo>() {}
 
 Token TabelaDeSimbolos::insert(Tipo tipo) {		// Insere token
-	static long long int unique_index=0;
+	static long long unsigned int unique_index=0;
 
 	assert(unique_index == this->size());
 	
@@ -20,25 +21,31 @@ Token TabelaDeSimbolos::insert(Tipo tipo) {		// Insere token
 	unique_index++;
 	
 	// Criar símbolo
-	this->push_back(Simbolo());
+	this->emplace_back();
 	
 	return token;
+}
+
+TabelaDeSimbolos::~TabelaDeSimbolos() {
+	for(Simbolo& s: *this)
+		s.free();
 }
 
 /* Simbolo eh um conjunto de atributos, que podem ser inseridos pelos analisadores lexico, sintatico e semantico
 	Exemplo de atributos: valor, tipo (int ou long int?), constante (nunca variou apos inicializacao), etc.  
 */
 void Simbolo::insert(Atributo* att) {
+	assert(this->count(att->nome)==0);
 	(*this)[att->nome] = att;
 }	
 
-Simbolo::~Simbolo() {
-	for(pair<string,Atributo*> p: *this)
+void Simbolo::free() {
+	for(pair<string,Atributo*> p: *this)  
 		delete p.second;
 }
 
-Atributo::Atributo(string nome): nome(nome) {}
 
+Atributo::Atributo(string _nome): nome(_nome) {}
 
 
 

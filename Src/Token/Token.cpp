@@ -1,13 +1,16 @@
 #include "Token.h"
 #include <cassert>
 
-Token::Token(Tipo tipo, long long int index): tipo(tipo),index(index) {}
+
+Token::Token(const Token& token): tipo(token()),index(token.id()) {}
+
+Token::Token(Tipo _tipo, long long int _index): tipo(_tipo),index(_index) {}
 	
 long long Token::id() const {
 	assert(index>=0);	// Index inapropriado
 	return index;
 }
-Tipo Token::operator()() {	// Facilitar comparações
+Tipo Token::operator()() const{	// Facilitar comparações
 	return tipo;
 }
 

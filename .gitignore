@@ -2,3 +2,4 @@ all
 *.o
 */e
 e
+*/lex.yy.cc

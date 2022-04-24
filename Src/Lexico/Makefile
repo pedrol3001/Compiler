@@ -4,11 +4,12 @@ E = e
 CXX = g++ 
 STD = -std=c++17
 DEBUG = -Wall -Wextra -pedantic -std=c++11 -O2 -Wshadow -Wformat=2 -Wfloat-equal -Wconversion -Wlogical-op -Wshift-overflow=2 -Wduplicated-cond -Wcast-qual -Wcast-align -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_FORTIFY_SOURCE=2 -fsanitize=address -fsanitize=undefined -fno-sanitize-recover -fstack-protector
+
 FLAGS = -g $(STD) $(DEBUG)
 
 TEST = test.cpp
 
-CPP = TabelaDeSimbolos.cpp ../Token/Token.cpp
+CPP = Lexico.cpp ../Token/Token.cpp ../TabelaDeSimbolos/TabelaDeSimbolos.cpp
 H = $(patsubst %.cpp,%.h,$(CPP)) ../Tipos.h
 OBJ = $(patsubst %.cpp,%.o,$(CPP))
 
@@ -23,8 +24,11 @@ endef
 	
 $(foreach obj,$(OBJ),$(eval $(call make_obj,$(obj)))) 
 
+L = $(wildcard *.l)
+build_lex:
+	flex $(L)
 
-build: $(OBJ)
+build: build_lex $(OBJ)
 	
 clear:
 	rm -f $(OBJ)
