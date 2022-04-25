@@ -1,5 +1,5 @@
 #include "Token.h"
-#include "../Sintatico/Sintatico.h"
+#include "../Tipos.h"
 
 #include <cassert>
 #include <iostream>
