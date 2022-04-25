@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Lexico.h"
+#include "../Tipos.h"
 
 
 using namespace std;
@@ -11,7 +12,7 @@ using namespace std;
 Lexico* lex;	// Ponteiro aaaaaaaaaaaaaaaa
 TabSim &ts = TabSim::getInstance();
 
-Token match(string str, Tipo tipo) {
+Token match(string str, int tipo) {
 	Token token = ts.insert(tipo);	// Insere na tabela de símbolos
 	lex->push_back(token);		// Insere no array de tokens
 	ts[token.id()].insert((Atributo*)(new NameAtt(str)));	// Insere atributo de nome do tipo
@@ -37,71 +38,71 @@ NotSpace [^\n\t ]
 
 %%
 
-"+" { match("Soma", Tipo::SUM);}
+"+" { match("Soma", SUM);}
 
-"-" {match("Subtracao", Tipo::SUB);}
+"-" {match("Subtracao", SUB);}
 
-"*" {match("Multiplicacao", Tipo::MUL);}
+"*" {match("Multiplicacao", MUL);}
 
-"/" {match("Divisao", Tipo::DIV);}
+"/" {match("Divisao", DIV);}
 
-"<" {match("Menor", Tipo::LESS);}
+"<" {match("Menor", LESS);}
 
-">" {match("Maior", Tipo::GREATER);}
+">" {match("Maior", GREATER);}
 
-"<=" {match("Menor ou igual", Tipo::LESSEQUAL);}
+"<=" {match("Menor ou igual", LESSEQUAL);}
 
-">=" {match("Maior ou igual", Tipo::GREATEREQUAL);}
+">=" {match("Maior ou igual", GREATEREQUAL);}
 
-"==" {match("Igualdade", Tipo::EQUAL);}
+"==" {match("Igualdade", EQUAL);}
 
-"!=" {match("Diferenca", Tipo::NOTEQUAL);}
+"!=" {match("Diferenca", NOTEQUAL);}
 
-"=" {match("Atribuicao", Tipo::ASSIGN);}
+"=" {match("Atribuicao", ASSIGN);}
 
-";" {match("Ponto e virgula", Tipo::SEMICOLON);}
+";" {match("Ponto e virgula", SEMICOLON);}
 
-"," {match("Virgula", Tipo::COMMA);}
+"," {match("Virgula", COMMA);}
 
-"if" {match("if", Tipo::IF);}
+"if" {match("if", IF);}
 
-"else" {match("else", Tipo::ELSE);}
+"else" {match("else", ELSE);}
 
-"return" {match("return", Tipo::RETURN);}
+"return" {match("return", RETURN);}
 
-"while" {match("while", Tipo::WHILE);}
+"while" {match("while", WHILE);}
 
-"void" {match("void", Tipo::VOID);}
+"void" {match("void", VOID);}
 
-"int" {match("int", Tipo::INT);}
+"int" {match("int", INT);}
 
-"float" {match("float", Tipo::FLOAT);}
+"float" {match("float", FLOAT);}
 
-"double" {match("double", Tipo::DOUBLE);}
+"double" {match("double", DOUBLE);}
 
-"char" {match("char", Tipo::CHAR);}
+"char" {match("char", CHAR);}
 
-"(" {match("(", Tipo::LPAREN);}
+"(" {match("(", LPAREN);}
 
-")" {match(")", Tipo::RPAREN);}
+")" {match(")", RPAREN);}
 
-"[" {match("[", Tipo::LBRACKET);}
+"[" {match("[", LBRACKET);}
 
-"]" {match("]", Tipo::RBRACKET);}
+"]" {match("]", RBRACKET);}
 
-"{" {match("{", Tipo::LBRACE);}
+"{" {match("{", LBRACE);}
 
-"}" {match("}", Tipo::RBRACE);}
+"}" {match("}", RBRACE);}
 
-{Letra}({Digito}|{Letra}|_)* {match("Identificador", Tipo::ID);}
+{Letra}({Digito}|{Letra}|_)* {match("Identificador", ID);}
 
-{Digito}+ {match("Inteiro", Tipo::C_INT);}
+{Digito}+ {match("Inteiro", C_INT);}
 
-({Digito}+"."{Digito}*)|({Digito}*"."{Digito}+) {match("Ponto flutuante", Tipo::C_FLOAT);}
+({Digito}+"."{Digito}*)|({Digito}*"."{Digito}+) {match("Ponto flutuante", C_FLOAT);}
 
-\"(\\\"|[^\"\n])*\" {match("String", Tipo::C_STRING);}
+\"(\\\"|[^\"\n])*\" {match("String", C_STRING);}
 
-"/*"[^*]*"*"+([^/][^*]*"*"+)*"/" { match("Comentario", Tipo::COMMENT);}
+"/*"[^*]*"*"+([^/][^*]*"*"+)*"/" { match("Comentario", COMMENT);}
 
 {Space}* {}
 

@@ -1,7 +1,6 @@
 #ifndef Lexico_h
 #define Lexico_h
 
-#include "../Tipos.h"
 #include "../Token/Token.h"
 #include "../TabelaDeSimbolos/TabelaDeSimbolos.h"
 

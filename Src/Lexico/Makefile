@@ -29,11 +29,15 @@ build_lex:
 	flex $(L)
 
 build: build_lex $(OBJ)
+
+
+build_parser_tab:
+	cd ../Sintatico && make build_bison
 	
 clear:
 	rm -f $(OBJ)
 
-test: clear build $(H)  
+test: clear build_parser_tab build $(H)  
 	$(CXX) $(TEST) $(FLAGS) $(OBJ) -o $(E)
 	./$(E)
 	
