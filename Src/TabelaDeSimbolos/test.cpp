@@ -1,7 +1,6 @@
 #include "TabelaDeSimbolos.h"
 
 #include "../Token/Token.h"
-#include "../Tipos.h"
 
 #include <string>
 #include <iostream>
@@ -25,9 +24,9 @@ class meuAtt2: public Atributo {
 int main() {
 	TabSim& ts = TabSim::getInstance();
 	
-	Token t0 = ts.insert(Tkn::INT);
-	Token t1 = ts.insert(Tkn::FLOAT);
-	Token t2 = ts.insert(Tkn::FLOAT);
+	Token t0 = ts.insert(INT);
+	Token t1 = ts.insert(FLOAT);
+	Token t2 = ts.insert(FLOAT);
 	
 	// Verificar funcionamento dos indices
 	assert(t0.id()==0);

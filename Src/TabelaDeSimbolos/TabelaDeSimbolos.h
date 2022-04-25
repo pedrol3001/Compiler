@@ -25,7 +25,7 @@ using TabSim = TabelaDeSimbolos;
 struct TabelaDeSimbolos: public std::vector<Simbolo> {
 	// Herda metodos e atributos de std::vector
 	static TabelaDeSimbolos& getInstance();	// Caso seja usada como Singleton
-	Token insert(Tipo tipo);			// Insere token, dado o tipo
+	Token insert(int tipo);			// Insere token, dado o tipo
 	~TabelaDeSimbolos();
 	private:
 		TabelaDeSimbolos();

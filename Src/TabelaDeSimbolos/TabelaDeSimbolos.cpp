@@ -11,7 +11,7 @@ TabelaDeSimbolos& TabelaDeSimbolos::getInstance() {	// Caso seja usada como Sing
 }
 TabelaDeSimbolos::TabelaDeSimbolos(): vector<Simbolo>() {}
 
-Token TabelaDeSimbolos::insert(Tipo tipo) {		// Insere token
+Token TabelaDeSimbolos::insert(int tipo) {		// Insere token
 	static long long unsigned int unique_index=0;
 
 	assert(unique_index == this->size());

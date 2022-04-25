@@ -29,7 +29,10 @@ build: $(OBJ)
 clear:
 	rm -f $(OBJ)
 
-test: clear build $(H)  
+build_parser_tab:
+	cd ../Sintatico && make build_bison
+
+test: clear build_parser_tab build $(H)  
 	$(CXX) $(TEST) $(FLAGS) $(OBJ) -o $(E)
 	./$(E)
 	
