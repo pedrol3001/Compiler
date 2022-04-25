@@ -1,0 +1,10 @@
+void f(int x) {
+	return x+1;
+}
+
+
+int main(void) {
+	int a;
+	a = 2;
+	b = a - a;
+}
