@@ -1,6 +1,12 @@
 all
+
 *.o
+
 */e
 e
+
 */lex.yy.cc
 */lex.yy.c
+
+*/parser.tab.c
+*/parser.tab.h
