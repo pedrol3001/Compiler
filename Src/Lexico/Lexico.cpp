@@ -4,7 +4,7 @@
 
 #include "lex.yy.c"	// Include do código gerado pelo flex
 
-Lexico::Lexico(std::string file): ok(true) {	
+Lexico::Lexico(std::string file): ok(true),count(0) {	
 	// Analisa arquivo e constoi vetor de tokens
 	// Usar flex
 	yyin = fopen (file.c_str(),"r");
@@ -13,6 +13,18 @@ Lexico::Lexico(std::string file): ok(true) {
 	yylex();	
 	fclose(yyin);	// Fecha o arquivo
 	// OBS: não feche stdout
+}
+
+void Lexico::reset() {
+	count=0;
+}
+
+bool Lexico::operator>>(Token& token) {
+	if(count < this->size()) {
+		token = (*this)[count++];
+		return true;
+	}
+	return false;
 }
 
 bool Lexico::error() {return !ok;}

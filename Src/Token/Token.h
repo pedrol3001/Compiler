@@ -4,6 +4,7 @@
 #include "../TabelaDeSimbolos/TabelaDeSimbolos.h"
 
 struct Token {	
+	Token();
 	Token(const Token& token);
 	Token(int _tipo, long long int _index);
 	

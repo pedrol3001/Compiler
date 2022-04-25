@@ -10,7 +10,10 @@
 struct Lexico: public std::vector<Token> {
 	Lexico(std::string file);	// Analisa arquivo e constoi vetor de tokens
 	bool error();
+	void reset();
+	bool operator>>(Token& token);
 	private:
+		long long unsigned int count;
 		bool ok;
 };
 

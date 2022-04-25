@@ -1,6 +1,8 @@
 #include "Token.h"
+#include "../Tipos.h"
 #include <cassert>
 
+Token::Token(): tipo(NOT_INITIALIZED),index(-1) {}
 
 Token::Token(const Token& token): tipo(token()),index(token.id()) {}
 
