@@ -5,15 +5,15 @@
 
 struct Token {	
 	Token(const Token& token);
-	Token(Tipo _tipo, long long int _index);
+	Token(int _tipo, long long int _index);
 	
 	long long id() const;	// Obter índice, mas pode ser desnecessário de qualquer forma.
 	
-	Tipo operator()() const;	// Facilitar comparações
+	int operator()() const;	// Facilitar comparações
 	void operator=(Token& token);	// Apenas copia tudo
 	
 	private:
-		Tipo tipo;		
+		int tipo;		
 		long long int index;
 };	
 

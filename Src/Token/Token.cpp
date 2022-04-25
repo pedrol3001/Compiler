@@ -4,13 +4,13 @@
 
 Token::Token(const Token& token): tipo(token()),index(token.id()) {}
 
-Token::Token(Tipo _tipo, long long int _index): tipo(_tipo),index(_index) {}
+Token::Token(int _tipo, long long int _index): tipo(_tipo),index(_index) {}
 	
 long long Token::id() const {
 	assert(index>=0);	// Index inapropriado
 	return index;
 }
-Tipo Token::operator()() const{	// Facilitar comparações
+int Token::operator()() const{	// Facilitar comparações
 	return tipo;
 }
 

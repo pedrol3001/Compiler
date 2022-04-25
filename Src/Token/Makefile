@@ -8,7 +8,7 @@ FLAGS = -g $(STD)
 TEST = test.cpp
 
 CPP = Token.cpp 
-H = $(patsubst %.cpp,%.h,$(CPP)) ../Tipos.h
+H = $(patsubst %.cpp,%.h,$(CPP))
 OBJ = $(patsubst %.cpp,%.o,$(CPP))
 
 #$(info $(CPP))
@@ -27,8 +27,11 @@ build: $(OBJ)
 	
 clear:
 	rm -f $(OBJ)
+	
+build_parser_tab:
+	cd ../Sintatico && make build_bison
 
-test: clear build $(H)  
+test: clear build_parser_tab build $(H)  
 	$(CXX) $(TEST) $(FLAGS) $(OBJ) -o $(E)
 	./$(E)
 	
