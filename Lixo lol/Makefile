@@ -10,7 +10,7 @@ SINTATICAL_DIR = ./sintatical/
 # Nome do arquivo .y
 SINTATICAL_NAME = parser.y
 
-TEST_DIR = ./tests/
+TEST_DIR = ./Tests/
 TESTS = $(wildcard $(TEST_DIR)*.txt)
 
 # Regras a serem usadas
