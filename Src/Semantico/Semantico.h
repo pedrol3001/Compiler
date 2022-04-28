@@ -49,8 +49,7 @@ struct Atribuicao: Comando {
     Atribuicao(Token &_var, Expressao _expr) : var(_var), expr(_expr) { }
 };
 
-// Argumentos de funções: |(int a, float b)|, |(a, b)|
-// Usado tanto para declarações quanto para chamadas
+// Argumentos para criação de funções: |(int a, float b)|
 struct Argumentos: Comando {
     std::vector<Expressao> args;
     std::vector<Tipo> tipos; // tipos dos argumentos
