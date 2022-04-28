@@ -6,3 +6,5 @@ e
 */lex.yy.c
 */parser.tab.c
 */parser.tab.h
+*/compiler
+compiler
