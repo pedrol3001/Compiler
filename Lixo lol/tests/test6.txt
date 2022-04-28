@@ -1,7 +1,5 @@
-int g(void) {
-	int a;
-  input(a);
-  output(a + 2);
+int g() {
+	
 }
 
 int main(void){
