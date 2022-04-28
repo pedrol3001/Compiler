@@ -3,5 +3,6 @@
 
 class Lexico;
 #include "Sintatico/parser.tab.h"
+// OBS: parser.tab.h eh gerado pelo GNU Bison
 
 #endif
