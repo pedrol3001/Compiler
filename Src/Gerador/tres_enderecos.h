@@ -3,6 +3,7 @@
 
 #include "Gerador.h"
 
+#include <string>
 
 
 
