@@ -1,13 +1,16 @@
-#include "Lexico.h"
+#include "../../Src/Lexico/Lexico.h"
 
 #include <iostream>
+#include "../test_format.cpp"
 
 using namespace std;
 
-int main() {
+bool test() {
 	TabSim &ts = TabSim::getInstance();
-	Lexico lexico("example");
+	Lexico lexico("Resources/code6.txt");
+	cout << lexico.size() << endl;
 	
+	cout << "\nTeste do sem operador >>" << endl;
 	for(Token token: lexico) {
 		StrAtt * sa = (StrAtt*)ts[token.id()]["StrAtt"];
 		cout << "Token: " << sa->str << endl;
@@ -29,8 +32,11 @@ int main() {
 		
 		cout << "Enum: " << token() << "\tn: " << token.id() << endl;
 	}
-	
-	cout << "Fim do teste da classe Lexico." << endl;
+	return true;
+}
 
+
+int main(int argn, char *argv[]) {
+	Test::execute(argv[1],test);
 	return 0;
 }

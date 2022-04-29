@@ -2,7 +2,7 @@
 #define Tipos_h
 
 class Lexico;
-#include "Sintatico/parser.tab.h"
+#include "Sintatico/bison.h"
 // OBS: parser.tab.h eh gerado pelo GNU Bison
 
 #endif

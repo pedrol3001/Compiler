@@ -1,11 +1,13 @@
-#include "TabelaDeSimbolos.h"
+#include "../../Src/TabelaDeSimbolos/TabelaDeSimbolos.h"
 
-#include "../Token/Token.h"
+#include "../../Src/Token/Token.h"
 
 #include <string>
 #include <iostream>
 #include <algorithm>
 #include <cassert>
+
+#include "../test_format.cpp"
 
 using namespace std;
 
@@ -21,7 +23,7 @@ class meuAtt2: public Atributo {
 		void print2() {cout << "Ola mundo!" << endl;}
 };
 
-int main() {
+bool test() {
 	TabSim& ts = TabSim::getInstance();
 	
 	Token t0 = ts.insert(INT);
@@ -47,6 +49,12 @@ int main() {
 	
 	// Verificar memory leaks (valgrind?)!
 	
-	cout << "Teste da classe TabelaDeSimbolos ok! (Lembre-se de testar memory leaks)" << endl;
+	cout << "(Lembre-se de testar memory leaks)" << endl;
+	return true;
+}
+
+
+int main(int argn, char *argv[]) {
+	Test::execute(argv[1],test);
 	return 0;
 }

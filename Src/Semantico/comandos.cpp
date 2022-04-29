@@ -2,8 +2,6 @@
 
 using namespace std;
 
-int main() { };
-
 struct Token { };
 struct State { };
 

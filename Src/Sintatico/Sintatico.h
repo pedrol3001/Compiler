@@ -2,7 +2,7 @@
 #define Sintatico_h
 
 #include "../Lexico/Lexico.h"
-#include "parser.tab.h"
+#include "bison.h"
 
 struct Sintatico {
 	Sintatico(Lexico &lexico);
