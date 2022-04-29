@@ -10,12 +10,14 @@ class Test {
 	static void end(string agv);	
 	public:
 		static void execute(string argv, bool (*func)()) {
+			cout << endl;
 			begin(argv);
 			if(func())
 				ok(argv);
 			else
 				fail(argv);
 			end(argv);
+			cout << endl;
 		}
 };
 
