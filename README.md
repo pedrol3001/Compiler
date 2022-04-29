@@ -14,7 +14,7 @@ Para recompilar com aproveitamento dos arquivos objetos, use:
 
     make fast
 ### Escrita de testes
-Escreva testes como arquivos .cpp no diretório Tests/, sempre adicionando mais um nível de profundidade no diretório (ex: Tests/example/example.cpp).
+Escreva testes como arquivos .cpp no diretório Tests/, sempre adicionando mais um nível de profundidade no diretório (ex: Tests/example/example.cpp). Use o arquivo test_format.cpp para padronizar o teste, conforme os outros testes já escritos.
 
 ### Execução de testes
 Para executar os testes do diretório Tests (depois de compilar o projeto), use:
