@@ -8,6 +8,10 @@ Lexico::Lexico(std::string file): ok(true),count(0) {
 	// Analisa arquivo e constoi vetor de tokens
 	// Usar flex
 	yyin = fopen (file.c_str(),"r");
+	if(yyin==NULL) {
+		ok=false;
+		return;
+	}
 	yyout = stdout; 
 	lex = this;	// Argumento extra que inventei
 	yylex();	
