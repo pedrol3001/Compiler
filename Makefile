@@ -32,14 +32,12 @@ $(foreach obj,$(OBJ),$(eval $(call make_obj,$(obj))))
 # Geracao do .y do bison
 Y = $(wildcard $(SRC)/*/*.y)
 build_bison:
-	cd "$(SRC)/Sintatico"
-	bison -d $(Y) --output="bison.c"  --header="bison.h" 
+	cd "$(SRC)/Sintatico" && bison -d "../../$(Y)" --output="bison.c"  --header="bison.h" 
 
 #  Geracao do .l do flex
 L = $(wildcard $(SRC)/*/*.l)
 build_flex: 
-	cd "$(SRC)/Lexico"
-	flex $(L)  
+	cd "$(SRC)/Lexico" && flex "../../$(L)"  
 
 
 # Processo de compilacao
