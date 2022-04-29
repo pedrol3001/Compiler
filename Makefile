@@ -14,6 +14,7 @@ TEST = test.cpp
 
 SRC = Src
 
+MAIN = compiler.cpp
 CPP = $(wildcard $(SRC)/*/*.cpp) 
 OBJ = $(patsubst %.cpp,%.o,$(CPP))
 H = $(patsubst %.cpp,%.h,$(CPP)) $(SRC)/Tipos.h
@@ -42,6 +43,7 @@ build_flex:
 
 # Processo de compilacao
 build: build_bison build_flex $(OBJ)
+	$(CXX) $(SRC)/$(MAIN) $(OBJ) $(FLAGS) -o compiler
 	
 # Limpeza de arquivos objeto
 clear:
@@ -53,7 +55,7 @@ clear:
 fast: build
 
 # Compilacao 
-compile: clear build
+compile: clear build	
 
 # ===============================================
 TESTS = $(patsubst %.cpp,%,$(wildcard Tests/*/*.cpp))
