@@ -18,6 +18,13 @@ Para recompilar com aproveitamento dos arquivos objetos, use:
 Para executar os testes do diretório Tests, use:
 
     make test
+    
+### Debug
+Para executar a linha de compilação suprema, use:
+
+    make compile debug=yes
+    make fast debug=yes
+    make test debug=yes
 
 ## Analisador léxico
 ## Analisador sintático
