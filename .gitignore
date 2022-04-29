@@ -26,5 +26,5 @@ bison.c
 */bison.h
 bison.h
 
-*/test[0-9]*
-test[0-9]*
+*/test[0-9!.]*
+test[0-9!.]*
