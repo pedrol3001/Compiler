@@ -61,8 +61,8 @@ compile: clear build
 TESTS = $(patsubst %.cpp,%,$(wildcard Tests/*/*.cpp))
 define execute_test =
 test_$(1): 
-	$(CXX) $(OBJ) $(FLAGS) $(1).cpp -o $(1)
-	./$(1) $(1)
+	$(CXX) $(OBJ) $(FLAGS) $(1).cpp -o $(1)_teste_
+	./$(1)_teste_ $(1)
 endef
 $(foreach test,$(TESTS),$(eval $(call execute_test,$(test)))) 
 
