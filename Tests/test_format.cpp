@@ -1,14 +1,43 @@
+// Windows
+#ifdef _WIN32
+	#define RESET_COLOR 	""
 
-#define RESET_COLOR 	"\x1B[0m"
+	#define ERR_COLOR 	""
+	#define ERR_BARS_COLOR	""
 
-#define ERR_COLOR 	"\x1B[31m"
-#define ERR_BARS_COLOR	"\x1B[91m"
+	#define OK_COLOR 	""
+	#define OK_BARS_COLOR 	""
 
-#define OK_COLOR 	"\x1B[32m"
-#define OK_BARS_COLOR 	"\x1B[92m"
+	#define LOG_COLOR  	""
+	#define LOG_BARS_COLOR	""
+	
+// Linux
+#elif __linux__
+	#define RESET_COLOR 	"\x1B[0m"
 
-#define LOG_COLOR  	"\x1B[33m"
-#define LOG_BARS_COLOR	"\x1B[93m"
+	#define ERR_COLOR 	"\x1B[31m"
+	#define ERR_BARS_COLOR	"\x1B[91m"
+
+	#define OK_COLOR 	"\x1B[32m"
+	#define OK_BARS_COLOR 	"\x1B[92m"
+
+	#define LOG_COLOR  	"\x1B[33m"
+	#define LOG_BARS_COLOR	"\x1B[93m"
+
+// MacOS? e outros
+#else 
+	#define RESET_COLOR 	""
+
+	#define ERR_COLOR 	""
+	#define ERR_BARS_COLOR	""
+
+	#define OK_COLOR 	""
+	#define OK_BARS_COLOR 	""
+
+	#define LOG_COLOR  	""
+	#define LOG_BARS_COLOR	""
+	
+#endif
 	
 #include <string>
 #include <iostream>
