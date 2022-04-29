@@ -15,7 +15,7 @@ Para recompilar com aproveitamento dos arquivos objetos, use:
     make fast
 
 ### Execução de testes
-Para executar os testes do diretório Tests, use:
+Para executar os testes do diretório Tests (depois de compilar o projeto), use:
 
     make test
     
