@@ -52,12 +52,11 @@ using namespace std;
 
 class Test {
 	void begin(string agv);
-	void fail(string agv, string err);
+	void fail(string agv);
 	void sucess(string agv);
 	void end(string agv);	
 	
 	ostream &out;
-	stringstream err;
 	
 	public:
 		Test(ostream &_out): out(_out) {} 
@@ -67,7 +66,7 @@ class Test {
 			if(func(*this))
 				sucess(argv);
 			else
-				fail(argv,err.str());
+				fail(argv);
 			end(argv);
 			out << RESET_COLOR << endl;	// Resetar cor
 		}
@@ -88,12 +87,11 @@ void Test::begin(string argv) {
 	out << RESET_COLOR;
 }
 
-void Test::fail(string argv, string err) {
+void Test::fail(string argv) {
 	out << ERR_BARS_COLOR;
 	out << "-------------------------------------------" << endl;
 	out << ERR_COLOR;
 	out << "Falha no teste: " << argv << endl;
-	out << "Motivo: " << err << endl;
 	out << ERR_BARS_COLOR;
 	out << "-------------------------------------------" << endl;
 	out << RESET_COLOR;

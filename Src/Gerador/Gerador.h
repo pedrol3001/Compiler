@@ -27,9 +27,10 @@ class Instrucao {
 struct Assembly {
 	std::string nome;
 	Assembly(std::string _nome);
-	virtual std::string toStr()=0;
+	virtual std::string str()=0;
 };
 
+#include "LourdenTM.h"
 #include "assemblyRiscV.h"
 #include "tres_enderecos.h"
 
