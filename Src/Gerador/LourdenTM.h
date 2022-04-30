@@ -46,7 +46,6 @@ namespace TM {
 		tipoRM(std::string _nome, Reg _r1, int _offset, Reg _r2, int _line);
 		std::string InstToStr();		
 	};
-	
 	#define INST_RM(name) struct name: public tipoRM { \
 		name (Reg _r1, int _offset, Reg _r2, int _line): tipoRM("name",_r1,_offset,_r2,_line) {}\
 	};
