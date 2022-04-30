@@ -4,7 +4,7 @@
 
 #include "lex.yy.c"	// Include do código gerado pelo flex
 
-Lexico::Lexico(std::string file): ok(true),count(0) {	
+Lexico::Lexico(std::string file): std::vector<Token>(), ok(true),count(0) {	
 	// Analisa arquivo e constoi vetor de tokens
 	// Usar flex
 	yyin = fopen (file.c_str(),"r");
