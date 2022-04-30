@@ -8,18 +8,25 @@
 
 using namespace std;
 
-bool test() {
+bool test(Test& tester) {
 	Token token(INT,1);
-	assert(token()==INT);	// Testa operator()
+	if(!(token()==INT)) {
+		tester.error() << "Erro no operador Token::operator()\n";
+		return false;
+	}
 
 	Token copy = token;	
-	assert(copy() == token() && copy.id()==token.id());	// Testa operador =
+	if(!(copy() == token() && copy.id()==token.id())) { // Testa operador =
+		tester.error() << "Erro no operador Token::operator=\n";
+		return false;	
+	}
 
 	return true;
 }
 
 
 int main(int argn, char *argv[]) {
-	Test::execute(argv[1],test);
+	Test tester(cout);
+	tester.execute(argv[1],test);
 	return 0;
 }

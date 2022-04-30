@@ -11,6 +11,8 @@
 	#define LOG_COLOR  	""
 	#define LOG_BARS_COLOR	""
 	
+	#define USR_COLOR  	""
+	
 // Linux
 #elif __linux__
 	#define RESET_COLOR 	"\x1B[0m"
@@ -23,6 +25,8 @@
 
 	#define LOG_COLOR  	"\x1B[33m"
 	#define LOG_BARS_COLOR	"\x1B[93m"
+	
+	#define USR_COLOR  	"\x1B[96m"
 
 // MacOS? e outros
 #else 
@@ -37,67 +41,80 @@
 	#define LOG_COLOR  	""
 	#define LOG_BARS_COLOR	""
 	
+	#define USR_COLOR  	""
 #endif
 	
 #include <string>
+#include <sstream>
 #include <iostream>
 
 using namespace std;
 
 class Test {
-	static void begin(string agv);
-	static void fail(string agv);
-	static void ok(string agv);
-	static void end(string agv);	
+	void begin(string agv);
+	void fail(string agv, string err);
+	void sucess(string agv);
+	void end(string agv);	
+	
+	ostream &out;
+	stringstream err;
+	
 	public:
-		static void execute(string argv, bool (*func)()) {
-			cout << endl;
+		Test(ostream &_out): out(_out) {} 
+		void execute(string argv, bool (*func)(Test& test)) {		
+			out << endl;
 			begin(argv);
-			if(func())
-				ok(argv);
+			if(func(*this))
+				sucess(argv);
 			else
-				fail(argv);
+				fail(argv,err.str());
 			end(argv);
-			cout << RESET_COLOR << endl;	// Resetar cor
+			out << RESET_COLOR << endl;	// Resetar cor
 		}
+		ostream& ok() {return out << OK_COLOR;} 
+		ostream& log() {return out << LOG_COLOR;} 
+		ostream& error() {return out << ERR_COLOR;} 
+		ostream& comment() {return out << USR_COLOR;} 
+		ostream& normal() {return out << RESET_COLOR;}
 };
 
 void Test::begin(string argv) {
-	cout << LOG_BARS_COLOR;
-	cout << "===========================================" << endl;
-	cout << LOG_COLOR;
-	cout << "Inicio do teste: " << argv << endl;
-	cout << LOG_BARS_COLOR;
-	cout << "===========================================" << endl;
-	cout << RESET_COLOR;
+	out << LOG_BARS_COLOR;
+	out << "===========================================" << endl;
+	out << LOG_COLOR;
+	out << "Inicio do teste: " << argv << endl;
+	out << LOG_BARS_COLOR;
+	out << "===========================================" << endl;
+	out << RESET_COLOR;
 }
 
-void Test::fail(string argv) {
-	cout << ERR_BARS_COLOR;
-	cout << "-------------------------------------------" << endl;
-	cout << ERR_COLOR;
-	cout << "Falha no teste: " << argv << endl;
-	cout << ERR_BARS_COLOR;
-	cout << "-------------------------------------------" << endl;
-	cout << RESET_COLOR;
+void Test::fail(string argv, string err) {
+	out << ERR_BARS_COLOR;
+	out << "-------------------------------------------" << endl;
+	out << ERR_COLOR;
+	out << "Falha no teste: " << argv << endl;
+	out << "Motivo: " << err << endl;
+	out << ERR_BARS_COLOR;
+	out << "-------------------------------------------" << endl;
+	out << RESET_COLOR;
 }
 
-void Test::ok(string argv) {
-	cout << OK_BARS_COLOR;
-	cout << "-------------------------------------------" << endl;
-	cout << OK_COLOR;
-	cout << "Sucesso no teste: " << argv << endl;
-	cout << OK_BARS_COLOR;
-	cout << "-------------------------------------------" << endl;
-	cout << RESET_COLOR;
+void Test::sucess(string argv) {
+	out << OK_BARS_COLOR;
+	out << "-------------------------------------------" << endl;
+	out << OK_COLOR;
+	out << "Sucesso no teste: " << argv << endl;
+	out << OK_BARS_COLOR;
+	out << "-------------------------------------------" << endl;
+	out << RESET_COLOR;
 }
 
 void Test::end(string argv) {
-	cout << LOG_BARS_COLOR;
-	cout << "===========================================" << endl;
-	cout << LOG_COLOR;
-	cout << "Fim do teste: " << argv << endl;
-	cout << LOG_BARS_COLOR;
-	cout << "===========================================" << endl;
-	cout << RESET_COLOR;
+	out << LOG_BARS_COLOR;
+	out << "===========================================" << endl;
+	out << LOG_COLOR;
+	out << "Fim do teste: " << argv << endl;
+	out << LOG_BARS_COLOR;
+	out << "===========================================" << endl;
+	out << RESET_COLOR;
 }

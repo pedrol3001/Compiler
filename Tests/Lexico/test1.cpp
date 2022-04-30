@@ -5,38 +5,43 @@
 
 using namespace std;
 
-bool test() {
+bool test(Test& tester) {
 	TabSim &ts = TabSim::getInstance();
 	Lexico lexico("Resources/code6.txt");
-	cout << lexico.size() << endl;
+	tester.normal() << lexico.size() << endl;
 	
-	cout << "\nTeste do sem operador >>" << endl;
+	tester.comment() << "\nTeste do sem operador >>" << endl;
 	for(Token token: lexico) {
 		StrAtt * sa = (StrAtt*)ts[token.id()]["StrAtt"];
-		cout << "Token: " << sa->str << endl;
+		tester.normal() << "Token: " << sa->str << endl;
 		
 		NameAtt * na = (NameAtt*)ts[token.id()]["NameAtt"];
-		cout << "Tipo: " << na->str << endl;
+		tester.normal() << "Tipo: " << na->str << endl;
 		
-		cout << "Enum: " << token() << "\tn: " << token.id() << endl;
+		tester.normal() << "Enum: " << token() << "\tn: " << token.id() << endl;
+		
+		tester.comment() << "===================================" << endl;
 	}
 	
-	cout << "\nTeste do operador >>" << endl;
+	tester.comment() << "\nTeste do operador >>" << endl;
 	Token token;
 	while(lexico >> token) {
 		StrAtt * sa = (StrAtt*)ts[token.id()]["StrAtt"];
-		cout << "Token: " << sa->str << endl;
+		tester.normal() << "Token: " << sa->str << endl;
 		
 		NameAtt * na = (NameAtt*)ts[token.id()]["NameAtt"];
-		cout << "Tipo: " << na->str << endl;
+		tester.normal() << "Tipo: " << na->str << endl;
 		
-		cout << "Enum: " << token() << "\tn: " << token.id() << endl;
+		tester.normal() << "Enum: " << token() << "\tn: " << token.id() << endl;
+		
+		tester.comment() << "===================================" << endl;
 	}
 	return true;
 }
 
 
 int main(int argn, char *argv[]) {
-	Test::execute(argv[1],test);
+	Test tester(cout);
+	tester.execute(argv[1],test);
 	return 0;
 }

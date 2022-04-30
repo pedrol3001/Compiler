@@ -12,18 +12,24 @@
 using namespace std;
 
 class meuAtt1: public Atributo {
+	Test& tester;
 	public: 	
-		meuAtt1(): Atributo("meuAtt1")	{}
-		void print1() {cout << "Hello world!" << endl;}
+		meuAtt1(Test& _tester): Atributo("meuAtt1"), tester(_tester) {}
+		void print1() {
+			tester.normal() << "Hello world!\n" << endl;
+		}
 };
 
 class meuAtt2: public Atributo {
+	Test& tester;
 	public: 
-		meuAtt2(): Atributo("meuAtt2") {}
-		void print2() {cout << "Ola mundo!" << endl;}
+		meuAtt2(Test& _tester): Atributo("meuAtt2"), tester(_tester) {}
+		void print2() {
+			tester.normal() << "Ola mundo!\n" << endl;
+		}
 };
 
-bool test() {
+bool test(Test& tester) {
 	TabSim& ts = TabSim::getInstance();
 	
 	Token t0 = ts.insert(INT);
@@ -31,30 +37,38 @@ bool test() {
 	Token t2 = ts.insert(FLOAT);
 	
 	// Verificar funcionamento dos indices
-	assert(t0.id()==0);
-	assert(t1.id()==1);
-	assert(t2.id()==2);
+	if(!(t0.id()==0 && t1.id()==1 && t2.id()==2)) {
+		tester.error() << "Falha na geracao de indices dos tokens" << endl;
+		return false;
+	}
 	
-	ts[t0.id()].insert((Atributo*)new meuAtt1);
-	ts[t0.id()].insert((Atributo*)new meuAtt2);
+	ts[t0.id()].insert((Atributo*)new meuAtt1(tester));
+	ts[t0.id()].insert((Atributo*)new meuAtt2(tester));
 	
 	meuAtt1& ma1 = *((meuAtt1*)(ts[t0.id()]["meuAtt1"]));
-	assert(ma1.nome == "meuAtt1"); 	// Verificar acesso direto
+	if(!(ma1.nome == "meuAtt1")) {		
+		tester.error() << "Falha na insercao de meuAtt1" << endl;
+		return false;	
+	}
 	
 	Simbolo& s = ts[t0.id()];
 	meuAtt2& ma2 = *((meuAtt2*)(s["meuAtt2"]));
-	assert(ma2.nome == "meuAtt2");
 	
+	if(!(ma2.nome == "meuAtt2")) {		
+		tester.error() << "Falha na insercao de meuAtt2" << endl;
+		return false;	
+	}
+	
+	tester.comment() << "Metodos de meuAtt1 e meuAtt2, respectivamente." << endl;
 	ma1.print1(); ma2.print2();
 	
-	// Verificar memory leaks (valgrind?)!
-	
-	cout << "(Lembre-se de testar memory leaks)" << endl;
+	tester.comment() << "Lembre-se de testar memory leaks! (debug=yes?)" << endl;
 	return true;
 }
 
 
 int main(int argn, char *argv[]) {
-	Test::execute(argv[1],test);
+	Test tester(cout);
+	tester.execute(argv[1],test);
 	return 0;
 }
