@@ -32,6 +32,6 @@ struct Assembly {
 
 #include "LourdenTM.h"
 #include "assemblyRiscV.h"
-#include "tres_enderecos.h"
+#include "tresEnderecos.h"
 
 #endif
