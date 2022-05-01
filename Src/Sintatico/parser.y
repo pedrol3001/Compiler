@@ -3,6 +3,7 @@
 #include "../Semantico/Semantico.h"
 #include <vector>
 using namespace std;
+class Value;
 }
 
 %{
@@ -17,26 +18,36 @@ using namespace std;
 	
 // Implementacao no final do .y
 void debug(string s);
-void yyerror(Lexico& lexico, std::vector<Bloco*> container, string s);
+void yyerror(Lexico& lexico, std::vector<Bloco*>& container, string s);
 int yylex(Lexico& lexico);
 
 %}
+// yylval ======================================================== 
 
-%define parse.error detailed
+%{
+	struct Value {
+		vector<Token> tokens;
+		Value(): tokens() {}
+		Value(Token& token): tokens(1,token) {}
+		Value(vector<Token>& _tokens): tokens(_tokens) {}
+		vector<Token> operator()() {return tokens;}
+	};
+	
+	Value operator,(Value& l, Value& r) {
+		Value ret(l);
+		ret.tokens.insert(ret.tokens.end(),r.tokens.begin(),r.tokens.end());
+		return ret;
+	}
+%}
+%define api.value.type {Value}
 
-%lex-param {Lexico &lexico}
-%parse-param {Lexico &lexico} {std::vector<Bloco*> container}
-
-/* declare tokens */
+// Tokens ======================================================
 // Usado para debug
 %token NOT_INITIALIZED
-
 // Comentários
 %token COMMENT
-
 // Constantes
-%token  C_STRING C_CHAR C_INT C_FLOAT
-
+%token  	C_STRING C_CHAR C_INT C_FLOAT
 // Palavras reservadas
 	// Tipos
 %token		VOID
@@ -45,26 +56,32 @@ int yylex(Lexico& lexico);
 		// Números
 %token 	INT FLOAT DOUBLE 
 	// Comandos
-%token	RETURN OUTPUT INPUT
+%token		RETURN OUTPUT INPUT
 	// Construções
-%token	IF ELSE WHILE
-	
+%token		IF ELSE WHILE
 // Identificador
-%token	ID
-
+%token		ID
 // Estruturas
 	// Separadores
-%token	SEMICOLON COMMA
+%token		SEMICOLON COMMA	
 	// Invólucros
-%token	LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
-
+%token		LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE	
 // Operações
 	// Atribuição
-%token	ASSIGN
+%token		ASSIGN
 	// Operações aritméticas
-%token	SUM SUB DIV MUL
+%token		SUM SUB DIV MUL
 	// Comparações
-%token	LESS LESSEQUAL GREATER GREATEREQUAL EQUAL NOTEQUAL
+%token		LESS LESSEQUAL GREATER GREATEREQUAL EQUAL NOTEQUAL
+
+// Tipos das regras ==============================================
+
+// Outros parametros =============================================
+
+%define parse.error detailed
+
+%lex-param {Lexico &lexico}
+%parse-param {Lexico &lexico} {std::vector<Bloco*>& container}
 
 %%
 
@@ -114,7 +131,9 @@ additive-expression: additive-expression addop term | term ;
 
 addop: SUM | SUB ;
 
-term: term mulop factor | factor ;
+term: 	term mulop factor {	
+		container.push_back((Bloco*)(new Expressao($2())));	// TODO: eh um teste}
+	} | factor;
 
 mulop: MUL | DIV ;
 
@@ -129,19 +148,21 @@ arg-list: arg-list COMMA expression | expression | %empty;
 NUM: C_INT | C_FLOAT ;
 
 %%
-void yyerror(Lexico& lexico, std::vector<Bloco*> container, string s) {
+void yyerror(Lexico& lexico, std::vector<Bloco*>& container, string s) {
 	fprintf(stderr, "error: %s\n", s.c_str());
 	erros++;
 }
 
 int yylex(Lexico& lexico){
 	Token token;
-	if(lexico >> token)
+	if(lexico >> token) {
+		yylval = Value(token);
 		return token();
-	else
+	} else {
 		return YYEOF;
+	}
 }	
-
+	
 void debug(string s) {
   printf("%s\n", s.c_str());
 }

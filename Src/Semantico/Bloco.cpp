@@ -8,9 +8,21 @@ using namespace std;
 /**********************************************/
 Bloco::~Bloco() {}
 
+Bloco::Bloco() {}
+
+Bloco::Bloco(const vector<Token>& _tokens): tokens(_tokens) {} 
+
+bool Bloco::analisar(Semantico& state) {return true;}
+void Bloco::gerar(Semantico& state) {}
+// Debug
+std::vector<Token> Bloco::getTokens() {return tokens;}
+
 
 // |a|, |b|, |obj.x|, |*c|, |&d|, |v[5+7]|, |a * f(b) + obj.x|, |f(g(h(2)))|
-Expressao::Expressao(std::vector<Token> &notacaoPolonesaReversa): Bloco(notacaoPolonesaReversa) { }
+Expressao::Expressao(const vector<Token> &notacaoPolonesaReversa): Bloco(notacaoPolonesaReversa) { }
+
+//bool Expressao::analisar(Semantico& state) {return true;}
+void Expressao::gerar(Semantico& state) {}
 
 
 Nada::Nada(): Bloco() {}

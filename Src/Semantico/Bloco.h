@@ -1,21 +1,27 @@
 #ifndef Bloco_h
 #define Bloco_h
 
+#include <iostream>
 #include <vector>
 #include "../Token/Token.h"
 
 class Semantico;
 
-struct Bloco: public std::vector<Token> {	
+struct Bloco {
+	std::vector<Token> tokens;	
 	Bloco(); 
-	Bloco(std::vector<Token>& tokens); // Tokens
+	Bloco(const std::vector<Token>& _tokens); // Tokens
 	virtual ~Bloco();
-	virtual bool eval(Semantico& state);
+	virtual bool analisar(Semantico& state);
+	virtual void gerar(Semantico& state)=0;
+	// Debug
+	std::vector<Token> getTokens();
 };
 
 // |a|, |b|, |obj.x|, |*c|, |&d|, |v[5+7]|, |a * f(b) + obj.x|, |f(g(h(2)))|
 struct Expressao: Bloco {
-    Expressao(std::vector<Token> &notacaoPolonesaReversa);
+    	Expressao(const std::vector<Token> &notacaoPolonesaReversa);
+	void gerar(Semantico& state);
 };
 
 struct Nada: Bloco {

@@ -13,6 +13,7 @@ struct Semantico {
 
 struct State {
 	
+	
 };
 
 //enum tipo { _int, _float, _void };
