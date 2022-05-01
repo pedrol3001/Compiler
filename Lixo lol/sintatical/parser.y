@@ -26,11 +26,11 @@ void debug(char *s) {
 
 %token LESS LESSEQUAL GREATER GREATEREQUAL EQUAL NOTEQUAL
 
-%token IF ELSE WHILE RETURN
+%right LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
+
+%right IF ELSE WHILE RETURN
 
 %token VOID INT
-
-%token LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 
 %token OUTPUT INPUT
 
@@ -94,7 +94,7 @@ factor: LPAREN expression RPAREN | var | call | NUM ;
 
 call: ID LPAREN args RPAREN ;
 
-args: arg-list | %empty ;
+args: arg-list ;
 
 arg-list: arg-list COMMA expression | expression | %empty;
 
