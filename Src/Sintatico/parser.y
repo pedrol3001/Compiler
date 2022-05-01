@@ -14,7 +14,7 @@ using namespace std;
 
 unsigned long long erros = 0;
 using namespace std;
-	
+
 // Implementacao no final do .y
 void debug(string s);
 void yyerror(Lexico& lexico, std::vector<Bloco*> container, string s);
@@ -28,28 +28,29 @@ int yylex(Lexico& lexico);
 %parse-param {Lexico &lexico} {std::vector<Bloco*> container}
 
 /* declare tokens */
-// Usado para debug
+	// Usado para debug
 %token NOT_INITIALIZED
 
-// Comentários
+	// Comentários
 %token COMMENT
 
-// Constantes
+	// Constantes
 %token  C_STRING C_CHAR C_INT C_FLOAT
 
 // Palavras reservadas
 	// Tipos
 %token		VOID
-		// Letras
+	// Letras
 %token 	STRING CHAR
-		// Números
-%token 	INT FLOAT DOUBLE 
+	// Números
+%token 	INT FLOAT DOUBLE
 	// Comandos
 %token	RETURN OUTPUT INPUT
 	// Construções
-%token	IF ELSE WHILE
-	
-// Identificador
+%right 	IF ELSE
+ 	// Loop
+%token 	WHILE
+	// Identificador
 %token	ID
 
 // Estruturas
@@ -140,7 +141,7 @@ int yylex(Lexico& lexico){
 		return token();
 	else
 		return YYEOF;
-}	
+}
 
 void debug(string s) {
   printf("%s\n", s.c_str());
@@ -149,11 +150,11 @@ void debug(string s) {
 
 /*
 void main(int argc, char **argv){
-  ++argv; --argc; 	    // abre arquivo de entrada se houver 
+  ++argv; --argc; 	    // abre arquivo de entrada se houver
   if(argc > 0)
       yyin = fopen(argv[0],"rt");
   else
-      yyin = stdin;    // cria arquivo de saida se especificado 
+      yyin = stdin;    // cria arquivo de saida se especificado
   if(argc > 1)
       yyout = fopen(argv[1],"wt");
   else
