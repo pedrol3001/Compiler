@@ -1,7 +1,6 @@
 #ifndef Tabela_h
 #define Tabela_h
 
-#include "../Tipos.h"
 #include "../Token/Token.h"
 
 #include <vector>

@@ -1,35 +1,31 @@
+%code requires {
+#include "../Lexico/Lexico.h"
+#include "../Semantico/Semantico.h"
+#include <vector>
+using namespace std;
+}
+
 %{
 #include <iostream>
 #include <stdio.h>
 #include "Sintatico.h"
+#include "../Lexico/Lexico.h"
+#include "../Semantico/Semantico.h"
 
 unsigned long long erros = 0;
 using namespace std;
 	
-void debug(string s) {
-  printf("%s\n", s.c_str());
-}
-
-
-
-void yyerror(Lexico& lexico, string s) {
-	fprintf(stderr, "error: %s\n", s.c_str());
-	erros++;
-}
-
-int yylex(Lexico& lexico){
-	Token token;
-	if(lexico >> token)
-		return token();
-	else
-		return YYEOF;
-}
+// Implementacao no final do .y
+void debug(string s);
+void yyerror(Lexico& lexico, std::vector<Bloco*> container, string s);
+int yylex(Lexico& lexico);
 
 %}
+
 %define parse.error detailed
 
-%lex-param {Lexico &lexico }
-%parse-param {Lexico &lexico }
+%lex-param {Lexico &lexico}
+%parse-param {Lexico &lexico} {std::vector<Bloco*> container}
 
 /* declare tokens */
 // Usado para debug
@@ -133,6 +129,24 @@ arg-list: arg-list COMMA expression | expression | %empty;
 NUM: C_INT | C_FLOAT ;
 
 %%
+void yyerror(Lexico& lexico, std::vector<Bloco*> container, string s) {
+	fprintf(stderr, "error: %s\n", s.c_str());
+	erros++;
+}
+
+int yylex(Lexico& lexico){
+	Token token;
+	if(lexico >> token)
+		return token();
+	else
+		return YYEOF;
+}	
+
+void debug(string s) {
+  printf("%s\n", s.c_str());
+}
+
+
 /*
 void main(int argc, char **argv){
   ++argv; --argc; 	    // abre arquivo de entrada se houver 

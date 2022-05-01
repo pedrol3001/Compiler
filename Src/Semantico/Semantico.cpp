@@ -4,7 +4,7 @@
 using namespace std;
 
 Semantico::Semantico(Sintatico &sintatico) {
-
+	
 }
 
 Bloco::Bloco(): std::vector<Token>() {}

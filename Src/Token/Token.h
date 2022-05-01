@@ -1,8 +1,6 @@
 #ifndef Token_h
 #define Token_h
 
-#include "../TabelaDeSimbolos/TabelaDeSimbolos.h"
-
 struct Token {	
 	Token();
 	Token(const Token& token);

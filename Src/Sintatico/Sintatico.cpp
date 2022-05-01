@@ -4,13 +4,13 @@
 
 using namespace std;
 
-Sintatico::Sintatico(Lexico &lexico): vector<Bloco*>() {
-	status = yyparse(lexico);
+Sintatico::Sintatico(Lexico &lexico) {
+	status = yyparse(lexico,container);
 
 
 }
 
 Sintatico::~Sintatico() {
-	for(Bloco* bloco: *this)
+	for(Bloco* bloco: this->container)
 		delete bloco;
 }

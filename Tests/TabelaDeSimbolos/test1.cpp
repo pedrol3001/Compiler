@@ -2,6 +2,8 @@
 
 #include "../../Src/Token/Token.h"
 
+#include "../../Src/Tipos.h"
+
 #include <string>
 #include <iostream>
 #include <algorithm>
