@@ -16,8 +16,17 @@ bool test(Test& tester) {
 	
 	tester.normal() << lexico.size() << endl;
 	
+	vector<string> ans = {"/* /**/","*","/" ,"," ,"/* /* */","*","/"};
+	
+	int i=0;
 	Token token;
 	while(lexico >> token) {
+		if(i>=ans.size()) {
+			tester.error() << "Numero incorreto de tokens encontrado!" << endl;
+			tester.log() << "Esperavam-se " << ans.size() <<  " tokens." << endl;
+			return false;
+		}
+	
 		tester.normal() << "Enum: " << token() << "\tn: " << token.id() << endl;
 		
 		// Str Arr
@@ -25,6 +34,13 @@ bool test(Test& tester) {
 			tester.normal() << "Token sem atributo StrArr" << endl;
 		else {
 			StrAtt * sa = (StrAtt*)(ts[token]["StrAtt"]);
+			
+			if(sa->str != ans[i]) {
+				tester.error() << "Token '" << sa->str << "' incorreto!" << endl;
+				tester.log() << "Esperava-se '" << ans[i] << "'." << endl;
+				return false;
+			}
+			
 			tester.normal() << "Token: " << sa->str << endl;
 		}
 		
