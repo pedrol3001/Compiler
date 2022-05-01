@@ -11,9 +11,8 @@ using namespace std;
 
 
 bool test(Test& tester) {
-	return false;
-
-	TabSim ts = TabSim::getInstance();
+	TabSim &ts = TabSim::getInstance();
+	
 	Lexico lexico("Resources/Semantico/expressao.txt");
 	if(lexico.error()) {
 		tester.error() << "Nao foi possivel abrir o arquivo!" << endl;
@@ -23,15 +22,25 @@ bool test(Test& tester) {
 		
 	Sintatico sintatico(lexico);
 	
+	vector<string> ans = {"*","/","*","/","*","/","*","/"};
+		
 	tester.comment() << "Testando expressoes! (Para cada linha, todos tokens do bloco)" << endl;
 	tester.normal() << sintatico.container.size() << endl;
+	tester.comment() << endl << "..........................................." << endl;
+	
+	int i=0;
 	for(Bloco* bloco: sintatico.container) {
 		vector<Token> tokens = bloco->getTokens();
 		for(Token token: tokens) {
-			if(ts[token].has("StrAtt"))
+			if(ts[token].has("StrAtt"))  {
+				if(((StrAtt*)ts[token]["StrAtt"])->str != ans[i]) {
+					
+				}
 				tester.normal() << ((StrAtt*)ts[token]["StrAtt"])->str << ' ';
+			}
 		}
-		tester.comment() << "..........................................." << endl;
+		tester.comment() << endl << "..........................................." << endl;
+		i++;
 	}	
 
 	return true;
