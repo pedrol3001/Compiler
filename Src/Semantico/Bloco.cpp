@@ -1,28 +1,24 @@
+
 #include <vector>
+#include "Bloco.h"
+#include "../Token/Token.h"
 
 using namespace std;
 
-struct Token { };
-struct State { };
-
 /**********************************************/
 
-enum tipo { _int, _float, _void };
 
-struct Comando {
-      Comando();
-      virtual void Update(State& state);
-};
+// |a|, |b|, |obj.x|, |*c|, |&d|, |v[5+7]|, |a * f(b) + obj.x|, |f(g(h(2)))|
+Expressao::Expressao(std::vector<Token> &notacaoPolonesaReversa): Bloco(notacaoPolonesaReversa) { }
+
+Nada::Nada(): Bloco() {}
+
+/*
+enum tipo { _int, _float, _void };
 
 struct Tipo: Comando {
     tipo t;
     Tipo(tipo _t) : t(_t) { }
-};
-
-struct Expressao: Comando {
-    vector<Token> tokens;
-    Expressao() { }
-    Expressao(vector<Token> &_tokens) : tokens(_tokens) { }
 };
 
 struct Declaracao: Comando{
@@ -73,3 +69,4 @@ struct While: Comando {
 struct AbreEscopo { };
 
 struct FechaEscopo { };
+*/
