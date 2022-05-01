@@ -37,6 +37,12 @@ int yylex(Lexico& lexico);
 	// Constantes
 %token  C_STRING C_CHAR C_INT C_FLOAT
 
+// Estruturas
+	// Separadores
+%token	SEMICOLON COMMA
+	// Invólucros
+%right	LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
+
 // Palavras reservadas
 	// Tipos
 %token		VOID
@@ -52,12 +58,6 @@ int yylex(Lexico& lexico);
 %token 	WHILE
 	// Identificador
 %token	ID
-
-// Estruturas
-	// Separadores
-%token	SEMICOLON COMMA
-	// Invólucros
-%token	LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 
 // Operações
 	// Atribuição
