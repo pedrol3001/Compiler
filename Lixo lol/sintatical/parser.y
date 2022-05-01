@@ -26,7 +26,7 @@ void debug(char *s) {
 
 %token LESS LESSEQUAL GREATER GREATEREQUAL EQUAL NOTEQUAL
 
-%token IF ELSE WHILE RETURN
+%precedence IF ELSE WHILE RETURN
 
 %token VOID INT
 
@@ -94,7 +94,7 @@ factor: LPAREN expression RPAREN | var | call | NUM ;
 
 call: ID LPAREN args RPAREN ;
 
-args: arg-list | %empty ;
+args: arg-list ;
 
 arg-list: arg-list COMMA expression | expression | %empty;
 
