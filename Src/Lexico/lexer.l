@@ -106,21 +106,25 @@ NotSpace [^\n\t ]
 
 {Space}* {}
 
+
 "/*" {
+	match("Invalido",NOT_INITIALIZED);
 	BEGIN(INVALIDO_VARIAS_LINHAS);
 	yyless(yyleng-2);
 }
 <INVALIDO_VARIAS_LINHAS>(.|\n)+ {
-	//match("Invalido");
+	match("Invalido",NOT_INITIALIZED);
 	BEGIN(INITIAL);
 }
 
 . {
-	BEGIN(INVALIDO_UMA_LINHA); yyless(yyleng-1);
+	match("Invalido",NOT_INITIALIZED);
+	BEGIN(INVALIDO_UMA_LINHA); 
+	yyless(yyleng-1);
 }
 
 <INVALIDO_UMA_LINHA>.+ {
-	//match("Invalido");
+	match("Invalido",NOT_INITIALIZED);
 	BEGIN(INITIAL);
 }
 
