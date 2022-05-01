@@ -9,25 +9,33 @@ TabelaDeSimbolos& TabelaDeSimbolos::getInstance() {	// Caso seja usada como Sing
 	static TabelaDeSimbolos instance;
 	return instance;
 }
-TabelaDeSimbolos::TabelaDeSimbolos(): vector<Simbolo>() {}
+TabelaDeSimbolos::TabelaDeSimbolos() {}
+
+Simbolo& TabelaDeSimbolos::operator[](Token& token) {
+	return this->container[token.id()];
+}
+	
+long long unsigned int TabelaDeSimbolos::size() {
+	return this->container.size();
+}
 
 Token TabelaDeSimbolos::insert(int tipo) {		// Insere token
 	static long long unsigned int unique_index=0;
 
-	assert(unique_index == this->size());
+	assert(unique_index == this->container.size());
 	
 	// Criar token
 	Token token(tipo,unique_index);
 	unique_index++;
 	
 	// Criar símbolo
-	this->emplace_back();
+	this->container.emplace_back();
 	
 	return token;
 }
 
 TabelaDeSimbolos::~TabelaDeSimbolos() {
-	for(Simbolo& s: *this)
+	for(Simbolo& s: this->container)
 		s.free();
 }
 
@@ -35,12 +43,22 @@ TabelaDeSimbolos::~TabelaDeSimbolos() {
 	Exemplo de atributos: valor, tipo (int ou long int?), constante (nunca variou apos inicializacao), etc.  
 */
 void Simbolo::insert(Atributo* att) {
-	assert(this->count(att->nome)==0);
-	(*this)[att->nome] = att;
+	assert(this->container.count(att->nome)==0);
+	this->container[att->nome] = att;
 }	
 
+Atributo* Simbolo::operator[](std::string key) {
+	if(this->container.count(key)==0)
+		return nullptr;
+	return this->container[key];
+}
+
+bool Simbolo::has(std::string key) {
+	return this->container.count(key)>0;
+}
+
 void Simbolo::free() {
-	for(pair<string,Atributo*> p: *this)  
+	for(pair<string,Atributo*> p: this->container)  
 		delete p.second;
 }
 

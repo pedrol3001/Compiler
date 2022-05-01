@@ -11,21 +11,21 @@ bool test(Test& tester) {
 	tester.normal() << lexico.size() << endl;
 	
 	tester.comment() << "\nTeste sem operador >>" << endl;
-	for(Token token: lexico) {
+	for(Token token: lexico.container) {
 		tester.normal() << "Enum: " << token() << "\tn: " << token.id() << endl;
 		
 		// Str Arr
-		if(ts[token.id()].count("StrAtt")==0)
+		if(ts[token].has("StrAtt"))
 			tester.normal() << "Token sem atributo StrArr" << endl;
 		else {
-			StrAtt * sa = (StrAtt*)ts[token.id()]["StrAtt"];
+			StrAtt * sa = (StrAtt*)(ts[token]["StrAtt"]);
 			tester.normal() << "Token: " << sa->str << endl;
 		}
 		
-		if(ts[token.id()].count("NameAtt")==0)
+		if(ts[token].has("NameAtt"))
 			tester.normal() << "Token sem atributo NameAtt" << endl;
 		else {
-			NameAtt * na = (NameAtt*)ts[token.id()]["NameAtt"];
+			NameAtt * na = (NameAtt*)ts[token]["NameAtt"];
 			tester.normal() << "Tipo: " << na->str << endl;
 		}
 		
@@ -38,17 +38,17 @@ bool test(Test& tester) {
 		tester.normal() << "Enum: " << token() << "\tn: " << token.id() << endl;
 		
 		// Str Arr
-		if(ts[token.id()].count("StrAtt")==0)
+		if(ts[token].has("StrAtt"))
 			tester.normal() << "Token sem atributo StrArr" << endl;
 		else {
-			StrAtt * sa = (StrAtt*)ts[token.id()]["StrAtt"];
+			StrAtt * sa = (StrAtt*)ts[token]["StrAtt"];
 			tester.normal() << "Token: " << sa->str << endl;
 		}
 		
-		if(ts[token.id()].count("NameAtt")==0)
+		if(ts[token].has("NameAtt"))
 			tester.normal() << "Token sem atributo NameAtt" << endl;
 		else {
-			NameAtt * na = (NameAtt*)ts[token.id()]["NameAtt"];
+			NameAtt * na = (NameAtt*)ts[token]["NameAtt"];
 			tester.normal() << "Tipo: " << na->str << endl;
 		}
 		

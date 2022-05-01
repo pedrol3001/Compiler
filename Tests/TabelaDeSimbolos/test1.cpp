@@ -42,16 +42,16 @@ bool test(Test& tester) {
 		return false;
 	}
 	
-	ts[t0.id()].insert((Atributo*)new meuAtt1(tester));
-	ts[t0.id()].insert((Atributo*)new meuAtt2(tester));
+	ts[t0].insert((Atributo*)new meuAtt1(tester));
+	ts[t0].insert((Atributo*)new meuAtt2(tester));
 	
-	meuAtt1& ma1 = *((meuAtt1*)(ts[t0.id()]["meuAtt1"]));
+	meuAtt1& ma1 = *((meuAtt1*)(ts[t0]["meuAtt1"]));
 	if(!(ma1.nome == "meuAtt1")) {		
 		tester.error() << "Falha na insercao de meuAtt1" << endl;
 		return false;	
 	}
 	
-	Simbolo& s = ts[t0.id()];
+	Simbolo& s = ts[t0];
 	meuAtt2& ma2 = *((meuAtt2*)(s["meuAtt2"]));
 	
 	if(!(ma2.nome == "meuAtt2")) {		

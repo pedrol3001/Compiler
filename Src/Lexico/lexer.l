@@ -14,9 +14,9 @@ TabSim &ts = TabSim::getInstance();
 
 Token match(string str, int tipo) {
 	Token token = ts.insert(tipo);	// Insere na tabela de símbolos
-	lex->push_back(token);		// Insere no array de tokens
-	ts[token.id()].insert((Atributo*)(new NameAtt(str)));	// Insere atributo de nome do tipo
-	ts[token.id()].insert((Atributo*)(new StrAtt(yytext)));// Insere atributo de string lida
+	lex->container.push_back(token);		// Insere no array de tokens
+	ts[token].insert((Atributo*)(new NameAtt(str)));	// Insere atributo de nome do tipo
+	ts[token].insert((Atributo*)(new StrAtt(yytext)));// Insere atributo de string lida
 	return token;
 }
 

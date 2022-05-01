@@ -22,10 +22,12 @@ struct TabelaDeSimbolos;
 using TabSim = TabelaDeSimbolos;
 
 /* A tabela de símbolos é um vetor de conjuntos de atributos, com nome em forma de string*/
-struct TabelaDeSimbolos: public std::vector<Simbolo> {
-	// Herda metodos e atributos de std::vector
+struct TabelaDeSimbolos {
+	std::vector<Simbolo> container; 	// Simbolos
 	static TabelaDeSimbolos& getInstance();	// Caso seja usada como Singleton
 	Token insert(int tipo);			// Insere token, dado o tipo
+	long long unsigned int size();
+	Simbolo& operator[](Token& token);
 	~TabelaDeSimbolos();
 	private:
 		TabelaDeSimbolos();
@@ -34,7 +36,10 @@ struct TabelaDeSimbolos: public std::vector<Simbolo> {
 /* Simbolo eh um conjunto de atributos, que podem ser inseridos pelos analisadores lexico, sintatico e semantico
 	Exemplo de atributos: valor, tipo (int ou long int?), constante (nunca variou apos inicializacao), etc.  
 */
-struct Simbolo: public std::map<std::string,Atributo*> {
+struct Simbolo {
+	std::map<std::string,Atributo*> container;	// Atributos
+	Atributo* operator[](std::string key);
+	bool has(std::string key);
 	void insert(Atributo* att);	
 	void free();
 };
