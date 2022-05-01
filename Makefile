@@ -66,7 +66,7 @@ test_$(1):
 endef
 $(foreach test,$(TESTS),$(eval $(call execute_test,$(test)))) 
 
-test: build $(foreach test,$(TESTS),test_$(test))
+test: compile $(foreach test,$(TESTS),test_$(test))
 
 
 	

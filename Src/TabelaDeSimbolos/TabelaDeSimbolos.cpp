@@ -65,6 +65,8 @@ void Simbolo::free() {
 
 Atributo::Atributo(string _nome): nome(_nome) {}
 
+Atributo::~Atributo() {}
+
 
 
 

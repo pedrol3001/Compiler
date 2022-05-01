@@ -6,10 +6,12 @@
 using namespace std;
 
 /**********************************************/
+Bloco::~Bloco() {}
 
 
 // |a|, |b|, |obj.x|, |*c|, |&d|, |v[5+7]|, |a * f(b) + obj.x|, |f(g(h(2)))|
 Expressao::Expressao(std::vector<Token> &notacaoPolonesaReversa): Bloco(notacaoPolonesaReversa) { }
+
 
 Nada::Nada(): Bloco() {}
 

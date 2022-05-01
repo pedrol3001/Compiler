@@ -9,6 +9,7 @@ class Semantico;
 struct Bloco: public std::vector<Token> {	
 	Bloco(); 
 	Bloco(std::vector<Token>& tokens); // Tokens
+	virtual ~Bloco();
 	virtual bool eval(Semantico& state);
 };
 

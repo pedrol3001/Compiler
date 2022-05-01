@@ -47,6 +47,7 @@ struct Simbolo {
 struct Atributo{
 	std::string nome;
 	Atributo(std::string _nome);
+	virtual ~Atributo();
 };
 
 
