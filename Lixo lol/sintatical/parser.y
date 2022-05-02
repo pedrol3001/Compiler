@@ -30,7 +30,7 @@ void debug(char *s) {
 
 %right IF ELSE WHILE RETURN
 
-%token VOID INT
+%token VOID INT STRING
 
 %token OUTPUT INPUT
 
@@ -44,7 +44,7 @@ declaration: var-declaration | fun-declaration ;
 
 var-declaration: type-specifier ID SEMICOLON | type-specifier ID LBRACKET INTEGER RBRACKET SEMICOLON ;
 
-type-specifier: INT | VOID ;
+type-specifier: INT | VOID | STRING;
 
 fun-declaration: type-specifier ID LPAREN params RPAREN compound-stmt ;
 
