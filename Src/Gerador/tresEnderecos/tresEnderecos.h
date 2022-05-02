@@ -14,6 +14,7 @@ namespace Addr3{
 		int size;	
 		
 		Instrucao(int _size);
+		virtual ~Instrucao();
 		virtual std::list<Assembly*> gera_codigo()=0;
 	};
 
@@ -32,6 +33,7 @@ namespace Addr3{
 		Token dst;
 		std::vector<Token> op;	// No maximo 2, ex: dst = op1 . op2
 		
+		virtual ~Operacao();
 		Operacao(Token _dst, Token _op); 
 		Operacao(Token _dst, Token _op1, Token _op2); 
 		Operacao(Token _dst, std::vector<Token>& _op); 	

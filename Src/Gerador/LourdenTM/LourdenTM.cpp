@@ -13,6 +13,7 @@ string Inst::str() {
 	ss << line << ": " << InstStr();
 	return ss.str();
 }
+Inst::~Inst() {}
 
 
 // Tipo RO
@@ -22,6 +23,7 @@ std::string tipoRO::InstStr() {
 	ss << nome << ' ' << r1 << ',' << r2 << ',' << r3;	// opcode r1,r2,r3
 	return ss.str();
 }
+tipoRO::~tipoRO() {}
 
 // Tipo RM
 tipoRM::tipoRM(string _nome, Reg _r1, int _offset, Reg _r2, int _line): Inst(_nome, _line), r1(_r1), offset(_offset), r2(_r2) {}
@@ -30,6 +32,7 @@ std::string tipoRM::InstStr() {
 	ss << nome << ' ' << r1 << ',' << offset << '(' << r2 << ')';	// opcode r1,offset(r2)
 	return ss.str();
 }
+tipoRM::~tipoRM() {}
 
 
 

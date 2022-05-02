@@ -9,6 +9,7 @@ using namespace Addr3;
 using namespace std;
 
 Addr3::Instrucao::Instrucao(int _size): size(_size) {}
+Addr3::Instrucao::~Instrucao() {}
 
 // Declaracao ==================================
 list<Assembly*> Declaracao::gera_codigo() {
@@ -19,6 +20,7 @@ list<Assembly*> Declaracao::gera_codigo() {
 Declaracao::Declaracao(Token _token): Instrucao(0) {}
 
 // Operacao ====================================
+Operacao::~Operacao() {}
 Operacao::Operacao(Token _dst, vector<Token>& _op): dst(_dst), op(_op), Instrucao(0) {}
 Operacao::Operacao(Token _dst, Token _op): dst(_dst), Instrucao(0) {
 	op.push_back(_op);

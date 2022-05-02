@@ -37,8 +37,3 @@ bool Lexico::operator>>(Token& token) {
 
 bool Lexico::error() {return !ok;}
 
-
-StrAtt::StrAtt(string _str): Atributo("StrAtt"), str(_str) {}
-
-NameAtt::NameAtt(string _str): Atributo("NameAtt"), str(_str) {}
-

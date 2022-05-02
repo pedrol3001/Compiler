@@ -6,6 +6,7 @@
 struct Assembly {
 	std::string nome;
 	Assembly(std::string _nome);
+	virtual ~Assembly();
 	virtual std::string str()=0;
 };
 

@@ -1,10 +1,11 @@
 #include "../../Src/Gerador/Gerador.h"
 
 #include "../../Src/TabelaDeSimbolos/TabelaDeSimbolos.h"
-#include "../../Src/Tipos/Tipos.h"
+#include "../../Src/Tipos.h"
 
 #include <iostream>
 #include <sstream>
+#include <list>
 #include "../test_format.cpp"
 
 using namespace std;
@@ -25,20 +26,21 @@ bool test(Test& tester) {
 
 	vector<Instrucao*> v;
 	// Declaracao
-	v.insert(new Declaracao());	// 0: int a,b;		-	int a,b;
+	v.push_back(new Declaracao(a));		// 0: int a;		-	int a,b;
+	v.push_back(new Declaracao(b));		// 1: int b;		-	
 	// Operacoes
-	v.insert(new Assignment());	// 1: a = 2		-	a=2;
-	v.insert(new Adicao());	// 2: t1 = 2 + a	-
-	v.insert(new Multiplicacao());	// 3: t2 = t1*3	|	b = ((2+a)*3)-1;
-	v.insert(new Subtracao());	// 4: b = t2-1		-
-	v.insert(new Divisao());	// 5: a = b/2		-	a=b/2;
+	v.push_back(new Assignment(a,c2));		// 2: a = 2		-	a=2;
+	v.push_back(new Adicao(t1,c2,a));		// 3: t1 = 2 + a	-
+	v.push_back(new Multiplicacao(t2,t1,c3));	// 4: t2 = t1*3	|	b = ((2+a)*3)-1;
+	v.push_back(new Subtracao(b,c2,c1));		// 5: b = t2-1		-
+	v.push_back(new Divisao(a,b,c2));		// 6: a = b/2		-	a=b/2;
 	// Salto incondicional
-	v.insert(new Salto(7));	// 6: goto 7: 
+	v.push_back(new Salto(8));			// 7: goto 8: 
 	// Saltos Condicionais	
-	v.insert(new Beq(1));		// 7: if a+b < 100 goto 1:
+	v.push_back(new Beq(2));			// 8: if a+b < 100 goto 2:
 	
 	for(Instrucao* instrucao: v) {
-		std::vector<Assembly*> code = instrucao->gera_codigo();
+		list<Assembly*> code = instrucao->gera_codigo();
 		
 		for(Assembly* assembly: code)
 			output << assembly->str() << '\n';

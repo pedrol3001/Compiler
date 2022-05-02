@@ -15,6 +15,7 @@ namespace TM {
 	struct Inst: public Assembly {
 		std::string str();	
 		Inst(std::string _nome, int _line);
+		virtual ~Inst();
 		protected:
 			virtual std::string InstStr()=0;
 		private:
@@ -24,6 +25,7 @@ namespace TM {
 	struct tipoRO: public Inst {	// opcode r1,r2,r3
 		Reg r1,r2,r3;
 		tipoRO(std::string _nome, Reg _r1, Reg _r2, Reg _r3, int _line);
+		~tipoRO();
 		std::string InstStr();	
 	};
 	#define INST_RO(tipo,nome) \
@@ -45,6 +47,7 @@ namespace TM {
 	struct tipoRM: public Inst {	//  opcode r1,offset(r2)
 		Reg r1; int offset; Reg r2;
 		tipoRM(std::string _nome, Reg _r1, int _offset, Reg _r2, int _line);
+		~tipoRM();
 		std::string InstStr();		
 	};
 	#define INST_RM(tipo,nome) \
