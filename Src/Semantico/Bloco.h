@@ -14,14 +14,16 @@ struct Bloco {
 	virtual ~Bloco();
 	virtual bool analisar(Semantico& state);
 	virtual void gerar(Semantico& state)=0;
+    virtual int eval(Semantico& state)=0;
 	// Debug
 	std::vector<Token> getTokens();
 };
 
 // |a|, |b|, |obj.x|, |*c|, |&d|, |v[5+7]|, |a * f(b) + obj.x|, |f(g(h(2)))|
 struct Expressao: Bloco {
-    	Expressao(const std::vector<Token> &notacaoPolonesaReversa);
+    Expressao(const std::vector<Token> &notacaoPolonesaReversa);
 	void gerar(Semantico& state);
+    void eval(Semantico& state);
 };
 
 struct Nada: Bloco {

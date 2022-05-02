@@ -8,6 +8,7 @@
 class Sintatico;	// Definido em Sintatico.h
 
 struct Semantico {
+	Semantico();
 	Semantico(Sintatico &sintatico);
 };
 
