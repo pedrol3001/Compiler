@@ -113,7 +113,8 @@ void main(int argc, char **argv){
       yyout = stdout;
 
   yyparse();
-  printf("Finished: %llu erros", erros);
+
+  if(erros == 0) printf("Finished: %llu erros", erros);
 
   fclose(yyin);
   fclose(yyout);
