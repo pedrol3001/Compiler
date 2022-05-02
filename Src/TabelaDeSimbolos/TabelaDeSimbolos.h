@@ -52,5 +52,6 @@ struct Atributo{
 
 #include "Constantes/Constantes.h"
 #include "Teste/Teste.h"
+#include "Memory/Memory.h"
 
 #endif

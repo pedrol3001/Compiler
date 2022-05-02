@@ -12,32 +12,40 @@ using namespace std;
 using namespace Addr3;
 
 bool test(Test& tester) {
-	stringstream output;
-
 	TabSim& ts = TabSim::getInstance();
 	
 	Token a = ts.insert(ID);
+	ts[a].insert(new VarEstatica(1));
 	Token b = ts.insert(ID);
+	ts[b].insert(new VarEstatica(1));
 	Token t1 = ts.insert(ID);
+	ts[t1].insert(new VarEstatica(1));
 	Token t2 = ts.insert(ID);
+	ts[t2].insert(new VarEstatica(1));
+	
 	Token c1 = ts.insert(C_INT);
+	ts[c1].insert(new IntVal("1"));
+	
 	Token c2 = ts.insert(C_INT);
+	ts[c2].insert(new IntVal("2"));
+	
 	Token c3 = ts.insert(C_INT);
+	ts[c3].insert(new IntVal("3"));
 
 	vector<Instrucao*> v;
-	// Declaracao
-	v.push_back(new Declaracao(a));		// 0: int a;		-	int a,b;
-	v.push_back(new Declaracao(b));		// 1: int b;		-	
-	// Operacoes
-	v.push_back(new Assignment(a,c2));		// 2: a = 2		-	a=2;
-	v.push_back(new Adicao(t1,c2,a));		// 3: t1 = 2 + a	-
-	v.push_back(new Multiplicacao(t2,t1,c3));	// 4: t2 = t1*3	|	b = ((2+a)*3)-1;
-	v.push_back(new Subtracao(b,c2,c1));		// 5: b = t2-1		-
-	v.push_back(new Divisao(a,b,c2));		// 6: a = b/2		-	a=b/2;
-	// Salto incondicional
-	v.push_back(new Salto(8));			// 7: goto 8: 
-	// Saltos Condicionais	
-	v.push_back(new Beq(2));			// 8: if a+b < 100 goto 2:
+	v.push_back(new Empilha(a));			// 1: int a;		-	int a,b;
+	v.push_back(new Empilha(b));			// 2: int b;		-	
+	v.push_back(new Assignment(a,c2));		// 3: a = 2		-	a=2;
+	v.push_back(new Empilha(t1));			// 4: int t1;		-	
+	v.push_back(new Adicao(t1,c2,a));		// 5: t1 = 2 + a	-
+	v.push_back(new Empilha(t2));			// 6: int t2;		-	
+	v.push_back(new Multiplicacao(t2,t1,c3));	// 7: t2 = t1*3	|	b = ((2+a)*3)-1;
+	v.push_back(new Subtracao(b,c2,c1));		// 8: b = t2-1		-
+	v.push_back(new Divisao(a,b,c2));		// 9: a = b/2		-	a=b/2;
+	v.push_back(new Salto(8));			// 10: goto 11: 
+	v.push_back(new Beq(2));			// 11:if a+b = 100 goto 3:
+	
+	stringstream output;
 	
 	for(Instrucao* instrucao: v) {
 		list<Assembly*> code = instrucao->gera_codigo();
@@ -48,12 +56,13 @@ bool test(Test& tester) {
 		for(Assembly* assembly: code)
 			delete assembly;
 	}
+	output << "HALT 0,0,0" << endl;
 
 	tester.comment() << "Output: ..............." << endl;
 	tester.normal() << output.str();
 	tester.comment() << "Fim do output ........." << endl;
 	
-	tester.log() << "Esse teste nao eh verificado automaticamente" << endl;
+	tester.log() << "Partes deste teste nao sao verificas automaticamente" << endl;
 	
 	for(Instrucao* instrucao: v) 
 		delete instrucao;

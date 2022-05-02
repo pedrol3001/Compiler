@@ -11,6 +11,9 @@
 
 namespace Addr3{
 	struct Instrucao {
+		static long long int count;
+		static long long int linha();
+		
 		int size;	
 		
 		Instrucao(int _size);
@@ -20,11 +23,18 @@ namespace Addr3{
 
 	// Declaracao ==================================
 
-	struct Declaracao: public Instrucao {
+	struct Empilha: public Instrucao {
 		Token token;	// unico token por declaracao
 		
 		std::list<Assembly*> gera_codigo();	
-		Declaracao(Token _token); 	
+		Empilha(Token _token); 	
+	};
+	
+	struct Desempilha: public Instrucao {
+		Token token;	// unico token por declaracao
+		
+		std::list<Assembly*> gera_codigo();	
+		Desempilha(Token _token); 	
 	};
 
 	// Operacao ====================================

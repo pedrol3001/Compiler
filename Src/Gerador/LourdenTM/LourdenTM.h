@@ -8,7 +8,7 @@
 namespace TM {
 
 	enum Reg {
-		r0,r1,r2,r3,r4,r5,sp,
+		r0,r1,r2,r3,gp,ra,sp,	// gp = global pointer, ra = return adress, sp = stack pointer
 		pc	// nao use
 	};
 	

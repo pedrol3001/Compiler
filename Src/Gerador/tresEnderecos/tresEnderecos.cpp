@@ -8,16 +8,29 @@
 using namespace Addr3;
 using namespace std;
 
+long long int Instrucao::count=-1;
+long long int Instrucao::linha() {
+	Instrucao::count++;
+	return Instrucao::count;
+}
+
 Addr3::Instrucao::Instrucao(int _size): size(_size) {}
 Addr3::Instrucao::~Instrucao() {}
 
 // Declaracao ==================================
-list<Assembly*> Declaracao::gera_codigo() {
+list<Assembly*> Empilha::gera_codigo() {
 	list<Assembly*>  code;
 	// Aloca espaco na pilha
 	return code;
 }	
-Declaracao::Declaracao(Token _token): Instrucao(0) {}
+Empilha::Empilha(Token _token): Instrucao(0) {}
+
+list<Assembly*> Desempilha::gera_codigo() {
+	list<Assembly*>  code;
+	// Desaloca espaco na pilha
+	return code;
+}	
+Desempilha::Desempilha(Token _token): Instrucao(0) {}
 
 // Operacao ====================================
 Operacao::~Operacao() {}
