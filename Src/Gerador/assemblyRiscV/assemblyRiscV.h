@@ -1,7 +1,7 @@
 #ifndef assemblyRiscV_h
 #define assemblyRiscV_h
 
-#include "Assembly.h"
+#include "../Assembly/Assembly.h"
 
 
 #include <string>

@@ -1,6 +1,6 @@
 #include "Sintatico.h"
 
-#include "bison.c"
+#include "../bison.c"
 
 using namespace std;
 

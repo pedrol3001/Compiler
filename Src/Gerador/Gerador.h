@@ -6,9 +6,9 @@
 #include <vector>
 #include <string>
 
-#include "tresEnderecos.h"
-#include "LourdenTM.h"
-#include "assemblyRiscV.h"
+#include "tresEnderecos/tresEnderecos.h"
+#include "LourdenTM/LourdenTM.h"
+#include "assemblyRiscV/assemblyRiscV.h"
 
 class Gerador {
 	Gerador(const std::vector<Addr3::Instrucao*> instrucoes, int otimizar=0);

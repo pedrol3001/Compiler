@@ -1,11 +1,12 @@
 #ifndef tresEnderecos_h
 #define tresEnderecos_h
 
-#include "Assembly.h"
+#include "../Assembly/Assembly.h"
 
-#include "../Token/Token.h"
+#include "../../Token/Token.h"
 
 #include <string>
+#include <list>
 #include <vector>
 
 namespace Addr3{
@@ -13,7 +14,7 @@ namespace Addr3{
 		int size;	
 		
 		Instrucao(int _size);
-		virtual std::vector<Assembly*> gera_codigo()=0;
+		virtual std::list<Assembly*> gera_codigo()=0;
 	};
 
 	// Declaracao ==================================
@@ -21,7 +22,7 @@ namespace Addr3{
 	struct Declaracao: public Instrucao {
 		Token token;	// unico token por declaracao
 		
-		std::vector<Assembly*> gera_codigo();	
+		std::list<Assembly*> gera_codigo();	
 		Declaracao(Token _token); 	
 	};
 
@@ -31,33 +32,39 @@ namespace Addr3{
 		Token dst;
 		std::vector<Token> op;	// No maximo 2, ex: dst = op1 . op2
 		
+		Operacao(Token _dst, Token _op); 
+		Operacao(Token _dst, Token _op1, Token _op2); 
 		Operacao(Token _dst, std::vector<Token>& _op); 	
-		virtual std::vector<Assembly*> gera_codigo()=0;	
+		virtual std::list<Assembly*> gera_codigo()=0;	
 	};
 	
 	struct Adicao: public Operacao {
-		Adicao(Token _dst, std::vector<Token>& op);
-		std::vector<Assembly*> gera_codigo();		
+		Adicao(Token _dst, Token _op1, Token _op2);
+		std::list<Assembly*> gera_codigo();		
 	};
 	struct Multiplicacao: public Operacao {
-		Multiplicacao(Token _dst, std::vector<Token>& op);
-		std::vector<Assembly*> gera_codigo();	
+		Multiplicacao(Token _dst, Token _op1, Token _op2);
+		std::list<Assembly*> gera_codigo();	
 	};
 	struct Subtracao: public Operacao {
-		Subtracao(Token _dst, std::vector<Token>& op);
-		std::vector<Assembly*> gera_codigo();	
+		Subtracao(Token _dst, Token _op1, Token _op2);
+		std::list<Assembly*> gera_codigo();	
 	};
 	struct Divisao: public Operacao {
-		Divisao(Token _dst, std::vector<Token>& op);
-		std::vector<Assembly*> gera_codigo();	
+		Divisao(Token _dst, Token _op1, Token _op2);
+		std::list<Assembly*> gera_codigo();	
+	};
+	struct Assignment: public Operacao {
+		Assignment(Token _dst, Token _op);
+		std::list<Assembly*> gera_codigo();	
 	};
 
 	// Saltos ======================================
 
 	struct Salto: public Instrucao {
-		long int linha;	// Linha de destiono
-		Salto(long int _linha);
-		std::vector<Assembly*> gera_codigo();	
+		long int instrucao;	// Linha de destiono
+		Salto(long int instrucao);
+		std::list<Assembly*> gera_codigo();	
 	};
 	
 	// Saltos condicionais =========================
@@ -66,15 +73,15 @@ namespace Addr3{
 
 	
 	struct SaltoCondicional: public Instrucao {
-		long int linha;	// Linha de destino=
-		SaltoCondicional(long int _linha);
+		long int instrucao;	// Linha de destino=
+		SaltoCondicional(long int _instrucao);
 		
-		virtual std::vector<Assembly*> gera_codigo()=0;		
+		virtual std::list<Assembly*> gera_codigo()=0;		
 	};
 	
 	struct Beq: public SaltoCondicional {
-		Beq(long int _linha);
-		std::vector<Assembly*> gera_codigo();		
+		Beq(long int _instrucao);
+		std::list<Assembly*> gera_codigo();		
 	};
 	/*
 	struct Blt: public SaltoCondicional {=

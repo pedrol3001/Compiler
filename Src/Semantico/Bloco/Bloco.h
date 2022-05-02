@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <vector>
-#include "../Token/Token.h"
+#include "../../Token/Token.h"
 
 class Semantico;
 

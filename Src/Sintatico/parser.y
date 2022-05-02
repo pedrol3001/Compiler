@@ -1,6 +1,6 @@
 %code requires {
-#include "../Lexico/Lexico.h"
-#include "../Semantico/Semantico.h"
+#include "Lexico/Lexico.h"
+#include "Semantico/Semantico.h"
 #include <vector>
 using namespace std;
 class Value;
@@ -9,9 +9,9 @@ class Value;
 %{
 #include <iostream>
 #include <stdio.h>
-#include "Sintatico.h"
-#include "../Lexico/Lexico.h"
-#include "../Semantico/Semantico.h"
+#include "Sintatico/Sintatico.h"
+#include "Lexico/Lexico.h"
+#include "Semantico/Semantico.h"
 
 unsigned long long erros = 0;
 using namespace std;

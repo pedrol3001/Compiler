@@ -1,7 +1,7 @@
 #ifndef Semantico_h
 #define Semantico_h
 
-#include "Bloco.h"	// Olhar esse .h
+#include "Bloco/Bloco.h"	// Olhar esse .h
 
 #include <vector>
 

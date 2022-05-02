@@ -50,5 +50,6 @@ struct Atributo{
 };
 
 
+#include "Constantes/Constantes.h"
 
 #endif

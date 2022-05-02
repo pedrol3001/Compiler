@@ -1,7 +1,7 @@
 #ifndef LourdenTM_h
 #define LourdenTM_h
 
-#include "Assembly.h"
+#include "../Assembly/Assembly.h"
 
 #include <string>
 

@@ -15,7 +15,7 @@ TEST = test.cpp
 SRC = Src
 
 MAIN = compiler.cpp
-CPP = $(wildcard $(SRC)/*/*.cpp) 
+CPP = $(wildcard $(SRC)/*/*.cpp)  $(wildcard $(SRC)/*/*/*.cpp)
 OBJ = $(patsubst %.cpp,%.o,$(CPP))
 H = $(patsubst %.cpp,%.h,$(CPP)) $(SRC)/Tipos.h
 
@@ -33,7 +33,7 @@ $(foreach obj,$(OBJ),$(eval $(call make_obj,$(obj))))
 # Geracao do .y do bison
 Y = $(wildcard $(SRC)/*/*.y)
 build_bison:
-	cd "$(SRC)/Sintatico" && bison -d "../../$(Y)" --output="bison.c"  --header="bison.h" 
+	cd "$(SRC)/Sintatico" && bison -d "../../$(Y)" --output="../bison.c"  --header="../bison.h" 
 
 #  Geracao do .l do flex
 L = $(wildcard $(SRC)/*/*.l)
