@@ -88,13 +88,13 @@ bool test(Test& tester) {
 	// 11: goto 12: 				// Pilha: a 
 	v.push_back(new Salto(11));
 	
-	// 12:if a < 100 goto 2:			// Pilha: a 
+	// 12:if a == 100 goto 2:			// Pilha: a 
 	Token a_4 = ts.insert(ID);	
 		ts[a_4].insert(new VarEstatica(0,1));	//        ^
-	Token c100_0 = ts.insert(C_INT);	
-		ts[c100_0].insert(new IntVal("100"));
+	Token c44_0 = ts.insert(C_INT);	
+		ts[c44_0].insert(new IntVal("44"));
 	
-	v.push_back(new Blt(a_4,c100_0,2));
+	v.push_back(new Beq(a_4,c44_0,2));
 	
 	// Teste:	
 	stringstream output;

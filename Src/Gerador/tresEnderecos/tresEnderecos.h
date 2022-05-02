@@ -16,7 +16,7 @@ namespace Addr3{
 		
 		int size;	
 		
-		Instrucao(int _size);
+		Instrucao();
 		virtual ~Instrucao();
 		virtual std::list<Assembly*> gera_codigo()=0;
 	};
@@ -24,15 +24,15 @@ namespace Addr3{
 	// Declaracao ==================================
 
 	struct Aloca: public Instrucao {
-		int bytes;			
+		int space;			
 		std::list<Assembly*> gera_codigo();	
-		Aloca(int _bytes); 	
+		Aloca(int _space); 	
 	};
 	
 	struct Desaloca: public Instrucao {
-		int bytes;			
+		int space;			
 		std::list<Assembly*> gera_codigo();	
-		Desaloca(int _bytes); 	
+		Desaloca(int _space); 	
 	};
 
 	// Operacao ====================================
@@ -89,14 +89,14 @@ namespace Addr3{
 		virtual std::list<Assembly*> gera_codigo()=0;		
 	};
 	
-	struct Blt: public SaltoCondicional {
+	struct Beq: public SaltoCondicional {
 		Token op1, op2; 
-		Blt(Token _op1, Token _op2, long int _instrucao);
+		Beq(Token _op1, Token _op2, long int _instrucao);
 		std::list<Assembly*> gera_codigo();		
 	};
 	
 	/*
-	struct Beq: public SaltoCondicional {=
+	struct Blt: public SaltoCondicional {=
 		std::vector<Assembly> gera_codigo();		
 	};
 	struct Ble: public SaltoCondicional {

@@ -16,31 +16,45 @@ long long int Instrucao::linha() {
 	return Instrucao::count;
 }
 
-Addr3::Instrucao::Instrucao(int _size): size(_size) {}
+Addr3::Instrucao::Instrucao(): size(0) {}
 Addr3::Instrucao::~Instrucao() {}
 
 // Declaracao ==================================
 list<Assembly*> Aloca::gera_codigo() {
 	list<Assembly*>  code;
+	// Carregar constante
+	const long int ctel = Instrucao::linha();
+	code.push_back(new TM::LDC(TM::r0,space,TM::r0,ctel));	// allocl: LDC r0,space(r0)	
 	// Aloca espaco na pilha
+	const long int allocl = Instrucao::linha();
+	code.push_back(new TM::ADD(TM::sp,TM::sp,TM::r0,allocl));	// allocl: ADD sp,sp,r0	
+	
+	size = code.size();	
 	return code;
 }	
-Aloca::Aloca(int _bytes): Instrucao(0), bytes(_bytes) {}
+Aloca::Aloca(int _space): space(_space) {}
 
 list<Assembly*> Desaloca::gera_codigo() {
 	list<Assembly*>  code;
+	// Carregar constante
+	const long int ctel = Instrucao::linha();
+	code.push_back(new TM::LDC(TM::r0,space,TM::r0,ctel));	// allocl: LDC r0,space(r0)	
 	// Desaloca espaco na pilha
+	const long int deallocl = Instrucao::linha();
+	code.push_back(new TM::SUB(TM::sp,TM::sp,TM::r0,deallocl));	// deallocl: SUB sp,sp,r0
+		
+	size = code.size();	
 	return code;
 }	
-Desaloca::Desaloca(int _bytes): Instrucao(0), bytes(_bytes) {}
+Desaloca::Desaloca(int _space): space(_space) {}
 
 // Operacao ====================================
 Operacao::~Operacao() {}
-Operacao::Operacao(Token _dst, vector<Token>& _op): dst(_dst), op(_op), Instrucao(0) {}
-Operacao::Operacao(Token _dst, Token _op): dst(_dst), Instrucao(0) {
+Operacao::Operacao(Token _dst, vector<Token>& _op): dst(_dst), op(_op) {}
+Operacao::Operacao(Token _dst, Token _op): dst(_dst) {
 	op.push_back(_op);
 }	
-Operacao::Operacao(Token _dst, Token _op1, Token _op2): dst(_dst), Instrucao(0) {
+Operacao::Operacao(Token _dst, Token _op1, Token _op2): dst(_dst) {
 	op.push_back(_op1);
 	op.push_back(_op2);
 }		
@@ -98,6 +112,7 @@ list<Assembly*> Adicao::gera_codigo() {
 	// Armazena valor obtido em r2 no destino
 	storeTemp(code,dst,TM::r2);
 	
+	size = code.size();	
 	return code;
 }	
 Adicao::Adicao(Token _dst, Token _op1, Token _op2): Operacao(_dst,_op1,_op2) {}
@@ -105,7 +120,16 @@ Adicao::Adicao(Token _dst, Token _op1, Token _op2): Operacao(_dst,_op1,_op2) {}
 // Multiplicacao
 list<Assembly*> Multiplicacao::gera_codigo() {
 	list<Assembly*> code;
-	// Realiza multiplicacao, carregando operandos da pilha e salvando resultado na pilha
+	// Carregar operandos (op[0], op[1])
+	loadTemp(code,op[0],TM::r0);
+	loadTemp(code,op[1],TM::r1);
+	// Realiza multiplicacao, no temp r2
+	const long int mull = Instrucao::linha();
+	code.push_back(new TM::MUL(TM::r2,TM::r0,TM::r1,mull));	// mull: MUL r2,r0,r1
+	// Armazena valor obtido em r2 no destino
+	storeTemp(code,dst,TM::r2);
+	
+	size = code.size();	
 	return code;
 }	
 
@@ -114,7 +138,16 @@ Multiplicacao::Multiplicacao(Token _dst, Token _op1, Token _op2): Operacao(_dst,
 // Divisao
 list<Assembly*> Divisao::gera_codigo() {
 	list<Assembly*>  code;
-	// Realiza divisao, carregando operandos da pilha e salvando resultado na pilha
+	// Carregar operandos (op[0], op[1])
+	loadTemp(code,op[0],TM::r0);
+	loadTemp(code,op[1],TM::r1);
+	// Realiza divisao, no temp r2
+	const long int divl = Instrucao::linha();
+	code.push_back(new TM::DIV(TM::r2,TM::r0,TM::r1,divl));	// divl: DIV r2,r0,r1
+	// Armazena valor obtido em r2 no destino
+	storeTemp(code,dst,TM::r2);
+	
+	size = code.size();	
 	return code;
 }	
 Divisao::Divisao(Token _dst, Token _op1, Token _op2): Operacao(_dst,_op1,_op2) {}
@@ -122,8 +155,16 @@ Divisao::Divisao(Token _dst, Token _op1, Token _op2): Operacao(_dst,_op1,_op2) {
 // Subtracao
 list<Assembly*> Subtracao::gera_codigo() {
 	list<Assembly*> code;
-	// Realiza subtracao, carregando operandos da pilha e salvando resultado na pilha
+	// Carregar operandos (op[0], op[1])
+	loadTemp(code,op[0],TM::r0);
+	loadTemp(code,op[1],TM::r1);
+	// Realiza divisao, no temp r2
+	const long int subl = Instrucao::linha();
+	code.push_back(new TM::SUB(TM::r2,TM::r0,TM::r1,subl));	// subl: SUB r2,r0,r1
+	// Armazena valor obtido em r2 no destino
+	storeTemp(code,dst,TM::r2);
 	
+	size = code.size();	
 	return code;
 }	
 
@@ -134,9 +175,12 @@ Atribuicao::Atribuicao(Token _dst, Token _op): Operacao(_dst,_op) {}
 
 list<Assembly*> Atribuicao::gera_codigo() {
 	list<Assembly*> code;
-	// Realiza atribuicao, carregando operandos da pilha e salvando resultado na pilha
+	// Carregar operando op[0]
+	loadTemp(code,op[0],TM::r0);
+	// Realiza atribuicao, no temp r2
+	storeTemp(code,dst,TM::r0);	// dst = op[0]
 	
-	
+	size = code.size();	
 	return code;
 }	
 
@@ -145,19 +189,24 @@ list<Assembly*> Atribuicao::gera_codigo() {
 list<Assembly*> Salto::gera_codigo() {
 	list<Assembly*>  code;
 	
+	size = code.size();	
 	return code;
 }
-Salto::Salto(long int _instrucao): instrucao(_instrucao), Instrucao(0) {}
+Salto::Salto(long int _instrucao): instrucao(_instrucao) {}
 	
 // Saltos condicionais =========================
-SaltoCondicional::SaltoCondicional(long int _instrucao): instrucao(_instrucao), Instrucao(0) {}
+SaltoCondicional::SaltoCondicional(long int _instrucao): instrucao(_instrucao) {}
 
-list<Assembly*> Blt::gera_codigo() {
+list<Assembly*> Beq::gera_codigo() {
 	list<Assembly*>  code;
+	// Carregar operandos (op[0], op[1])
+	loadTemp(code,op1,TM::r0);
+	loadTemp(code,op2,TM::r1);
 	// 
+	size = code.size();	
 	return code;
 }
-Blt::Blt(Token _op1, Token _op2, long int _instrucao): SaltoCondicional(_instrucao), op1(_op1), op2(_op2) {}
+Beq::Beq(Token _op1, Token _op2, long int _instrucao): SaltoCondicional(_instrucao), op1(_op1), op2(_op2) {}
 
 
 
