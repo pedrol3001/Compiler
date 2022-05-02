@@ -18,8 +18,13 @@ struct DoubleVal : public Atributo
 
 struct IdVal : public Atributo
 {
-	std::string str;
+	std::string val;
 	IdVal(std::string _str);
+};
+
+struct StringVal: public Atributo {
+	std::string val;
+	StringVal(std::string _str);
 };
 
 #endif

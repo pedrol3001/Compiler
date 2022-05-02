@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Lexico.h"
+#include "../Token/Token.h"
 #include "../Tipos.h"
 
 
@@ -94,13 +95,25 @@ NotSpace [^\n\t ]
 
 "}" {match("}", RBRACE);}
 
-{Letra}({Digito}|{Letra}|_)* {match("Identificador", ID);}
+{Letra}({Digito}|{Letra}|_)* {
+	Token token = match("Identificador", ID);
+	ts[token].insert((Atributo*)(new IdVal(yytext)));	
+}
 
-{Digito}+ {match("Inteiro", C_INT);}
+{Digito}+ {
+	Token token = match("Inteiro", C_INT);
+	ts[token].insert((Atributo*)(new IntVal(yytext)));
+}
 
-({Digito}+"."{Digito}*)|({Digito}*"."{Digito}+) {match("Ponto flutuante", C_FLOAT);}
+({Digito}+"."{Digito}*)|({Digito}*"."{Digito}+) {
+	Token token = match("Ponto flutuante", C_FLOAT);
+	ts[token].insert((Atributo*)(new DoubleVal(yytext)));
+}
 
-\"(\\\"|[^\"\n])*\" {match("String", C_STRING);}
+\"(\\\"|[^\"\n])*\" {
+	Token token = match("String", C_STRING);
+	ts[token].insert((Atributo*)(new StringVal(yytext)));
+}
 
 "/*"[^*]*"*"+([^/][^*]*"*"+)*"/" { match("Comentario", COMMENT);}
 
