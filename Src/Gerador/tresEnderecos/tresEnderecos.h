@@ -23,18 +23,16 @@ namespace Addr3{
 
 	// Declaracao ==================================
 
-	struct Empilha: public Instrucao {
-		Token token;	// unico token por declaracao
-		
+	struct Aloca: public Instrucao {
+		int bytes;			
 		std::list<Assembly*> gera_codigo();	
-		Empilha(Token _token); 	
+		Aloca(int _bytes); 	
 	};
 	
-	struct Desempilha: public Instrucao {
-		Token token;	// unico token por declaracao
-		
+	struct Desaloca: public Instrucao {
+		int bytes;			
 		std::list<Assembly*> gera_codigo();	
-		Desempilha(Token _token); 	
+		Desaloca(int _bytes); 	
 	};
 
 	// Operacao ====================================
@@ -66,8 +64,8 @@ namespace Addr3{
 		Divisao(Token _dst, Token _op1, Token _op2);
 		std::list<Assembly*> gera_codigo();	
 	};
-	struct Assignment: public Operacao {
-		Assignment(Token _dst, Token _op);
+	struct Atribuicao: public Operacao {
+		Atribuicao(Token _dst, Token _op);
 		std::list<Assembly*> gera_codigo();	
 	};
 
@@ -91,12 +89,14 @@ namespace Addr3{
 		virtual std::list<Assembly*> gera_codigo()=0;		
 	};
 	
-	struct Beq: public SaltoCondicional {
-		Beq(long int _instrucao);
+	struct Blt: public SaltoCondicional {
+		Token op1, op2; 
+		Blt(Token _op1, Token _op2, long int _instrucao);
 		std::list<Assembly*> gera_codigo();		
 	};
+	
 	/*
-	struct Blt: public SaltoCondicional {=
+	struct Beq: public SaltoCondicional {=
 		std::vector<Assembly> gera_codigo();		
 	};
 	struct Ble: public SaltoCondicional {

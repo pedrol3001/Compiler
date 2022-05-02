@@ -4,7 +4,7 @@
 
 using namespace std;
 
-char *aux;
+
 IntVal::IntVal(string _val) : Atributo("IntVal"), val(stoll(_val,0,10)) {}
 
 DoubleVal::DoubleVal(string _val) : Atributo("DoubleVal"), val(stold(_val)) {}

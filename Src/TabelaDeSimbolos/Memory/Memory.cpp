@@ -4,28 +4,13 @@
 
 using namespace std;
 
-long int *Variavel::counter = NULL;
-Variavel::Variavel(string _nome, long int *_counter, int _bytes): Atributo(_nome), bytes(_bytes) {
-	Variavel::counter = _counter;
-	assert(Variavel::counter != NULL);
-	distance = *counter+bytes;
-	*(Variavel::counter) += bytes;
-}
+Variavel::Variavel(string _nome, long int _offset, int _bytes): Atributo(_nome), offset_(_offset), bytes(_bytes) {}
+
 Variavel::~Variavel() {}
-long int Variavel::getOffset() {
-	return *(Variavel::counter) - distance;
-}
-void Variavel::free(long int _bytes) {
-	*(Variavel::counter) -= _bytes;
-	assert(*(Variavel::counter)>=0);	
-}
-void Variavel::free() {
-	*(Variavel::counter) -= bytes;
-	assert(*(Variavel::counter)>=0);	
-}
 
-long int VarEstatica::sp_counter=0;
-VarEstatica::VarEstatica(int _bytes): Variavel("VarEstatica",&(VarEstatica::sp_counter),_bytes) {}
+long int Variavel::offset() {return offset_;}
 
-long int VarGlobal::gp_counter=0;
-VarGlobal::VarGlobal(int _bytes): Variavel("VarGlobal",&(VarGlobal::gp_counter),_bytes) {}
+
+VarEstatica::VarEstatica(long int _offset, int _bytes): Variavel("VarEstatica",_offset,_bytes) {}
+
+VarGlobal::VarGlobal(long int _offset, int _bytes): Variavel("VarGlobal",_offset,_bytes) {}
