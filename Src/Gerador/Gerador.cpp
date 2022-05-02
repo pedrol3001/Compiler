@@ -4,14 +4,13 @@
 #include <string>
 
 using namespace std;
+using namespace Addr3;
 
-Gerador(const vector<Instrucao>& instrucoes, int otimizar=0) {
+Gerador::Gerador(const vector<Instrucao*> instrucoes, int otimizar) {
 	// Otimizar
 	
 	// Gerar
-	for(Instrucao instrucao: instrucoes) {
+	for(Instrucao* instrucao: instrucoes) {
 			
 	}
 }
-
-Assembly::Assembly(string _nome): nome(_nome) {}

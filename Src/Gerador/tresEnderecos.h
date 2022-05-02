@@ -1,7 +1,7 @@
 #ifndef tresEnderecos_h
 #define tresEnderecos_h
 
-#include "Gerador.h"
+#include "Assembly.h"
 
 #include "../Token/Token.h"
 
@@ -31,7 +31,7 @@ namespace Addr3{
 		Token dst;
 		std::vector<Token> op;	// No maximo 2, ex: dst = op1 . op2
 		
-		Operacao(Token _dst, std::vector<Token>& op); 	
+		Operacao(Token _dst, std::vector<Token>& _op); 	
 		virtual std::vector<Assembly*> gera_codigo()=0;	
 	};
 	
@@ -73,6 +73,7 @@ namespace Addr3{
 	};
 	
 	struct Beq: public SaltoCondicional {
+		Beq(long int _linha);
 		std::vector<Assembly*> gera_codigo();		
 	};
 	/*

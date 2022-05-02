@@ -1,6 +1,7 @@
 #include "assemblyRiscV.h"
 
 #include <sstream>
+#include <vector>
 
 using namespace std;
 using namespace RV;

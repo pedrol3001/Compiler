@@ -1,7 +1,8 @@
 #ifndef assemblyRiscV_h
 #define assemblyRiscV_h
 
-#include "Gerador.h"
+#include "Assembly.h"
+
 
 #include <string>
 

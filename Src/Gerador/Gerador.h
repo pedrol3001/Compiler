@@ -6,23 +6,15 @@
 #include <vector>
 #include <string>
 
-class Instrucao;
-class Assembly;
+#include "tresEnderecos.h"
+#include "LourdenTM.h"
+#include "assemblyRiscV.h"
 
 class Gerador {
-	Gerador(Semantico& semantico);
+	Gerador(const std::vector<Addr3::Instrucao*> instrucoes, int otimizar=0);
 	
 	//void otimizar();
 };
 
-struct Assembly {
-	std::string nome;
-	Assembly(std::string _nome);
-	virtual std::string str()=0;
-};
-
-#include "LourdenTM.h"
-#include "assemblyRiscV.h"
-#include "tresEnderecos.h"
 
 #endif
