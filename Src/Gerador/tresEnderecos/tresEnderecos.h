@@ -72,7 +72,7 @@ namespace Addr3{
 	// Saltos ======================================
 
 	struct Salto: public Instrucao {
-		long int instrucao;	// Linha de destiono
+		long int distancia;	// Distancia ate a linha de destino
 		Salto(long int instrucao);
 		std::list<Assembly*> gera_codigo();	
 	};
@@ -83,7 +83,7 @@ namespace Addr3{
 
 	
 	struct SaltoCondicional: public Instrucao {
-		long int instrucao;	// Linha de destino=
+		long int distancia;	// Distancia ate a linha de destino
 		SaltoCondicional(long int _instrucao);
 		
 		virtual std::list<Assembly*> gera_codigo()=0;		

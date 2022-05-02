@@ -24,7 +24,7 @@ list<Assembly*> Aloca::gera_codigo() {
 	list<Assembly*>  code;
 	// Carregar constante
 	const long int ctel = Instrucao::linha();
-	code.push_back(new TM::LDC(TM::r0,space,TM::r0,ctel));	// allocl: LDC r0,space(r0)	
+	code.push_back(new TM::LDC(TM::r0,space,TM::r0,ctel));		// allocl: LDC r0,space(r0)	
 	// Aloca espaco na pilha
 	const long int allocl = Instrucao::linha();
 	code.push_back(new TM::ADD(TM::sp,TM::sp,TM::r0,allocl));	// allocl: ADD sp,sp,r0	
@@ -38,7 +38,7 @@ list<Assembly*> Desaloca::gera_codigo() {
 	list<Assembly*>  code;
 	// Carregar constante
 	const long int ctel = Instrucao::linha();
-	code.push_back(new TM::LDC(TM::r0,space,TM::r0,ctel));	// allocl: LDC r0,space(r0)	
+	code.push_back(new TM::LDC(TM::r0,space,TM::r0,ctel));		// allocl: LDC r0,space(r0)	
 	// Desaloca espaco na pilha
 	const long int deallocl = Instrucao::linha();
 	code.push_back(new TM::SUB(TM::sp,TM::sp,TM::r0,deallocl));	// deallocl: SUB sp,sp,r0
@@ -188,25 +188,36 @@ list<Assembly*> Atribuicao::gera_codigo() {
 // Saltos ======================================
 list<Assembly*> Salto::gera_codigo() {
 	list<Assembly*>  code;
+	// Carregar constante
+	const long int ctel = Instrucao::linha();
+	code.push_back(new TM::LDC(TM::r0,0,TM::r0,ctel));		// allocl: LDC r0,0(r0)	
+	const long int jeql = Instrucao::linha();
+	code.push_back(new TM::JEQ(TM::r0,distancia,TM::pc,jeql));	// jeql: JEQ r0,distancia(pc)
 	
 	size = code.size();	
 	return code;
 }
-Salto::Salto(long int _instrucao): instrucao(_instrucao) {}
+Salto::Salto(long int _distancia): distancia(_distancia) {}
 	
 // Saltos condicionais =========================
-SaltoCondicional::SaltoCondicional(long int _instrucao): instrucao(_instrucao) {}
+SaltoCondicional::SaltoCondicional(long int _distancia): distancia(_distancia) {}
 
 list<Assembly*> Beq::gera_codigo() {
 	list<Assembly*>  code;
-	// Carregar operandos (op[0], op[1])
+	// Carregar operandos (op1, op2)
 	loadTemp(code,op1,TM::r0);
 	loadTemp(code,op2,TM::r1);
-	// 
+	// Subtrair
+	const long int subl = Instrucao::linha();
+	code.push_back(new TM::SUB(TM::r2,TM::r0,TM::r1,subl));	// subl: SUB r2,r0,r1
+	const long int jeql = Instrucao::linha();
+	code.push_back(new TM::JEQ(TM::r2,distancia,TM::pc,jeql));	// jeql: JEQ r2,distancia(pc)
+	
+	
 	size = code.size();	
 	return code;
 }
-Beq::Beq(Token _op1, Token _op2, long int _instrucao): SaltoCondicional(_instrucao), op1(_op1), op2(_op2) {}
+Beq::Beq(Token _op1, Token _op2, long int _distancia): SaltoCondicional(_distancia), op1(_op1), op2(_op2) {}
 
 
 
