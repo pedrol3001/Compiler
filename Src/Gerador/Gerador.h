@@ -10,18 +10,9 @@ class Instrucao;
 class Assembly;
 
 class Gerador {
-	Gerador(std::vector<Instrucao*> v);
+	Gerador(Semantico& semantico);
 	
 	//void otimizar();
-};
-
-
-class Instrucao {
-	Token e1,e2,e3;	// 3 endereços
-	
-	public:
-	Instrucao(Token _e1,Token _e2,Token _e3);
-	std::vector<Assembly> gera_codigo();
 };
 
 struct Assembly {

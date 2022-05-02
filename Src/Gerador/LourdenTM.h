@@ -8,7 +8,7 @@
 namespace TM {
 
 	enum Reg {
-		r0,r1,r2,r3,r4,r5,r6,
+		r0,r1,r2,r3,r4,r5,sp,
 		pc	// nao use
 	};
 	
