@@ -8,7 +8,9 @@ using namespace std;
 bool test(Test& tester) {
 
 	TabSim &ts = TabSim::getInstance();
-	Lexico lexico("Resources/teste_comentario.txt");
+	FILE* f = fopen("Resources/teste_comentario.txt","r");
+	Lexico lexico(f,stdout,true);
+	fclose(f);
 	if(lexico.error()) {
 		tester.error() << "Nao foi possivel abrir o arquivo!" << endl;
 		return false;

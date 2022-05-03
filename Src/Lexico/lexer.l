@@ -9,7 +9,7 @@
 
 using namespace std;
 
-
+bool verbose=false;
 Lexico* lex;	// Ponteiro aaaaaaaaaaaaaaaa
 TabSim &ts = TabSim::getInstance();
 
@@ -20,7 +20,8 @@ string getToken() {
 }
 
 Token match(string str, int tipo) {
-	fprintf(yyout," [%s] ",yytext); // Util para debug
+	if(verbose)
+		fprintf(yyout," [%s] ",yytext); // Util para debug
 	Token token = ts.insert(tipo);	// Insere na tabela de símbolos
 	lex->container.push_back(token);		// Insere no array de tokens
 	ts[token].insert((Atributo*)(new NameAtt(str)));	// Insere atributo de nome do tipo
@@ -127,6 +128,7 @@ NotSpace [^\n\t ]
 {Space}* {}
 
 . {
+	return -1;
 	BEGIN(INVALIDO_UMA_LINHA); 
 	yyless(yyleng-1);
 }
@@ -134,6 +136,8 @@ NotSpace [^\n\t ]
 	BEGIN(INVALIDO_VARIAS_LINHAS);
 	yyless(yyleng-2);
 }
+
+<<EOF>> {return 0;}
 
 
 <INVALIDO_VARIAS_LINHAS>(.|\n)+ {

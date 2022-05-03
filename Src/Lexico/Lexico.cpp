@@ -5,13 +5,18 @@
 
 #include "lex.yy.c"	// Include do código gerado pelo flex
 
-Lexico::Lexico(FILE* ifile, FILE* ofile): ok(true),count(0) {	
+Lexico::Lexico(FILE* ifile, FILE* ofile, bool _verbose): ok(true),count(0) {	
+
 	// Analisa arquivo e constoi vetor de tokens
 	// Usar flex
 	yyin = ifile;
 	yyout = ofile; 
 	lex = this;	// Argumento extra que inventei
-	if(yylex()) {
+	verbose = _verbose;
+	int status = yylex();
+	if(verbose)
+		fprintf(yyout,"\n");
+	if(status<0) {
 		cout << "Erro lexico!" << endl;
 		ok=false;
 		return;	

@@ -9,7 +9,9 @@ using namespace std;
 bool test(Test &tester)
 {
 	TabSim &ts = TabSim::getInstance();
-	Lexico lexico("Resources/Lexico/constantes.txt");
+	FILE* f = fopen("Resources/Lexico/constantes.txt","r");
+	Lexico lexico(f,stdout,false);
+	fclose(f);
 	tester.normal() << lexico.size() << endl;
 
 	tester.comment() << "\nTestando valores de constantes na tabela de simbolos" << endl;

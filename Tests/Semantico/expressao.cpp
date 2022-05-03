@@ -6,30 +6,34 @@
 #include "../../Src/TabelaDeSimbolos/TabelaDeSimbolos.h"
 
 #include <vector>
+#include <cstdio>
+#include <memory>
 
 using namespace std;
 
 
 bool test(Test& tester) {
 	TabSim &ts = TabSim::getInstance();
-	
-	Lexico lexico("Resources/Semantico/expressao.txt");
+	FILE * f = fopen("Resources/Semantico/expressao.txt","r");
+	Lexico lexico(f,stdout,true);
+	fclose(f);
 	if(lexico.error()) {
 		tester.error() << "Nao foi possivel abrir o arquivo!" << endl;
 		return false;
 	}
 	tester.comment() << "Lexico ok!" << endl;
 		
-	Sintatico sintatico(lexico);
+	Sintatico sintatico;
+	sintatico.analisar(lexico);
 	
 	vector<string> ans = {"*","/","*","/","*","/","*","/"};
 		
 	tester.comment() << "Testando expressoes! (Para cada linha, todos tokens do bloco)" << endl;
-	tester.normal() << sintatico.container.size() << endl;
+	tester.normal() << sintatico.blocos().size() << endl;
 	tester.comment() << endl << "..........................................." << endl;
 	
 	int i=0;
-	for(Bloco* bloco: sintatico.container) {
+	for(shared_ptr<Bloco> bloco: sintatico.blocos()) {
 		vector<Token> tokens = bloco->getTokens();
 		for(Token token: tokens) {
 			if(ts[token].has("StrAtt"))  {

@@ -19,7 +19,7 @@ bool test(Test& tester) {
 	// 1: int a;					// Pilha: a
 	Token a_0 = ts.insert(ID);
 	
-	v.push_back(new Aloca(1));
+	v.push_back(new Aloca(a_0));
 	
 	// 2: a = 2					// Pilha: a
 	Token a_1 = ts.insert(ID);
@@ -31,7 +31,7 @@ bool test(Test& tester) {
 	
 	// 3: int t1;					// Pilha: a t1
 	Token t1_0 = ts.insert(ID);
-	v.push_back(new Aloca(1));
+	v.push_back(new Aloca(t1_0));
 	
 	// 4: t1 = 2 + a				// Pilha: a t1
 	Token t1_1 = ts.insert(ID);
@@ -45,7 +45,7 @@ bool test(Test& tester) {
 	
 	// 5: int t2;					// Pilha: a t1 t2
 	Token t2_0 = ts.insert(ID);			
-	v.push_back(new Aloca(1));
+	v.push_back(new Aloca(t2_0));
 	
 	// 6: t2 = t1*3				// Pilha: a t1 t2
 	Token t2_1 = ts.insert(ID);
@@ -59,7 +59,7 @@ bool test(Test& tester) {
 	
 	// 7: int t3;					// Pilha: a t1 t2 t3
 	Token t3_0 = ts.insert(ID);
-	v.push_back(new Aloca(1));
+	v.push_back(new Aloca(t3_0));
 	
 	// 8: t3 = t2-1				// Pilha: a t1 t2 t3
 	Token t3_1 = ts.insert(ID);
@@ -82,7 +82,9 @@ bool test(Test& tester) {
 	v.push_back(new Divisao(a_3,t3_2,c2_2));
 	
 	// 10: ~int 3					// Pilha: a 
-	v.push_back(new Desaloca(3));
+	v.push_back(new Desaloca(t3_0));
+	v.push_back(new Desaloca(t2_0));
+	v.push_back(new Desaloca(t1_0));
 	
 	
 	// 11: goto 12: 				// Pilha: a 

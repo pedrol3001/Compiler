@@ -6,7 +6,9 @@
 using namespace std;
 
 bool test(Test& tester) {
-	Lexico lexico("Resources/code6.txt");
+	FILE* f = fopen("Resources/code6.txt","r");
+	Lexico lexico(f,stdout,false);
+	fclose(f);
 	if(lexico.error()) {
 		tester.error() << "Nao foi possivel abrir o arquivo!" << endl;
 		return false;
@@ -15,7 +17,10 @@ bool test(Test& tester) {
 	sintatico.analisar(lexico);
 	
 	tester.comment() << "Status retornado pelo bison" << endl;
-	tester.normal() << "Status: " << sintatico.status << endl;
+	if(sintatico.good())	
+		tester.normal() << "Aceito!" << endl;
+	else
+		tester.normal() << "Rejeitado!" << endl;
 	return true;
 }
 

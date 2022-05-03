@@ -21,49 +21,51 @@ int main(int argn, char *argv[]) {
 		return 0;
 	}
 	// Verificar input e output =============================
+	
+	// Lexico ===============================================
 	// Input
 	FILE* source = fopen(argv[0],"r");
 	if(source==NULL) {
 		cout << "Nao foi possivel abrir o arquivo '" << argv[0] << "'" << endl;
 		return 0;
 	}
+	// Lexico
+	Lexico lexico(source,stdout,true);	
+	fclose(source);
+	
+	if(!lexico.good()) {
+		cout << "Analise lexica FALHOU!" << endl;
+		return 0;
+	}
+	cout << "Analise lexica bem sucedida!" << endl;
+	// Sintatico ============================================
+	Sintatico sintatico;
+	sintatico.analisar(lexico);
+	
+	if(!sintatico.good()) {
+		cout << "Analise sintatica FALHOU!" << endl;
+		return 0;
+	}	
+	cout << "Analise sintatica bem sucedida!" << endl;
+	// Semantico =============================================
+	Semantico semantico;
+	semantico.analisar(sintatico.blocos());
+	
+	if(!semantico.good()) {
+		cout << "Analise semantica FALHOU!" << endl;
+		return 0;
+	}	
+	cout << "Analise semantica bem sucedida!" << endl;
+	// Geracao de codigo =====================================
 	// Output
 	ofstream ofile(OUTPUT_NAME);
 	if(!ofile.good()) {
 		cout << "Falha ao criar arquivo de output!" << endl;
 		return 0;
 	}
-	
-	// Lexico ===============================================
-	Lexico lexico(source,stdout);	
-	if(!lexico.good()) {
-		cout << "\nAnalise lexica FALHOU!" << endl;
-		return 0;
-	}
-	cout << "\nAnalise lexica bem sucedida!" << endl;
-	// Sintatico ============================================
-	Sintatico sintatico;
-	sintatico.analisar(lexico);
-	
-	if(!sintatico.good()) {
-		cout << "\nAnalise sintatica FALHOU!" << endl;
-		return 0;
-	}	
-	cout << "\nAnalise sintatica bem sucedida!" << endl;
-	// Semantico =============================================
-	Semantico semantico;
-	semantico.analisar(sintatico.blocos());
-	
-	if(!semantico.good()) {
-		cout << "\nAnalise semantica FALHOU!" << endl;
-		return 0;
-	}	
-	cout << "\nAnalise semantica bem sucedida!" << endl;
-	// Geracao de codigo
-	
+	// Geracao	
 	Gerador gerador;
 	gerador.gerar(ofile,semantico.instrucoes());
-	
 	ofile.close();
 
 	return 0;
