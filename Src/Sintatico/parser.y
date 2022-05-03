@@ -2,7 +2,10 @@
 #include "Lexico/Lexico.h"
 #include "Semantico/Semantico.h"
 #include <vector>
+#include <memory>
+
 using namespace std;
+
 class Value;
 }
 
@@ -18,7 +21,7 @@ using namespace std;
 
 // Implementacao no final do .y
 void debug(string s);
-void yyerror(Lexico& lexico, std::vector<Bloco*>& container, string s);
+void yyerror(Lexico& lexico, std::vector<std::shared_ptr<Bloco> >& container, string s);
 int yylex(Lexico& lexico);
 
 %}
@@ -88,7 +91,7 @@ int yylex(Lexico& lexico);
 %define parse.error detailed
 
 %lex-param {Lexico &lexico}
-%parse-param {Lexico &lexico} {std::vector<Bloco*>& container}
+%parse-param {Lexico &lexico} {std::vector<std::shared_ptr<Bloco> >& container}
 
 %%
 
@@ -139,7 +142,7 @@ additive-expression: additive-expression addop term | term ;
 addop: SUM | SUB ;
 
 term: 	term mulop factor {	
-		container.push_back((Bloco*)(new Expressao($2())));	// TODO: eh um teste}
+		container.emplace_back(new Expressao($2()));	// TODO: eh um teste}
 	} | factor;
 
 mulop: MUL | DIV ;
@@ -155,7 +158,7 @@ arg-list: arg-list COMMA expression | expression | %empty;
 NUM: C_INT | C_FLOAT ;
 
 %%
-void yyerror(Lexico& lexico, std::vector<Bloco*>& container, string s) {
+void yyerror(Lexico& lexico, std::vector<std::shared_ptr<Bloco> >& container, string s) {
 	fprintf(stderr, "error: %s\n", s.c_str());
 	erros++;
 }

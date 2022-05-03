@@ -1,7 +1,6 @@
 #ifndef Bloco_h
 #define Bloco_h
 
-#include <iostream>
 #include <vector>
 #include "../../Token/Token.h"
 

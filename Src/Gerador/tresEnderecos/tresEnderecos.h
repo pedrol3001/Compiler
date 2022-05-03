@@ -14,6 +14,8 @@ namespace Addr3{
 		static long long int count;
 		static long long int linha();
 		
+		int id;	// id usado para referenciar saltos
+		
 		int size;	
 		
 		Instrucao();
@@ -21,18 +23,18 @@ namespace Addr3{
 		virtual std::list<Assembly*> gera_codigo()=0;
 	};
 
-	// Declaracao ==================================
+	// Declaracoes ==================================
 
 	struct Aloca: public Instrucao {
-		int space;			
+		Token token;			
 		std::list<Assembly*> gera_codigo();	
-		Aloca(int _space); 	
+		Aloca(Token _token); 	
 	};
 	
 	struct Desaloca: public Instrucao {
-		int space;			
+		Token token;			
 		std::list<Assembly*> gera_codigo();	
-		Desaloca(int _space); 	
+		Desaloca(Token _token); 	
 	};
 
 	// Operacao ====================================
@@ -72,25 +74,24 @@ namespace Addr3{
 	// Saltos ======================================
 
 	struct Salto: public Instrucao {
-		long int linha;	// Linha de destino
-		Salto(long int _linha);
+		long int dst_id;	// Linha de destino
+		Salto(long int _dst_id);
 		std::list<Assembly*> gera_codigo();	
 	};
 	
 	
 	// Saltos condicionais =========================
 
-	
 	struct SaltoCondicional: public Instrucao {
-		long int linha;	// Distancia ate a linha de destino
-		SaltoCondicional(long int _linha);
+		long int dst_id;	// Linha de destino
+		SaltoCondicional(long int _dst_id);
 		
 		virtual std::list<Assembly*> gera_codigo()=0;		
 	};
 	
 	struct Beq: public SaltoCondicional {
 		Token op1, op2; 
-		Beq(Token _op1, Token _op2, long int _linha);
+		Beq(Token _op1, Token _op2, long int _dst_id);
 		std::list<Assembly*> gera_codigo();		
 	};
 	

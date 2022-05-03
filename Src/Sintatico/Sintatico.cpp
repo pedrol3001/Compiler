@@ -1,20 +1,22 @@
 #include "Sintatico.h"
+#include "../Util/Util.h"
 
 #include "../bison.c"
 
+#include <cassert>
+
 using namespace std;
 
-Sintatico::Sintatico(Lexico &lexico) {
-	int status = yyparse(lexico,container);
+bool Sintatico::analisar(Lexico &lexico) {
+	blocosGerados.clear();	
+	int status = yyparse(lexico,blocosGerados);
 	ok = (status==0);
-
-}
-
-bool Sintatico::good() {
 	return ok;
 }
 
-Sintatico::~Sintatico() {
-	for(Bloco* bloco: this->container)
-		delete bloco;
+std::vector<std::shared_ptr<Bloco> > Sintatico::blocos() {
+	assert(ok);
+	return blocosGerados;
 }
+	
+bool Sintatico::good() {return ok;}

@@ -24,29 +24,29 @@ list<Assembly*> Aloca::gera_codigo() {
 	list<Assembly*>  code;
 	// Carregar constante
 	const long int ctel = Instrucao::linha();
-	code.push_back(new TM::LDC(TM::r0,space,TM::r0,ctel));		// allocl: LDC r0,space(r0)	
+	//code.push_back(new TM::LDC(TM::r0,space,TM::r0,ctel));		// allocl: LDC r0,space(r0)	
 	// Aloca espaco na pilha
 	const long int allocl = Instrucao::linha();
-	code.push_back(new TM::ADD(TM::sp,TM::sp,TM::r0,allocl));	// allocl: ADD sp,sp,r0	
+	//code.push_back(new TM::ADD(TM::sp,TM::sp,TM::r0,allocl));	// allocl: ADD sp,sp,r0	
 	
 	size = code.size();	
 	return code;
 }	
-Aloca::Aloca(int _space): space(_space) {}
+Aloca::Aloca(Token _token): token(_token) {}
 
 list<Assembly*> Desaloca::gera_codigo() {
 	list<Assembly*>  code;
 	// Carregar constante
 	const long int ctel = Instrucao::linha();
-	code.push_back(new TM::LDC(TM::r0,space,TM::r0,ctel));		// allocl: LDC r0,space(r0)	
+	//code.push_back(new TM::LDC(TM::r0,space,TM::r0,ctel));		// allocl: LDC r0,space(r0)	
 	// Desaloca espaco na pilha
 	const long int deallocl = Instrucao::linha();
-	code.push_back(new TM::SUB(TM::sp,TM::sp,TM::r0,deallocl));	// deallocl: SUB sp,sp,r0
+	//code.push_back(new TM::SUB(TM::sp,TM::sp,TM::r0,deallocl));	// deallocl: SUB sp,sp,r0
 		
 	size = code.size();	
 	return code;
 }	
-Desaloca::Desaloca(int _space): space(_space) {}
+Desaloca::Desaloca(Token _token): token(_token) {}
 
 // Operacao ====================================
 Operacao::~Operacao() {}
@@ -199,10 +199,10 @@ list<Assembly*> Salto::gera_codigo() {
 	size = code.size();	
 	return code;
 }
-Salto::Salto(long int _linha): linha(_linha) {}
+Salto::Salto(long int _dst_id): dst_id(_dst_id) {}
 	
 // Saltos condicionais =========================
-SaltoCondicional::SaltoCondicional(long int _linha): linha(_linha) {}
+SaltoCondicional::SaltoCondicional(long int _dst_id): dst_id(_dst_id) {}
 
 list<Assembly*> Beq::gera_codigo() {
 	list<Assembly*>  code;
@@ -221,7 +221,7 @@ list<Assembly*> Beq::gera_codigo() {
 	size = code.size();	
 	return code;
 }
-Beq::Beq(Token _op1, Token _op2, long int _distancia): SaltoCondicional(_distancia), op1(_op1), op2(_op2) {}
+Beq::Beq(Token _op1, Token _op2, long int _dst_id): SaltoCondicional(_dst_id), op1(_op1), op2(_op2) {}
 
 
 

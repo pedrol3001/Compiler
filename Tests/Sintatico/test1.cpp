@@ -11,7 +11,8 @@ bool test(Test& tester) {
 		tester.error() << "Nao foi possivel abrir o arquivo!" << endl;
 		return false;
 	}
-	Sintatico sintatico(lexico);
+	Sintatico sintatico;
+	sintatico.analisar(lexico);
 	
 	tester.comment() << "Status retornado pelo bison" << endl;
 	tester.normal() << "Status: " << sintatico.status << endl;

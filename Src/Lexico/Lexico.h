@@ -6,9 +6,10 @@
 
 #include <vector>
 #include <string>
+#include <cstdio>
 
 struct Lexico {
-	Lexico(std::string file);	// Analisa arquivo e constoi vetor de tokens
+	Lexico(FILE* ifile, FILE* ofile);	// Analisa arquivo e constoi vetor de tokens
 	std::vector<Token> container;
 	bool error();
 	bool good();
