@@ -38,7 +38,6 @@ Digito [0-9]
 Letra [a-zA-Z]
 Sinal [-+]
 Space [\n\t \r]
-NotSpace [^\n\t \r]
 
 %x INVALIDO_VARIAS_LINHAS
 %x INVALIDO_UMA_LINHA
