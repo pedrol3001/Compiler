@@ -8,29 +8,29 @@
 namespace TM {
 
 	enum Reg {
-		r0,r1,r2,r3,gp,ra,sp,	// gp = global pointer, ra = return adress, sp = stack pointer
+		r0,r1,r2,zero,gp,ra,sp,	// zero = 0, gp = global pointer, ra = return adress, sp = stack pointer
 		pc	// nao use
 	};
 	
 	struct Inst: public Assembly {
 		std::string str();	
-		Inst(std::string _nome, int _line);
+		Inst(std::string _nome);
 		virtual ~Inst();
 		protected:
 			virtual std::string InstStr()=0;
 		private:
-			int line;
+			std::string nome;
 	};
 
 	struct tipoRO: public Inst {	// opcode r1,r2,r3
 		Reg r1,r2,r3;
-		tipoRO(std::string _nome, Reg _r1, Reg _r2, Reg _r3, int _line);
+		tipoRO(std::string _nome, Reg _r1, Reg _r2, Reg _r3);
 		~tipoRO();
 		std::string InstStr();	
 	};
 	#define INST_RO(tipo,nome) \
 	struct tipo: public tipoRO { \
-		tipo (Reg _r1, Reg _r2, Reg _r3, int _line): tipoRO(nome,_r1,_r2,_r3,_line) {}\
+		tipo (Reg _r1, Reg _r2, Reg _r3): tipoRO(nome,_r1,_r2,_r3) {}\
 	};
 	
 	// IO
@@ -46,13 +46,13 @@ namespace TM {
 	
 	struct tipoRM: public Inst {	//  opcode r1,offset(r2)
 		Reg r1; int offset; Reg r2;
-		tipoRM(std::string _nome, Reg _r1, int _offset, Reg _r2, int _line);
+		tipoRM(std::string _nome, Reg _r1, int _offset, Reg _r2);
 		~tipoRM();
 		std::string InstStr();		
 	};
 	#define INST_RM(tipo,nome) \
 	struct tipo: public tipoRM { \
-		tipo (Reg _r1, int _offset, Reg _r2, int _line): tipoRM(nome,_r1,_offset,_r2,_line) {}\
+		tipo (Reg _r1, int _offset, Reg _r2): tipoRM(nome,_r1,_offset,_r2) {}\
 	};
 	// Load
 	INST_RM(LDC,"LDC")	// r1 = offset (ignora r2)

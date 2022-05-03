@@ -16,8 +16,8 @@ struct Variavel: public Atributo {
 	long int offset();
 };
 
-struct VarEstatica: public Variavel {	// Variaveis estaticas
-	VarEstatica(long int _offset, int _bytes);	// space = 
+struct VarLocal: public Variavel {	// Variaveis estaticas
+	VarLocal(long int _offset, int _bytes);	// space = 
 };
 
 struct VarGlobal: public Variavel {	// Variaveis globais

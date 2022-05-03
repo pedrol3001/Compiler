@@ -7,34 +7,52 @@
 
 #include <string>
 #include <list>
+#include <memory>
 #include <vector>
 
 namespace Addr3{
 	struct Instrucao {
-		static long long int count;
-		static long long int linha();
+		std::string classe;
 		
 		int id;	// id usado para referenciar saltos
 		
-		int size;	
-		
-		Instrucao();
+		Instrucao(std::string _classe);
 		virtual ~Instrucao();
-		virtual std::list<Assembly*> gera_codigo()=0;
+		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;
+	};
+
+	// Input/output =================================
+	
+	struct Read: public Instrucao {
+		Token op;			
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		Read(Token _op); 	
+	};
+	
+	struct Print: public Instrucao {
+		Token op;			
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		Print(Token _op); 	
 	};
 
 	// Declaracoes ==================================
 
+	struct Global: public Instrucao {
+		Token op;			
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		Global(Token _op); 	
+	};
+
 	struct Aloca: public Instrucao {
-		Token token;			
-		std::list<Assembly*> gera_codigo();	
-		Aloca(Token _token); 	
+		Token op;			
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		Aloca(Token _op); 	
 	};
 	
 	struct Desaloca: public Instrucao {
-		Token token;			
-		std::list<Assembly*> gera_codigo();	
-		Desaloca(Token _token); 	
+		Token op;			
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		Desaloca(Token _op); 	
 	};
 
 	// Operacao ====================================
@@ -44,55 +62,76 @@ namespace Addr3{
 		std::vector<Token> op;	// No maximo 2, ex: dst = op1 . op2
 		
 		virtual ~Operacao();
-		Operacao(Token _dst, Token _op); 
-		Operacao(Token _dst, Token _op1, Token _op2); 
-		Operacao(Token _dst, std::vector<Token>& _op); 	
-		virtual std::list<Assembly*> gera_codigo()=0;	
+		Operacao(std::string _classe, Token _dst, Token _op); 
+		Operacao(std::string _classe, Token _dst, Token _op1, Token _op2); 
+		Operacao(std::string _classe, Token _dst, std::vector<Token>& _op); 	
+		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;	
 	};
 	
 	struct Adicao: public Operacao {
 		Adicao(Token _dst, Token _op1, Token _op2);
-		std::list<Assembly*> gera_codigo();		
+		std::list<std::shared_ptr<Assembly> > gera_codigo();		
 	};
 	struct Multiplicacao: public Operacao {
 		Multiplicacao(Token _dst, Token _op1, Token _op2);
-		std::list<Assembly*> gera_codigo();	
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	struct Subtracao: public Operacao {
 		Subtracao(Token _dst, Token _op1, Token _op2);
-		std::list<Assembly*> gera_codigo();	
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	struct Divisao: public Operacao {
 		Divisao(Token _dst, Token _op1, Token _op2);
-		std::list<Assembly*> gera_codigo();	
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	struct Atribuicao: public Operacao {
 		Atribuicao(Token _dst, Token _op);
-		std::list<Assembly*> gera_codigo();	
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+	};
+	// Chamada de funcao============================
+	
+	struct BeginCall: public Instrucao {
+		BeginCall();
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+	};
+	
+	struct Param: public Instrucao {
+		Param(Token parametro);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+	};
+
+	struct Call: public Instrucao {
+		Call(Token funcao);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 
 	// Saltos ======================================
 
+	struct Label: public Instrucao {
+		Token token;	// Nome da label
+		Label(Token _token);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+	};
+
 	struct Salto: public Instrucao {
-		long int dst_id;	// Linha de destino
-		Salto(long int _dst_id);
-		std::list<Assembly*> gera_codigo();	
+		Token label;	// Linha de destino
+		Salto(Token _label);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	
-	
-	// Saltos condicionais =========================
 
 	struct SaltoCondicional: public Instrucao {
-		long int dst_id;	// Linha de destino
-		SaltoCondicional(long int _dst_id);
+		Token label;	// Linha de destino
+		SaltoCondicional(std::string _classe, Token _label);
 		
-		virtual std::list<Assembly*> gera_codigo()=0;		
+		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;		
 	};
 	
 	struct Beq: public SaltoCondicional {
-		Token op1, op2; 
-		Beq(Token _op1, Token _op2, long int _dst_id);
-		std::list<Assembly*> gera_codigo();		
+		Token op1, op2, label; 
+		
+		Beq(Token _op1, Token _op2, Token _label);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();		
 	};
 	
 	/*

@@ -11,11 +11,12 @@
 
 #include "tresEnderecos/tresEnderecos.h"
 #include "LourdenTM/LourdenTM.h"
+#include "Assembly/Assembly.h"
 
 struct Gerador {
 	Gerador(bool _oI=false, bool _oM=false);
 	bool gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::Instrucao> > instrucoes);
-	std::list<std::shared_ptr<TM::Inst> > codigo();
+	std::list<std::shared_ptr<Assembly> > codigo();
 	
 	private:
 		bool oI=false,oM=false;
@@ -30,7 +31,7 @@ struct Gerador {
 		void corrigirTmLourden();
 		
 		std::list<std::shared_ptr<Addr3::Instrucao> > instrucoes;
-		std::list<std::shared_ptr<TM::Inst> > codigoGerado;
+		std::list<std::shared_ptr<Assembly> > codigoGerado;
 };
 
 

@@ -14,7 +14,7 @@ using namespace Addr3;
 
 Gerador::Gerador(bool _oI, bool _oM): oI(_oI), oM(_oM) {}
 
-list<shared_ptr<TM::Inst> > Gerador::codigo() {
+list<std::shared_ptr<Assembly> > Gerador::codigo() {
 	assert(ok);
 	return codigoGerado;
 }
