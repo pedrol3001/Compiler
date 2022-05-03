@@ -5,9 +5,13 @@
 using namespace std;
 
 Sintatico::Sintatico(Lexico &lexico) {
-	status = yyparse(lexico,container);
+	int status = yyparse(lexico,container);
+	ok = (status==0);
 
+}
 
+bool Sintatico::good() {
+	return ok;
 }
 
 Sintatico::~Sintatico() {

@@ -188,22 +188,26 @@ list<Assembly*> Atribuicao::gera_codigo() {
 // Saltos ======================================
 list<Assembly*> Salto::gera_codigo() {
 	list<Assembly*>  code;
+	/*
+	
 	// Carregar constante
 	const long int ctel = Instrucao::linha();
 	code.push_back(new TM::LDC(TM::r0,0,TM::r0,ctel));		// allocl: LDC r0,0(r0)	
 	const long int jeql = Instrucao::linha();
 	code.push_back(new TM::JEQ(TM::r0,distancia,TM::pc,jeql));	// jeql: JEQ r0,distancia(pc)
-	
+	*/
 	size = code.size();	
 	return code;
 }
-Salto::Salto(long int _distancia): distancia(_distancia) {}
+Salto::Salto(long int _linha): linha(_linha) {}
 	
 // Saltos condicionais =========================
-SaltoCondicional::SaltoCondicional(long int _distancia): distancia(_distancia) {}
+SaltoCondicional::SaltoCondicional(long int _linha): linha(_linha) {}
 
 list<Assembly*> Beq::gera_codigo() {
 	list<Assembly*>  code;
+	/*
+	
 	// Carregar operandos (op1, op2)
 	loadTemp(code,op1,TM::r0);
 	loadTemp(code,op2,TM::r1);
@@ -212,7 +216,7 @@ list<Assembly*> Beq::gera_codigo() {
 	code.push_back(new TM::SUB(TM::r2,TM::r0,TM::r1,subl));	// subl: SUB r2,r0,r1
 	const long int jeql = Instrucao::linha();
 	code.push_back(new TM::JEQ(TM::r2,distancia,TM::pc,jeql));	// jeql: JEQ r2,distancia(pc)
-	
+	*/
 	
 	size = code.size();	
 	return code;

@@ -1,6 +1,7 @@
 #include "Lexico.h"
 
 #include <cstdio>
+#include <iostream>
 
 #include "lex.yy.c"	// Include do código gerado pelo flex
 
@@ -9,12 +10,17 @@ Lexico::Lexico(std::string file): ok(true),count(0) {
 	// Usar flex
 	yyin = fopen (file.c_str(),"r");
 	if(yyin==NULL) {
+		cout << "Nao foi possivel abrir o arquivo '" << file << "'" << endl;
 		ok=false;
 		return;
 	}
 	yyout = stdout; 
 	lex = this;	// Argumento extra que inventei
-	yylex();	
+	if(yylex()) {
+		cout << "Erro lexico!" << endl;
+		ok=false;
+		return;	
+	}	
 	fclose(yyin);	// Fecha o arquivo
 	// OBS: não feche stdout
 }
@@ -34,6 +40,8 @@ bool Lexico::operator>>(Token& token) {
 	}
 	return false;
 }
+
+bool Lexico::good() {return ok;}
 
 bool Lexico::error() {return !ok;}
 

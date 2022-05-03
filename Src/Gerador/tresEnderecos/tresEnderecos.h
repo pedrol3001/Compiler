@@ -72,26 +72,25 @@ namespace Addr3{
 	// Saltos ======================================
 
 	struct Salto: public Instrucao {
-		long int distancia;	// Distancia ate a linha de destino
-		Salto(long int instrucao);
+		long int linha;	// Linha de destino
+		Salto(long int _linha);
 		std::list<Assembly*> gera_codigo();	
 	};
 	
-	// Saltos condicionais =========================
 	
-	// Chamada de funcao
+	// Saltos condicionais =========================
 
 	
 	struct SaltoCondicional: public Instrucao {
-		long int distancia;	// Distancia ate a linha de destino
-		SaltoCondicional(long int _instrucao);
+		long int linha;	// Distancia ate a linha de destino
+		SaltoCondicional(long int _linha);
 		
 		virtual std::list<Assembly*> gera_codigo()=0;		
 	};
 	
 	struct Beq: public SaltoCondicional {
 		Token op1, op2; 
-		Beq(Token _op1, Token _op2, long int _instrucao);
+		Beq(Token _op1, Token _op2, long int _linha);
 		std::list<Assembly*> gera_codigo();		
 	};
 	

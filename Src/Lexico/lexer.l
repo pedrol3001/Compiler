@@ -13,11 +13,18 @@ using namespace std;
 Lexico* lex;	// Ponteiro aaaaaaaaaaaaaaaa
 TabSim &ts = TabSim::getInstance();
 
+string getToken() {
+	string token(yytext);
+	token = token.substr(0,yyleng);
+	return token;
+}
+
 Token match(string str, int tipo) {
+	fprintf(yyout," [%s] ",yytext); // Util para debug
 	Token token = ts.insert(tipo);	// Insere na tabela de símbolos
 	lex->container.push_back(token);		// Insere no array de tokens
 	ts[token].insert((Atributo*)(new NameAtt(str)));	// Insere atributo de nome do tipo
-	ts[token].insert((Atributo*)(new StrAtt(yytext)));// Insere atributo de string lida
+	ts[token].insert((Atributo*)(new StrAtt(getToken())));// Insere atributo de string lida
 	return token;
 }
 
@@ -97,49 +104,52 @@ NotSpace [^\n\t ]
 
 {Letra}({Digito}|{Letra}|_)* {
 	Token token = match("Identificador", ID);
-	ts[token].insert((Atributo*)(new IdVal(yytext)));	
+	ts[token].insert((Atributo*)(new IdVal(getToken())));	
 }
 
 {Digito}+ {
 	Token token = match("Inteiro", C_INT);
-	ts[token].insert((Atributo*)(new IntVal(yytext)));
+	ts[token].insert((Atributo*)(new IntVal(getToken())));
 }
 
 ({Digito}+"."{Digito}*)|({Digito}*"."{Digito}+) {
 	Token token = match("Ponto flutuante", C_FLOAT);
-	ts[token].insert((Atributo*)(new DoubleVal(yytext)));
+	ts[token].insert((Atributo*)(new DoubleVal(getToken())));
 }
 
 \"(\\\"|[^\"\n])*\" {
 	Token token = match("String", C_STRING);
-	ts[token].insert((Atributo*)(new StringVal(yytext)));
+	ts[token].insert((Atributo*)(new StringVal(getToken())));
 }
 
 "/*"[^*]*"*"+([^/][^*]*"*"+)*"/" { match("Comentario", COMMENT);}
 
 {Space}* {}
 
-
-"/*" {
-	match("Invalido",NOT_INITIALIZED);
-	BEGIN(INVALIDO_VARIAS_LINHAS);
-	yyless(yyleng-2);
-}
-<INVALIDO_VARIAS_LINHAS>(.|\n)+ {
-	match("Invalido",NOT_INITIALIZED);
-	BEGIN(INITIAL);
-}
-
 . {
-	match("Invalido",NOT_INITIALIZED);
 	BEGIN(INVALIDO_UMA_LINHA); 
 	yyless(yyleng-1);
 }
+"/*" {
+	BEGIN(INVALIDO_VARIAS_LINHAS);
+	yyless(yyleng-2);
+}
+
+
+<INVALIDO_VARIAS_LINHAS>(.|\n)+ {
+	//match("Invalido",NOT_INITIALIZED);
+	BEGIN(INITIAL);
+}
+
 
 <INVALIDO_UMA_LINHA>.+ {
-	match("Invalido",NOT_INITIALIZED);
+	//match("Invalido",NOT_INITIALIZED);
 	BEGIN(INITIAL);
 }
 
 %%
+
+/*
+
+*/
 

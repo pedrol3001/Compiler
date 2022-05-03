@@ -8,7 +8,9 @@ struct Sintatico {
 	std::vector<Bloco*> container;
 	Sintatico(Lexico &lexico);
 	~Sintatico();
-	int status;
+	bool good();
+	private:
+		bool ok;
 };
 
 

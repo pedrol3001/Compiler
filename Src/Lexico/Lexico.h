@@ -11,6 +11,7 @@ struct Lexico {
 	Lexico(std::string file);	// Analisa arquivo e constoi vetor de tokens
 	std::vector<Token> container;
 	bool error();
+	bool good();
 	void reset();
 	bool operator>>(Token& token);
 	long long unsigned int size();
