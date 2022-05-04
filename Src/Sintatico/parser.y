@@ -103,14 +103,27 @@ int yylex(Lexico& lexico);
 				if(it->nome == nome) return it->escopo;
 			return -1;
 		}
-		bool verificar(string nome){
+		bool verificar(string nome, int tipo){
 			this->verificar_escopo();
-			if(existe(nome) == -1){
-				std::cout << "Erro: variável \"" << nome << "\" não declarada." << std::endl;
-				erros_semantico++;
-				return false;
+			for(auto it = vars.begin(); it != vars.end(); it++){
+				if(it->nome == nome){
+					if(it->natureza != 1 && tipo == 1){ // não-função sendo usada como função
+						std::cout << "Erro: variável \"" << nome << "\" não pode ser usada como uma função." << std::endl;
+						erros_semantico++;
+						return false;
+					}
+					if(it->natureza == 0 && tipo == 2){ // variável normal sendo usada como array
+						std::cout << "Erro: variável \"" << nome << "\" não pode ser usada como um array." << std::endl;
+						erros_semantico++;
+						return false;
+					}
+					
+					return true;
+				};
 			}
-			return true;
+			std::cout << "Erro: variável \"" << nome << "\" não declarada." << std::endl;
+			erros_semantico++;
+			return false;
 		}
 		void verificar_escopo(){
 			while(!vars.empty() && vars.back().escopo > escopo)
@@ -227,8 +240,8 @@ return-stmt: RETURN SEMICOLON | RETURN expression SEMICOLON ;
 
 expression: var ASSIGN expression | simple-expression ;
 
-var: ID { tabela.verificar(token_name($1)); } 
-	| ID LBRACKET expression RBRACKET { tabela.verificar(token_name($1)); } ;
+var: ID { tabela.verificar(token_name($1), 0); } 
+	| ID LBRACKET expression RBRACKET { tabela.verificar(token_name($1), 2); } ;
 
 simple-expression: additive-expression relop additive-expression | additive-expression ;
 
@@ -246,7 +259,7 @@ mulop: MUL | DIV ;
 
 factor: LPAREN expression RPAREN | var | call | NUM ;
 
-call: ID LPAREN args RPAREN { tabela.verificar(token_name($1)); } ;
+call: ID LPAREN args RPAREN { tabela.verificar(token_name($1), 1); } ;
 
 args: arg-list | %empty ;
 
