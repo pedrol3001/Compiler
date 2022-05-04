@@ -2,11 +2,14 @@
 #include "Lexico/Lexico.h"
 #include "Semantico/Semantico.h"
 #include <vector>
+#include <iostream>
 #include <memory>
+#include "Token/Token.h"
 
 using namespace std;
 
-class Value;
+class Token;
+//class Value;
 }
 
 %{
@@ -25,6 +28,7 @@ void yyerror(Lexico& lexico, std::vector<std::shared_ptr<Bloco> >& container, st
 int yylex(Lexico& lexico);
 
 %}
+
 // yylval ======================================================== 
 
 %{
@@ -41,8 +45,85 @@ int yylex(Lexico& lexico);
 		ret.tokens.insert(ret.tokens.end(),r.tokens.begin(),r.tokens.end());
 		return ret;
 	}
+
+	TabSim& tabsim = TabSim::getInstance();
+
+	string token_name(Token t){
+		return ((IdVal*) tabsim[t]["IdVal"])->val;
+	}
+
+	struct Simb {
+		string nome;
+		int tipo; // 0 = int, 1 = void
+		int escopo;
+		int natureza; // 0 = var, 1 = funcao, 2 = array
+		bool usado = false;
+	};
+
+	int erros_semantico = 0, escopo = 0;
+
+	struct Gerenciador {
+		vector<Simb> vars;
+
+		Gerenciador(){
+			vars.push_back(Simb{"input", 1, 0, 1});
+			vars.push_back(Simb{"output", 1, 0, 1});
+		}
+
+		void adicionar(string nome, int tipo, int natureza, int escopo){
+
+			this->verificar_escopo();
+
+			std::cout << "Adicionando " << nome << " no escopo " << escopo << std::endl;
+
+			int st = this->existe(nome);
+			if(st != -1 && st < escopo){
+				std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
+			}else if(st == escopo){
+				std::cout << "Erro: variável \"" << nome << "\" sendo redeclarada." << std::endl;
+			}
+
+			Simb s{nome, tipo, escopo, natureza};
+
+			if(tipo == 285)
+				tipo = 0; // int
+			else if(tipo == 284)
+				tipo = 1; // void
+
+			if(natureza == 0 && tipo == 1){ // variavel com tipo void
+				std::cout << "Erro: variável \"" << nome << "\" não pode ser do tipo void." << std::endl;
+				erros_semantico++;
+			}
+
+			this->vars.push_back(s);
+			std::cout << nome << " adicionado com sucesso." << std::endl;
+		}
+		int existe(string nome){
+			for(auto it = vars.begin(); it != vars.end(); it++)
+				if(it->nome == nome) return it->escopo;
+			return -1;
+		}
+		bool verificar(string nome){
+			this->verificar_escopo();
+			if(existe(nome) == -1){
+				std::cout << "Erro: variável \"" << nome << "\" não declarada." << std::endl;
+				erros_semantico++;
+				return false;
+			}
+			return true;
+		}
+		void verificar_escopo(){
+			while(!vars.empty() && vars.back().escopo > escopo)
+				vars.pop_back();
+		}
+	};
+
+	Gerenciador tabela;
+
 %}
-%define api.value.type {Value}
+
+//%define api.value.type {Value}
+%define api.value.type {Token}
 
 /* declare tokens */
 	// Usado para debug
@@ -101,19 +182,34 @@ declaration-list: declaration-list declaration | declaration ;
 
 declaration: var-declaration | fun-declaration ;
 
-var-declaration: type-specifier ID SEMICOLON | type-specifier ID LBRACKET C_INT RBRACKET SEMICOLON ;
+var-declaration: type-specifier ID SEMICOLON {
+		tabela.adicionar(token_name($2), $1.tipo, 0, escopo);
+	}
+	| type-specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
+		tabela.adicionar(token_name($2), $1.tipo, 2, escopo);
+	};
 
 type-specifier: INT | VOID ;
 
-fun-declaration: type-specifier ID LPAREN params RPAREN compound-stmt ;
+fun-declaration: type-specifier ID {
+		tabela.adicionar(token_name($2), $1.tipo, 1, escopo);
+	} open-esc LPAREN params RPAREN compound-stmt close-esc ;
+
+open-esc: %empty { escopo++; } ;
+close-esc: %empty { escopo--; } ;
 
 params: param-list | VOID ;
 
 param-list: param-list COMMA param | param ;
 
-param: type-specifier ID | type-specifier ID LBRACKET RBRACKET ;
+param: type-specifier ID {
+		tabela.adicionar(token_name($2), $1.tipo, 0, escopo);
+	}
+	| type-specifier ID LBRACKET RBRACKET {
+		tabela.adicionar(token_name($2), $1.tipo, 2, escopo);
+	};
 
-compound-stmt: LBRACE local-declarations statement-list RBRACE ;
+compound-stmt: LBRACE open-esc local-declarations statement-list close-esc RBRACE ;
 
 local-declarations: local-declarations var-declaration | %empty ;
 
@@ -131,7 +227,8 @@ return-stmt: RETURN SEMICOLON | RETURN expression SEMICOLON ;
 
 expression: var ASSIGN expression | simple-expression ;
 
-var: ID | ID LBRACKET expression RBRACKET ;
+var: ID { tabela.verificar(token_name($1)); } 
+	| ID LBRACKET expression RBRACKET { tabela.verificar(token_name($1)); } ;
 
 simple-expression: additive-expression relop additive-expression | additive-expression ;
 
@@ -142,14 +239,14 @@ additive-expression: additive-expression addop term | term ;
 addop: SUM | SUB ;
 
 term: 	term mulop factor {	
-		container.emplace_back(new Expressao($2()));	// TODO: eh um teste}
+		//container.emplace_back(new Expressao($2()));	// TODO: eh um teste}
 	} | factor;
 
 mulop: MUL | DIV ;
 
 factor: LPAREN expression RPAREN | var | call | NUM ;
 
-call: ID LPAREN args RPAREN ;
+call: ID LPAREN args RPAREN { tabela.verificar(token_name($1)); } ;
 
 args: arg-list | %empty ;
 
@@ -166,7 +263,8 @@ void yyerror(Lexico& lexico, std::vector<std::shared_ptr<Bloco> >& container, st
 int yylex(Lexico& lexico){
 	Token token;
 	if(lexico >> token) {
-		yylval = Value(token);
+		//yylval = Value(token);
+		yylval = token;
 		return token();
 	} else {
 		return YYEOF;
