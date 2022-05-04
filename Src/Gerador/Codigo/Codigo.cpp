@@ -4,7 +4,9 @@
  
 using namespace Code;
 using namespace std;
- 
+
+Codigo::Codigo(bool _is_label): flag_is_label(_is_label) {}
+bool Codigo::is_label() {return flag_is_label;}
 
 void Codigo::update(long long int _linha) {linha=_linha;}	// Atualiza linha
 long long int Codigo::getLinha() {

@@ -32,12 +32,14 @@ bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::I
 	
 	if(oM) otimizarTmLourden();
 	
-	long long int linha=0;
+	// Adiciona 
 	
 	// Atualiza labels
+	long long int linha=0;
 	for(shared_ptr<Assembly> assembly: codigoGerado) {
 		assembly->update(linha);
-		linha++;
+		if(!assembly->is_label())
+			linha++;
 	}
 	
 	// Gera codigo

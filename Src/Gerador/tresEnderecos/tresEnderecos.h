@@ -12,28 +12,28 @@
 #include <vector>
 
 namespace Addr3{
-	struct Instrucao: public Code::Codigo  {
+	struct Instrucao: public Code::Codigo {
 		std::string classe;		
-		Instrucao(std::string _classe);
+		Instrucao(std::string _classe, bool _is_label=false);
 		virtual ~Instrucao();
 		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;
 	};
 	
 	// Label ========================================
-	struct Label: public Code::Label, public Instrucao {
+	struct Label: public Code::Label, public Instrucao {	// Label:
 		Label(Token _label);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();
 	};	
 
 	// Input/output =================================
 	
-	struct Read: public Instrucao {
+	struct Read: public Instrucao {		// Read x;
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 		Read(Token _op); 	
 	};
 	
-	struct Print: public Instrucao {
+	struct Print: public Instrucao {	// Print x;
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 		Print(Token _op); 	
@@ -41,19 +41,19 @@ namespace Addr3{
 
 	// Declaracoes ==================================
 
-	struct Global: public Instrucao {
+	struct Global: public Instrucao {	
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 		Global(Token _op); 	
 	};
 
-	struct Aloca: public Instrucao {
+	struct Aloca: public Instrucao {	// Aloca x;
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 		Aloca(Token _op); 	
 	};
 	
-	struct Desaloca: public Instrucao {
+	struct Desaloca: public Instrucao {	// Desaloca x;
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 		Desaloca(Token _op); 	
@@ -88,24 +88,36 @@ namespace Addr3{
 		Divisao(Token _dst, Token _op1, Token _op2);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
-	struct Atribuicao: public Operacao {
+	struct Atribuicao: public Operacao {	// x = y
 		Atribuicao(Token _dst, Token _op);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+	};
+	// Ponteiros=====================================
+	
+	struct LoadFromRef: public Instrucao {	// x = *y
+		Token dst, pointer;
+		LoadFromRef(Token _dst, Token _pointer);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+	};
+	struct StoreInRef: public Instrucao {	// *x = y
+		Token src, pointer;
+		StoreInRef(Token _src, Token _pointer);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	// Chamada de funcao============================
 	
-	struct BeginCall: public Instrucao {
+	struct BeginCall: public Instrucao {	// Begin_call;
 		BeginCall();
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	
-	struct Param: public Instrucao {
+	struct Param: public Instrucao {	// Param param;
 		Token parametro;		
 		Param(Token _parametro);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 
-	struct Call: public Instrucao {
+	struct Call: public Instrucao {		// Call function;
 		Token funcao;		
 		Call(Token _funcao);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
@@ -113,18 +125,18 @@ namespace Addr3{
 
 	// Saltos ======================================
 	
-	struct Goto: public Instrucao, public Code::Goto {
+	struct Goto: public Instrucao, public Code::Goto {	// Goto label
 		Goto(Token _label);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	
 
-	struct SaltoCondicional: public Instrucao, public Code::Goto {
+	struct SaltoCondicional: public Instrucao, public Code::Goto {	// 
 		SaltoCondicional(std::string _classe, Token _label);
 		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;		
 	};
 	
-	struct Beq: public SaltoCondicional {
+	struct Beq: public SaltoCondicional {	// if op1 == op2 goto label
 		Token op1, op2; 
 		
 		Beq(Token _op1, Token _op2, Token _label);

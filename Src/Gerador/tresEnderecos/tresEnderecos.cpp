@@ -9,7 +9,7 @@
 using namespace Addr3;
 using namespace std;
 
-Instrucao::Instrucao(std::string _classe): classe(_classe) {}
+Instrucao::Instrucao(std::string _classe, bool _is_label): classe(_classe), Code::Codigo(_is_label) {}
 Instrucao::~Instrucao() {}
 
 // Funcoes auxiliares ===========================
@@ -72,7 +72,7 @@ std::list<std::shared_ptr<Assembly> > Label::gera_codigo() {
 	code.emplace_back(new TM::Label(label));		// Label
 	return code;
 }
-Label::Label(Token _label): Code::Label(_label), Instrucao("Label") {}
+Label::Label(Token _label): Code::Label(_label), Instrucao("Label",true) {}
 
 // Input/output =================================
 	
@@ -209,6 +209,36 @@ list<shared_ptr<Assembly> > Atribuicao::gera_codigo() {
 	
 	return code;
 }	
+
+// Ponteiros=====================================
+
+LoadFromRef::LoadFromRef(Token _dst, Token _pointer): Instrucao("RefLoad"), dst(_dst),pointer(_pointer) {}
+
+std::list<std::shared_ptr<Assembly> > LoadFromRef::gera_codigo() {
+	list<shared_ptr<Assembly> > code;
+	// Carrega ponteiro
+	loadReg(code,pointer,TM::t0);
+	// Le do ponteiro
+	code.emplace_back(new TM::LD(TM::t1,0,TM::t0));	// LD t1,0(t0)
+	// Armazena resultado
+	storeReg(code,dst,TM::t1);
+	
+	return code;
+}	
+
+StoreInRef::StoreInRef(Token _src, Token _pointer): Instrucao("RefStore"),src(_src),pointer(_pointer) {}
+
+std::list<std::shared_ptr<Assembly> > StoreInRef::gera_codigo() {
+	list<shared_ptr<Assembly> > code;
+	// Carrega ponteiro
+	loadReg(code,pointer,TM::t0);
+	// Carrega operando src
+	loadReg(code,src,TM::t1);
+	// Armazena no ponteiro
+	code.emplace_back(new TM::ST(TM::t1,0,TM::t0));	// ST t1,0(t0)
+	
+	return code;
+}
 
 
 // Chamada de funcao============================
