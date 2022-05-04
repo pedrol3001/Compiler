@@ -16,7 +16,7 @@ namespace TM {
 	
 	struct Instrucao: public Assembly {
 		virtual std::string str();	
-		Instrucao(std::string _nome, bool _is_label);
+		Instrucao(std::string _nome, bool _is_label=false);
 		virtual ~Instrucao();
 		protected:
 			virtual std::string InstStr();

@@ -2,16 +2,14 @@
 #define Sintatico_h
 
 #include "../Lexico/Lexico.h"
-#include "../Semantico/Bloco/Bloco.h"
+#include "../Semantico/Semantico.h"
 
 #include <memory>
 
 struct Sintatico {	
-	bool analisar(Lexico &lexico);
-	std::vector<std::shared_ptr<Bloco> > blocos();
+	bool analisar(Lexico &lexico, Semantico& semantico);
 	bool good();
 	private:
-		std::vector<std::shared_ptr<Bloco> > blocosGerados;
 		bool ok=false;
 };
 
