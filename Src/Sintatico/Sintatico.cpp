@@ -7,16 +7,10 @@
 
 using namespace std;
 
-bool Sintatico::analisar(Lexico &lexico) {
-	blocosGerados.clear();	
-	int status = yyparse(lexico,blocosGerados);
+bool Sintatico::analisar(Lexico &lexico, Semantico& semantico) {
+	int status = yyparse(lexico,semantico);
 	ok = (status==0);
 	return ok;
-}
-
-std::vector<std::shared_ptr<Bloco> > Sintatico::blocos() {
-	assert(ok);
-	return blocosGerados;
 }
 	
 bool Sintatico::good() {return ok;}

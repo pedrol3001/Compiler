@@ -7,7 +7,7 @@
 using namespace std;
 using namespace Addr3;
 
-bool Semantico::analisar(std::vector<std::shared_ptr<Bloco> > blocos) {
+bool Semantico::analisar() {
 	
 	ok = true;	// ok eh o resultado da analise
 	
@@ -22,6 +22,7 @@ void Semantico::gerarIntermediario() {
 	instrucoesGeradas.clear();
 	
 	// Geracao de codigo intermediario
+	// TODO: é um teste
 }
 
 std::list<std::shared_ptr<Addr3::Instrucao> > Semantico::instrucoes() {

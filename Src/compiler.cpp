@@ -39,8 +39,9 @@ int main(int argn, char *argv[]) {
 	}
 	cout << "Analise lexica bem sucedida!" << endl;
 	// Sintatico ============================================
+	Semantico semantico;
 	Sintatico sintatico;
-	sintatico.analisar(lexico);
+	sintatico.analisar(lexico,semantico);
 	
 	if(!sintatico.good()) {
 		cout << "Analise sintatica FALHOU!" << endl;
@@ -48,8 +49,6 @@ int main(int argn, char *argv[]) {
 	}	
 	cout << "Analise sintatica bem sucedida!" << endl;
 	// Semantico =============================================
-	Semantico semantico;
-	semantico.analisar(sintatico.blocos());
 	
 	if(!semantico.good()) {
 		cout << "Analise semantica FALHOU!" << endl;

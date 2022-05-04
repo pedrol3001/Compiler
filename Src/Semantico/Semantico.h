@@ -10,7 +10,7 @@
 #include <vector>
 
 struct Semantico {
-	bool analisar(std::vector<std::shared_ptr<Bloco> > blocos);
+	bool analisar();
 	std::list<std::shared_ptr<Addr3::Instrucao> > instrucoes();
 	bool good();
 	private:
