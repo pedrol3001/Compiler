@@ -78,7 +78,7 @@ int yylex(Lexico& lexico);
 		}
 
 		void adicionar(string nome, int tipo, int natureza, int escopo, string tamanho){
-			int st = this->existe(nome);
+			int st = this->existe(nome); st = vars[st].escopo;
 			if(st != -1 && st < escopo){
 				std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
 			}else if(st == escopo){
@@ -104,12 +104,12 @@ int yylex(Lexico& lexico);
 				cout << "aloca " << s.nome << " " << s.tamanho << "\n";
 		}
 		int existe(string nome){
-			for(auto it = vars.begin(); it != vars.end(); it++)
-				if(it->nome == nome) return it->escopo;
+			for(auto it = vars.rbegin(); it != vars.rend(); it++)
+				if(it->nome == nome) return distance(it, vars.rend());
 			return -1;
 		}
 		bool verificar(string nome, int tipo){
-			for(auto it = vars.begin(); it != vars.end(); it++){
+			for(auto it = vars.rbegin(); it != vars.rend(); it++){
 				if(it->nome == nome){
 					if(it->natureza != 1 && tipo == 1){ // não-função sendo usada como função
 						std::cout << "Erro: variável \"" << nome << "\" não pode ser usada como uma função." << std::endl;
@@ -267,7 +267,8 @@ iteration-stmt: WHILE LPAREN expression RPAREN statement ;
 return-stmt: RETURN SEMICOLON | RETURN expression SEMICOLON ;
 
 expression: var ASSIGN expression {
-	cout << const_name($1) << " = " << const_name($3) << endl;	
+	cout << const_name($1) << " = " << const_name($3) << endl;
+	$$ = $3; // para retornar o resultado da igualdade
 }
 	| simple-expression ;
 
@@ -325,25 +326,30 @@ term: term mulop factor {
 	cout << const_name(token) << " = " << const_name($1) << " " << const_name($2) << " " << const_name($3) << endl;
 	$$ = token;
 }
-	| factor {
-		cout << "factor: " << const_name($1) << endl; // testando
-	};
+	| factor ;
 
 mulop: MUL | DIV ;
 
 factor: LPAREN expression RPAREN | var | call | NUM ;
 
-call: ID LPAREN args RPAREN { 
-	tabela.verificar(token_name($1), 1); 
+call: ID LPAREN begin-call args RPAREN { 
+	tabela.verificar(token_name($1), 1);
 
+	Token token = tabsim.insert(285);
+	string t = suporte.obter_temporario();
+	//tabsim[token].insert((Atributo*)(new IdVal(t)));
+	tabsim[token].insert((Atributo*)(new StrAtt(t)));
+
+	cout << const_name(token) << " = " << "call " << const_name($1) << endl;
+	$$ = token;
 } {/* call() ;*/};
+
+begin-call: %empty { cout << "begin call" << endl; } ;
 
 args: arg-list | %empty ;
 
-arg-list: arg-list COMMA expression {
-	cout << "param " << const_name($3) << endl;	
-}
-	| expression | %empty;
+arg-list: arg-list COMMA expression { cout << "param " << const_name($3) << endl;	}
+	| expression { cout << "param " << const_name($1) << endl; }| %empty;
 
 NUM: C_INT | C_FLOAT ;
 
