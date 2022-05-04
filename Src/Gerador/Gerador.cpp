@@ -3,6 +3,7 @@
 #include <list>
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <cassert>
 
 #include "tresEnderecos/tresEnderecos.h"
@@ -31,7 +32,18 @@ bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::I
 	
 	if(oM) otimizarTmLourden();
 	
-	substituirLabels();
+	long long int linha=0;
+	
+	// Atualiza labels
+	for(shared_ptr<Assembly> assembly: codigoGerado) {
+		assembly->update(linha);
+		linha++;
+	}
+	
+	// Gera codigo
+	linha = 0;
+	for(shared_ptr<Assembly> assembly: codigoGerado) 
+		dst_stream << linha++ << ": " << setw(3) << assembly->str() << '\n';
 	
 	ok = true;
 	return ok;
@@ -42,8 +54,5 @@ void Gerador::otimizarIntermediario() {
 }
 
 void Gerador::otimizarTmLourden() {
-	// nada
-}
-void Gerador::substituirLabels() {
 	// nada
 }
