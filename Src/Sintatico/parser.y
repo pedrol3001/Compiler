@@ -78,10 +78,10 @@ int yylex(Lexico& lexico);
 		}
 
 		void adicionar(string nome, int tipo, int natureza, int escopo, string tamanho){
-			int st = this->existe(nome); st = vars[st].escopo;
-			if(st != -1 && st < escopo){
+			int st = this->existe(nome);
+			if(st != -1 && vars[st].escopo < escopo){
 				std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
-			}else if(st == escopo){
+			}else if(st != -1 && vars[st].escopo == escopo){
 				std::cout << "Erro: variável \"" << nome << "\" sendo redeclarada." << std::endl;
 			}
 
@@ -107,6 +107,9 @@ int yylex(Lexico& lexico);
 			for(auto it = vars.rbegin(); it != vars.rend(); it++)
 				if(it->nome == nome) return distance(it, vars.rend());
 			return -1;
+		}
+		int offset(string nome){
+			return existe(nome) - globais.size();
 		}
 		bool verificar(string nome, int tipo){
 			for(auto it = vars.rbegin(); it != vars.rend(); it++){
@@ -342,7 +345,7 @@ call: ID LPAREN begin-call args RPAREN {
 
 	cout << const_name(token) << " = " << "call " << const_name($1) << endl;
 	$$ = token;
-} {/* call() ;*/};
+};
 
 begin-call: %empty { cout << "begin call" << endl; } ;
 
