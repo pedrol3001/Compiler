@@ -18,6 +18,7 @@ class Token;
 #include "Sintatico/Sintatico.h"
 #include "Lexico/Lexico.h"
 #include "Semantico/Semantico.h"
+#include "Gerador/Gerador.h"
 
 unsigned long long erros = 0;
 using namespace std;
@@ -52,11 +53,16 @@ int yylex(Lexico& lexico);
 		return ((IdVal*) tabsim[t]["IdVal"])->val;
 	}
 
+	string const_name(Token t){
+		return ((StrAtt*) tabsim[t]["StrAtt"])->str;
+	}
+
 	struct Simb {
 		string nome;
 		int tipo; // 0 = int, 1 = void
 		int escopo;
 		int natureza; // 0 = var, 1 = funcao, 2 = array
+		string tamanho = "1";
 		bool usado = false;
 	};
 
@@ -64,18 +70,14 @@ int yylex(Lexico& lexico);
 
 	struct Gerenciador {
 		vector<Simb> vars;
+		vector<Simb> globais;
 
 		Gerenciador(){
 			vars.push_back(Simb{"input", 1, 0, 1});
 			vars.push_back(Simb{"output", 1, 0, 1});
 		}
 
-		void adicionar(string nome, int tipo, int natureza, int escopo){
-
-			this->verificar_escopo();
-
-			std::cout << "Adicionando " << nome << " no escopo " << escopo << std::endl;
-
+		void adicionar(string nome, int tipo, int natureza, int escopo, string tamanho){
 			int st = this->existe(nome);
 			if(st != -1 && st < escopo){
 				std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
@@ -83,7 +85,7 @@ int yylex(Lexico& lexico);
 				std::cout << "Erro: variável \"" << nome << "\" sendo redeclarada." << std::endl;
 			}
 
-			Simb s{nome, tipo, escopo, natureza};
+			Simb s{nome, tipo, escopo, natureza, tamanho};
 
 			if(tipo == 285)
 				tipo = 0; // int
@@ -96,7 +98,10 @@ int yylex(Lexico& lexico);
 			}
 
 			this->vars.push_back(s);
-			std::cout << nome << " adicionado com sucesso." << std::endl;
+			if(s.escopo == 0)
+				this->globais.push_back(s);
+			else
+				cout << "aloca " << s.nome << " " << s.tamanho << "\n";
 		}
 		int existe(string nome){
 			for(auto it = vars.begin(); it != vars.end(); it++)
@@ -104,7 +109,6 @@ int yylex(Lexico& lexico);
 			return -1;
 		}
 		bool verificar(string nome, int tipo){
-			this->verificar_escopo();
 			for(auto it = vars.begin(); it != vars.end(); it++){
 				if(it->nome == nome){
 					if(it->natureza != 1 && tipo == 1){ // não-função sendo usada como função
@@ -117,7 +121,8 @@ int yylex(Lexico& lexico);
 						erros_semantico++;
 						return false;
 					}
-					
+
+					it->usado = true;
 					return true;
 				};
 			}
@@ -125,14 +130,33 @@ int yylex(Lexico& lexico);
 			erros_semantico++;
 			return false;
 		}
-		void verificar_escopo(){
-			while(!vars.empty() && vars.back().escopo > escopo)
+		void desalocar(){
+			while(!vars.empty() && vars.back().escopo > escopo){
+				cout << "desaloca " << vars.back().nome << " " << vars.back().tamanho << std::endl;
 				vars.pop_back();
+			}
+		}
+		void mostrar_globais(){
+			cout << "=============================================\n";
+			for(auto it = globais.begin(); it != globais.end(); it++)
+				cout << "global: " << it->nome << " " << it->tamanho << std::endl; 
 		}
 	};
 
-	Gerenciador tabela;
+	struct Suporte{
+		int temp_index = 0;
+		
+		string obter_temporario(){
+			return "t" + std::to_string(temp_index++);
+		}
+		void reset_index(){
+			temp_index = 0;
+		}
 
+	};
+
+	Gerenciador tabela;
+	Suporte suporte;
 %}
 
 //%define api.value.type {Value}
@@ -189,37 +213,37 @@ int yylex(Lexico& lexico);
 
 %%
 
-program: declaration-list ;
+program: declaration-list { tabela.mostrar_globais(); };
 
 declaration-list: declaration-list declaration | declaration ;
 
 declaration: var-declaration | fun-declaration ;
 
 var-declaration: type-specifier ID SEMICOLON {
-		tabela.adicionar(token_name($2), $1.tipo, 0, escopo);
+		tabela.adicionar(token_name($2), $1.tipo, 0, escopo, "1");
 	}
 	| type-specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
-		tabela.adicionar(token_name($2), $1.tipo, 2, escopo);
+		tabela.adicionar(token_name($2), $1.tipo, 2, escopo, token_name($4));
 	};
 
 type-specifier: INT | VOID ;
 
 fun-declaration: type-specifier ID {
-		tabela.adicionar(token_name($2), $1.tipo, 1, escopo);
+		tabela.adicionar(token_name($2), $1.tipo, 1, escopo, "1");
 	} open-esc LPAREN params RPAREN compound-stmt close-esc ;
 
 open-esc: %empty { escopo++; } ;
-close-esc: %empty { escopo--; } ;
+close-esc: %empty { escopo--; tabela.desalocar(); } ;
 
 params: param-list | VOID ;
 
 param-list: param-list COMMA param | param ;
 
 param: type-specifier ID {
-		tabela.adicionar(token_name($2), $1.tipo, 0, escopo);
+		tabela.adicionar(token_name($2), $1.tipo, 0, escopo, "1");
 	}
 	| type-specifier ID LBRACKET RBRACKET {
-		tabela.adicionar(token_name($2), $1.tipo, 2, escopo);
+		tabela.adicionar(token_name($2), $1.tipo, 2, escopo, "1"); // mudar tamanho
 	};
 
 compound-stmt: LBRACE open-esc local-declarations statement-list close-esc RBRACE ;
@@ -228,7 +252,11 @@ local-declarations: local-declarations var-declaration | %empty ;
 
 statement-list: statement-list statement | %empty ;
 
-statement: expression-stmt | compound-stmt | selection-stmt | iteration-stmt | return-stmt ;
+statement: expression-stmt | compound-stmt | selection-stmt | iteration-stmt | input-stmt | output-stmt | return-stmt ;
+
+input-stmt: INPUT var SEMICOLON { /*Gerar intermediario Input() */  } ;
+
+output-stmt: OUTPUT var SEMICOLON;
 
 expression-stmt: expression SEMICOLON | SEMICOLON ;
 
@@ -238,32 +266,82 @@ iteration-stmt: WHILE LPAREN expression RPAREN statement ;
 
 return-stmt: RETURN SEMICOLON | RETURN expression SEMICOLON ;
 
-expression: var ASSIGN expression | simple-expression ;
+expression: var ASSIGN expression {
+	cout << const_name($1) << " = " << const_name($3) << endl;	
+}
+	| simple-expression ;
 
-var: ID { tabela.verificar(token_name($1), 0); } 
-	| ID LBRACKET expression RBRACKET { tabela.verificar(token_name($1), 2); } ;
+var: ID { 
+		// Analise semantica
+		tabela.verificar(token_name($1), 0); 
+		$$=$1;
+	} | ID LBRACKET expression RBRACKET { 
+		// Analise semantica
+		tabela.verificar(token_name($1), 2); 
+		// Converter vetor [$3 = expression] para:
+		/*cout << "Simplificar x = v[n]" << endl;
+		Token temp1 = tabsim.insert(ID);
+		tabsim[temp].insert(new StrAtt("ArrayTemp1"));
+		cout << '\t' << const_name(temp1) << " = " << const_name($1) << " + " << const_name($3) << " (temp1 = var + n)"; //Adicao(temp1,$1,$3);
+		cout << '\t' <<;
+			// temp1 = criar novo token
+			// Adicao(temp1,$1,$3) temp1 = vetor(ponteiro) + expression 
+		*/	// temp2 = *temp1
+	} ;
 
-simple-expression: additive-expression relop additive-expression | additive-expression ;
+
+
+simple-expression: additive-expression relop additive-expression {
+	Token token = tabsim.insert(285);
+	string t = suporte.obter_temporario();
+	//tabsim[token].insert((Atributo*)(new IdVal(t)));
+	tabsim[token].insert((Atributo*)(new StrAtt(t)));
+	cout << const_name(token) << " = " << const_name($1) << " " << const_name($2) << " " << const_name($3) << endl;
+	$$ = token;
+}
+	| additive-expression ;
 
 relop: LESS | LESSEQUAL | GREATER | GREATEREQUAL | EQUAL | NOTEQUAL;
 
-additive-expression: additive-expression addop term | term ;
+additive-expression: additive-expression addop term {
+	Token token = tabsim.insert(285);
+	string t = suporte.obter_temporario();
+	//tabsim[token].insert((Atributo*)(new IdVal(t)));
+	tabsim[token].insert((Atributo*)(new StrAtt(t)));
+
+	cout << const_name(token) << " = " << const_name($1) << " " << const_name($2) << " " << const_name($3) << endl;
+	$$ = token;
+}
+	| term ;
 
 addop: SUM | SUB ;
 
-term: 	term mulop factor {	
-		//container.emplace_back(new Expressao($2()));	// TODO: eh um teste}
-	} | factor;
+term: term mulop factor {
+	Token token = tabsim.insert(285);
+	string t = suporte.obter_temporario();
+	//tabsim[token].insert((Atributo*)(new IdVal(t)));
+	tabsim[token].insert((Atributo*)(new StrAtt(t)));
+
+	cout << const_name(token) << " = " << const_name($1) << " " << const_name($2) << " " << const_name($3) << endl;
+	$$ = token;
+}
+	| factor ;
 
 mulop: MUL | DIV ;
 
 factor: LPAREN expression RPAREN | var | call | NUM ;
 
-call: ID LPAREN args RPAREN { tabela.verificar(token_name($1), 1); } ;
+call: ID LPAREN args RPAREN { 
+	tabela.verificar(token_name($1), 1); 
+
+} {/* call() ;*/};
 
 args: arg-list | %empty ;
 
-arg-list: arg-list COMMA expression | expression | %empty;
+arg-list: arg-list COMMA expression {
+	cout << "param " << const_name($3) << endl;	
+}
+	| expression | %empty;
 
 NUM: C_INT | C_FLOAT ;
 
