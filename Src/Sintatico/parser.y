@@ -325,7 +325,9 @@ term: term mulop factor {
 	cout << const_name(token) << " = " << const_name($1) << " " << const_name($2) << " " << const_name($3) << endl;
 	$$ = token;
 }
-	| factor ;
+	| factor {
+		cout << "factor: " << const_name($1) << endl; // testando
+	};
 
 mulop: MUL | DIV ;
 
