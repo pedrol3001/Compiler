@@ -2,6 +2,7 @@
 #define tresEnderecos_h
 
 #include "../Assembly/Assembly.h"
+#include "../Codigo/Codigo.h"
 
 #include "../../Token/Token.h"
 
@@ -11,15 +12,18 @@
 #include <vector>
 
 namespace Addr3{
-	struct Instrucao {
-		std::string classe;
-		
-		int id;	// id usado para referenciar saltos
-		
+	struct Instrucao: public Code::Codigo  {
+		std::string classe;		
 		Instrucao(std::string _classe);
 		virtual ~Instrucao();
 		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;
 	};
+	
+	// Label ========================================
+	struct Label: public Code::Label, public Instrucao {
+		Label(Token _label);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();
+	};	
 
 	// Input/output =================================
 	
@@ -96,39 +100,32 @@ namespace Addr3{
 	};
 	
 	struct Param: public Instrucao {
-		Param(Token parametro);
+		Token parametro;		
+		Param(Token _parametro);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 
 	struct Call: public Instrucao {
-		Call(Token funcao);
+		Token funcao;		
+		Call(Token _funcao);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 
 	// Saltos ======================================
-
-	struct Label: public Instrucao {
-		Token token;	// Nome da label
-		Label(Token _token);
-		std::list<std::shared_ptr<Assembly> > gera_codigo();	
-	};
-
-	struct Salto: public Instrucao {
-		Token label;	// Linha de destino
-		Salto(Token _label);
+	
+	struct Goto: public Instrucao, public Code::Goto {
+		Goto(Token _label);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	
 
-	struct SaltoCondicional: public Instrucao {
-		Token label;	// Linha de destino
+	struct SaltoCondicional: public Instrucao, public Code::Goto {
 		SaltoCondicional(std::string _classe, Token _label);
-		
 		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;		
 	};
 	
 	struct Beq: public SaltoCondicional {
-		Token op1, op2, label; 
+		Token op1, op2; 
 		
 		Beq(Token _op1, Token _op2, Token _label);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();		

@@ -6,8 +6,7 @@
 #include <cassert>
 
 #include "tresEnderecos/tresEnderecos.h"
-#include "LourdenTM/LourdenTM.h"
-#include "assemblyRiscV/assemblyRiscV.h"
+#include "Assembly/Assembly.h"
 
 using namespace std;
 using namespace Addr3;
@@ -23,18 +22,16 @@ bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::I
 	codigoGerado.clear();
 	
 	
-	if(oI) {
-		otimizarIntermediario();
-		corrigirIntermediario();
+	if(oI) otimizarIntermediario();
+	
+	for(shared_ptr<Instrucao> instrucao: instrucoes)  {
+		list<shared_ptr<Assembly> > codigo = instrucao->gera_codigo();
+		codigoGerado.insert(codigoGerado.end(),codigo.begin(),codigo.end());
 	}
 	
-	for(shared_ptr<Instrucao> instrucao: instrucoes) 
-		gerarInstrucaoTM(instrucao);
+	if(oM) otimizarTmLourden();
 	
-	if(oM) {
-		otimizarTmLourden();
-		corrigirTmLourden();
-	}
+	substituirLabels();
 	
 	ok = true;
 	return ok;
@@ -43,17 +40,10 @@ bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::I
 void Gerador::otimizarIntermediario() {
 	// nada
 }
-void Gerador::corrigirIntermediario() {
-	// nada
-}
-
-void Gerador::gerarInstrucaoTM(shared_ptr<Instrucao> instrucao) {
-	// nada
-}
 
 void Gerador::otimizarTmLourden() {
 	// nada
 }
-void Gerador::corrigirTmLourden() {
+void Gerador::substituirLabels() {
 	// nada
 }

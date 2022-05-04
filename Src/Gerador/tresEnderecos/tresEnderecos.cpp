@@ -6,17 +6,15 @@
 
 #include <cassert>
 
-
 using namespace Addr3;
 using namespace std;
 
-Addr3::Instrucao::Instrucao(string _classe): classe(_classe) {}
-Addr3::Instrucao::~Instrucao() {}
+Instrucao::Instrucao(std::string _classe): classe(_classe) {}
+Instrucao::~Instrucao() {}
+
 // Funcoes auxiliares ===========================
-
-
 	
-void loadTemp(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg) {
+void loadReg(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg) {
 	TabSim &ts = TabSim::getInstance();
 	
 	assert(ts[op].has("VarGlobal") || ts[op].has("VarLocal") || ts[op].has("IntVal"));
@@ -38,7 +36,7 @@ void loadTemp(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg) {
 	}
 }
 
-void storeTemp(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg) {
+void storeReg(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg) {
 	TabSim &ts = TabSim::getInstance();
 	
 	assert(ts[op].has("VarGlobal") || ts[op].has("VarLocal"));
@@ -54,14 +52,36 @@ void storeTemp(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg) {
 	}
 }
 
+void alocar(list<shared_ptr<Assembly> >& code, int space,TM::Reg temp,TM::Reg pointer) {
+	// Carregar constante
+	code.emplace_back(new TM::LDC(temp,space,temp));	//  LDC temp,space(temp)	
+	// Aloca espaco na pilha
+	code.emplace_back(new TM::SUB(pointer,pointer,temp));	//  SUB pointer,pointer,temp		
+}
+
+void desalocar(list<shared_ptr<Assembly> >& code, int space,TM::Reg temp,TM::Reg pointer) {
+	// Carregar constante
+	code.emplace_back(new TM::LDC(temp,space,temp));	//  LDC temp,space(temp)	
+	// Desaloca espaco na pilha
+	code.emplace_back(new TM::ADD(pointer,pointer,temp));	//  ADD pointer,pointer,temp		
+}
+
+// Label ========================================
+std::list<std::shared_ptr<Assembly> > Label::gera_codigo() {
+	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Label(label));		// Label
+	return code;
+}
+Label::Label(Token _label): Code::Label(_label), Instrucao("Label") {}
+
 // Input/output =================================
 	
 list<shared_ptr<Assembly> > Read::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	// Le input
-	code.emplace_back(new TM::IN(TM::r0,TM::r0,TM::r0));		// IN r0,r0,r0	
+	code.emplace_back(new TM::IN(TM::t0,TM::t0,TM::t0));		// IN t0,t0,t0	
 	// Armazena input	
-	storeTemp(code,op,TM::r0);
+	storeReg(code,op,TM::t0);
 		
 	return code;
 }	
@@ -71,9 +91,9 @@ list<shared_ptr<Assembly> > Print::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	
 	// Carrega operando	
-	loadTemp(code,op,TM::r0);
+	loadReg(code,op,TM::t0);
 	// Escreve output
-	code.emplace_back(new TM::OUT(TM::r0,TM::r0,TM::r0));		// OUT r0,r0,r0	
+	code.emplace_back(new TM::OUT(TM::t0,TM::t0,TM::t0));		// OUT t0,t0,t0	
 		
 	return code;
 }	
@@ -82,33 +102,24 @@ Print::Print(Token _op): op(_op), Instrucao("Print") {}
 // Declaracao ==================================
 list<shared_ptr<Assembly> > Global::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	// Carregar constante
-	code.emplace_back(new TM::LDC(TM::r0,1,TM::r0));		//  LDC r0,-1(r0)	
-	// Aloca espaco na pilha
-	code.emplace_back(new TM::SUB(TM::gp,TM::gp,TM::r0));	//  SUB gp,gp,r0	
-	
+	int space = 1;	// normalmente, deveria ser extraido de Token op
+	alocar(code,space,TM::t0,TM::gp);		
 	return code;
 }	
 Global::Global(Token _op): op(_op), Instrucao("Global") {}
 
 list<shared_ptr<Assembly> > Aloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	// Carregar constante
-	code.emplace_back(new TM::LDC(TM::r0,1,TM::r0));		// LDC r0,1(r0)	
-	// Aloca espaco na pilha
-	code.emplace_back(new TM::SUB(TM::sp,TM::sp,TM::r0));	// SUB sp,sp,r0	sp--
-		
+	int space = 1;	// normalmente, deveria ser extraido de Token op
+	alocar(code,space,TM::t0,TM::sp);		
 	return code;
 }	
 Aloca::Aloca(Token _op): op(_op), Instrucao("Aloca") {}
 
 list<shared_ptr<Assembly> > Desaloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	// Carregar constante
-	code.emplace_back(new TM::LDC(TM::r0,1,TM::r0));		// LDC r0,1(r0)	
-	// Desaloca espaco na pilha
-	code.emplace_back(new TM::ADD(TM::sp,TM::sp,TM::r0));	// SUB sp,sp,r0	sp++
-			
+	int space = 1;	// normalmente, deveria ser extraido de Token op
+	desalocar(code,space,TM::t0,TM::sp);		
 	return code;
 }	
 Desaloca::Desaloca(Token _op): op(_op), Instrucao("Desaloca") {}
@@ -128,12 +139,12 @@ Operacao::Operacao(string _classe, Token _dst, Token _op1, Token _op2): dst(_dst
 list<shared_ptr<Assembly> > Adicao::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	// Carregar operandos (op[0], op[1])
-	loadTemp(code,op[0],TM::r0);
-	loadTemp(code,op[1],TM::r1);
-	// Realiza adicao, no temp r2
-	code.emplace_back(new TM::ADD(TM::r2,TM::r0,TM::r1));	// ADD r2,r0,r1
-	// Armazena valor obtido em r2 no destino
-	storeTemp(code,dst,TM::r2);
+	loadReg(code,op[0],TM::t0);
+	loadReg(code,op[1],TM::t1);
+	// Realiza adicao, no temp t2
+	code.emplace_back(new TM::ADD(TM::t2,TM::t0,TM::t1));	// ADD t2,t0,t1
+	// Armazena valor obtido em t2 no destino
+	storeReg(code,dst,TM::t2);
 	
 	return code;
 }	
@@ -143,12 +154,12 @@ Adicao::Adicao(Token _dst, Token _op1, Token _op2): Operacao("Adicao",_dst,_op1,
 list<shared_ptr<Assembly> > Multiplicacao::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
 	// Carregar operandos (op[0], op[1])
-	loadTemp(code,op[0],TM::r0);
-	loadTemp(code,op[1],TM::r1);
-	// Realiza multiplicacao, no temp r2
-	code.emplace_back(new TM::MUL(TM::r2,TM::r0,TM::r1));	// MUL r2,r0,r1
-	// Armazena valor obtido em r2 no destino
-	storeTemp(code,dst,TM::r2);
+	loadReg(code,op[0],TM::t0);
+	loadReg(code,op[1],TM::t1);
+	// Realiza multiplicacao, no temp t2
+	code.emplace_back(new TM::MUL(TM::t2,TM::t0,TM::t1));	// MUL t2,t0,t1
+	// Armazena valor obtido em t2 no destino
+	storeReg(code,dst,TM::t2);
 		
 	return code;
 }	
@@ -159,12 +170,12 @@ Multiplicacao::Multiplicacao(Token _dst, Token _op1, Token _op2): Operacao("Mult
 list<shared_ptr<Assembly> > Divisao::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	// Carregar operandos (op[0], op[1])
-	loadTemp(code,op[0],TM::r0);
-	loadTemp(code,op[1],TM::r1);
-	// Realiza divisao, no temp r2
-	code.emplace_back(new TM::DIV(TM::r2,TM::r0,TM::r1));	// DIV r2,r0,r1
-	// Armazena valor obtido em r2 no destino
-	storeTemp(code,dst,TM::r2);
+	loadReg(code,op[0],TM::t0);
+	loadReg(code,op[1],TM::t1);
+	// Realiza divisao, no temp t2
+	code.emplace_back(new TM::DIV(TM::t2,TM::t0,TM::t1));	// DIV t2,t0,t1
+	// Armazena valor obtido em t2 no destino
+	storeReg(code,dst,TM::t2);
 	
 	return code;
 }	
@@ -174,12 +185,12 @@ Divisao::Divisao(Token _dst, Token _op1, Token _op2): Operacao("Divisao",_dst,_o
 list<shared_ptr<Assembly> > Subtracao::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
 	// Carregar operandos (op[0], op[1])
-	loadTemp(code,op[0],TM::r0);
-	loadTemp(code,op[1],TM::r1);
-	// Realiza divisao, no temp r2
-	code.emplace_back(new TM::SUB(TM::r2,TM::r0,TM::r1));	// SUB r2,r0,r1
-	// Armazena valor obtido em r2 no destino
-	storeTemp(code,dst,TM::r2);
+	loadReg(code,op[0],TM::t0);
+	loadReg(code,op[1],TM::t1);
+	// Realiza divisao, no temp t2
+	code.emplace_back(new TM::SUB(TM::t2,TM::t0,TM::t1));	// SUB t2,t0,t1
+	// Armazena valor obtido em t2 no destino
+	storeReg(code,dst,TM::t2);
 		
 	return code;
 }	
@@ -192,46 +203,84 @@ Atribuicao::Atribuicao(Token _dst, Token _op): Operacao("Atribuicao",_dst,_op) {
 list<shared_ptr<Assembly> > Atribuicao::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
 	// Carregar operando op[0]
-	loadTemp(code,op[0],TM::r0);
-	// Realiza atribuicao, no temp r2
-	storeTemp(code,dst,TM::r0);	// dst = op[0]
+	loadReg(code,op[0],TM::t0);
+	// Realiza atribuicao, no temp t2
+	storeReg(code,dst,TM::t0);	// dst = op[0]
 	
 	return code;
 }	
 
 
+// Chamada de funcao============================
+std::list<std::shared_ptr<Assembly> > BeginCall::gera_codigo() {
+	list<shared_ptr<Assembly> > code;
+	// Aloca espaco para guardar o ra na pilha
+	alocar(code,1,TM::t0,TM::sp);
+	// Guarda ra na pilha
+	code.emplace_back(new TM::ST(TM::ra,1,TM::sp)); // ST ra,1(sp)
+		
+	return code;
+}
+BeginCall::BeginCall(): Instrucao("BeginCall") {}
+
+
+std::list<std::shared_ptr<Assembly> > Param::gera_codigo() {
+	list<shared_ptr<Assembly> > code;
+	// Aloca espaco para guardar o argumento na pilha
+	int space = 1;	// normalmente, deveria ser extraido de Token op
+	alocar(code,space,TM::t0,TM::sp);
+	// Guarda argumento na pilha
+	storeReg(code,parametro,TM::sp);		
+	return code;
+}
+Param::Param(Token _parametro): parametro(_parametro), Instrucao("Param") {}
+
+
+list<shared_ptr<Assembly> > Call::gera_codigo() {
+	list<shared_ptr<Assembly> > code;	
+	// Configurar ra
+	code.emplace_back(new TM::LDA(TM::ra,3,TM::pc));	// LA ra,3(pc)
+	// TODO: Configura destino do salto
+	//assert(ts[funcao].has("Label")) 
+	//long int offset_jump = ((Label*)ts[op]["Label"])->offset();
+	//code.emplace_back(new TM::LD(reg,offset_jump,TM::gp));				// ST reg,offset_jump(sp)
+	// Realiza salto
+	code.emplace_back(new TM::JEQ(TM::zero,0,TM::t0));	// JEQ zero,0(t0)
+	
+	
+	return code;
+}
+Call::Call(Token _funcao): funcao(_funcao), Instrucao("Call") {}
+
+
 // Saltos ======================================
-Label::Label(Token _token): token(_token), Instrucao("Label") {}
 
-list<shared_ptr<Assembly> > Label::gera_codigo() {
-	return list<shared_ptr<Assembly> >();	// Faz nada
-}	
-
-list<shared_ptr<Assembly> > Salto::gera_codigo() {
+list<shared_ptr<Assembly> > Goto::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	/*
 	
 	// Carregar constante
-	code.emplace_back(new TM::LDC(TM::r0,0,TM::r0));		// LDC r0,0(r0)	
-	code.emplace_back(new TM::JEQ(TM::r0,distancia,TM::pc));	// JEQ r0,distancia(pc)
+	code.emplace_back(new TM::LDC(TM::t0,0,TM::t0));		// LDC t0,0(t0)	
+	code.emplace_back(new TM::JEQ(TM::t0,distancia,TM::pc));	// JEQ t0,distancia(pc)
 	*/
 	return code;
 }
-Salto::Salto(Token _label): label(_label), Instrucao("Salto") {}
+Goto::Goto(Token _label): Code::Goto(_label), Instrucao("Goto") {}
 	
 	
-SaltoCondicional::SaltoCondicional(string _classe, Token _label): label(_label), Instrucao(_classe) {}
+SaltoCondicional::SaltoCondicional(string _classe, Token _label): Code::Goto(_label), Instrucao(_classe) {}
+
 
 list<shared_ptr<Assembly> > Beq::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	/*
 	
 	// Carregar operandos (op1, op2)
-	loadTemp(code,op1,TM::r0);
-	loadTemp(code,op2,TM::r1);
+	loadReg(code,op1,TM::t0);
+	loadReg(code,op2,TM::t1);
 	// Subtrair
-	code.emplace_back(new TM::SUB(TM::r2,TM::r0,TM::r1));	// SUB r2,r0,r1
-	code.emplace_back(new TM::JEQ(TM::r2,distancia,TM::pc));	// JEQ r2,distancia(pc)
+	code.emplace_back(new TM::SUB(TM::t2,TM::t0,TM::t1));	// SUB t2,t0,t1
+	code.emplace_back(new TM::JEQ(TM::t2,distancia,TM::pc));	// JEQ t2,distancia(pc)
 	*/
 	
 	return code;

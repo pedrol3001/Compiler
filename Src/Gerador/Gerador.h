@@ -23,12 +23,9 @@ struct Gerador {
 		bool ok=false;
 	
 		void otimizarIntermediario();
-		void corrigirIntermediario();
-		
-		void gerarInstrucaoTM(std::shared_ptr<Addr3::Instrucao> instrucao);
-		
 		void otimizarTmLourden();
-		void corrigirTmLourden();
+		
+		void substituirLabels();
 		
 		std::list<std::shared_ptr<Addr3::Instrucao> > instrucoes;
 		std::list<std::shared_ptr<Assembly> > codigoGerado;
