@@ -19,6 +19,7 @@ class Token;
 #include "Lexico/Lexico.h"
 #include "Semantico/Semantico.h"
 #include "Gerador/Gerador.h"
+#include <cassert>
 
 unsigned long long erros = 0;
 using namespace std;
@@ -30,12 +31,19 @@ int yylex(Lexico& lexico);
 
 TabSim& tabsim = TabSim::getInstance();
 
-string token_name(Token t){
+string tokenIdVal(Token t){
+	assert(tabsim[t].has("IdVal"));
 	return ((IdVal*) tabsim[t]["IdVal"])->val;
 }
 
-string const_name(Token t){
+string tokenStrAtt(Token t){
+	assert(tabsim[t].has("StrAtt"));
 	return ((StrAtt*) tabsim[t]["StrAtt"])->str;
+}
+
+long long int tokenIntVal(Token t){
+	assert(tabsim[t].has("IntVal"));
+	return ((IntVal*) tabsim[t]["IntVal"])->val;
 }
 	
 %}
@@ -63,13 +71,17 @@ string const_name(Token t){
 %define api.value.type {Token}
 
 /* declare tokens */
-	// Usado para debug
+
+// Usado para debug
 %token NOT_INITIALIZED
 
-	// Comentários
+// Usado na analise semnatica
+%token TEMP
+
+// Comentários
 %token COMMENT
 
-	// Constantes
+// Constantes
 %token  C_STRING C_CHAR C_INT C_FLOAT
 
 // Estruturas
@@ -123,16 +135,16 @@ declaration-list: declaration-list declaration | declaration ;
 declaration: var-declaration | fun-declaration ;
 
 var-declaration: type-specifier ID SEMICOLON {
-		semantico.tabela.adicionar(token_name($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, "1");
+		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, 1);
 	}
 	| type-specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
-		semantico.tabela.adicionar(token_name($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, token_name($4));
+		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, tokenIntVal($4));
 	};
 
 type-specifier: INT | VOID ;
 
 fun-declaration: type-specifier ID {
-		semantico.tabela.adicionar(token_name($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, "1");
+		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, 1);
 	} open-esc LPAREN params RPAREN compound-stmt close-esc ;
 
 open-esc: %empty { semantico.escopo++; } ;
@@ -143,10 +155,10 @@ params: param-list | VOID ;
 param-list: param-list COMMA param | param ;
 
 param: type-specifier ID {
-		semantico.tabela.adicionar(token_name($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, "1");
+		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, 1);
 	}
 	| type-specifier ID LBRACKET RBRACKET {
-		semantico.tabela.adicionar(token_name($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, "1"); // mudar tamanho
+		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, 1); // mudar tamanho
 	};
 
 compound-stmt: LBRACE open-esc local-declarations statement-list close-esc RBRACE ;
@@ -159,7 +171,7 @@ statement: expression-stmt | compound-stmt | selection-stmt | iteration-stmt | i
 
 input-stmt: INPUT var SEMICOLON { /*Gerar intermediario Input() */  } ;
 
-output-stmt: OUTPUT var SEMICOLON;
+output-stmt: OUTPUT expression SEMICOLON;
 
 expression-stmt: expression SEMICOLON | SEMICOLON ;
 
@@ -170,18 +182,18 @@ iteration-stmt: WHILE LPAREN expression RPAREN statement ;
 return-stmt: RETURN SEMICOLON | RETURN expression SEMICOLON ;
 
 expression: var ASSIGN expression {
-	cout << const_name($1) << " = " << const_name($3) << endl;
+	cout << tokenStrAtt($1) << " = " << tokenStrAtt($3) << endl;
 	$$ = $3; // para retornar o resultado da igualdade
 }
 	| simple-expression ;
 
 var: ID { 
 		// Analise semantica
-		semantico.tabela.verificar(token_name($1), Simb::Tipo::INT); 
+		semantico.tabela.verificar(tokenIdVal($1), Simb::Tipo::INT); 
 		$$=$1;
 	} | ID LBRACKET expression RBRACKET { 
 		// Analise semantica
-		semantico.tabela.verificar(token_name($1), Simb::Tipo::ARRAY); 
+		semantico.tabela.verificar(tokenIdVal($1), Simb::Tipo::ARRAY); 
 		// Converter vetor [$3 = expression] para:
 		/*cout << "Simplificar x = v[n]" << endl;
 		Token temp1 = tabsim.insert(ID);
@@ -196,11 +208,8 @@ var: ID {
 
 
 simple-expression: additive-expression relop additive-expression {
-	Token token = tabsim.insert(INT);
-	string t = semantico.suporte.obter_temporario();
-	//tabsim[token].insert((Atributo*)(new IdVal(t)));
-	tabsim[token].insert((Atributo*)(new StrAtt(t)));
-	cout << const_name(token) << " = " << const_name($1) << " " << const_name($2) << " " << const_name($3) << endl;
+	Token token = semantico.tempGen.gerar();
+	cout << tokenStrAtt(token) << " = " << tokenStrAtt($1) << " " << tokenStrAtt($2) << " " << tokenStrAtt($3) << endl;
 	$$ = token;
 }
 	| additive-expression ;
@@ -208,12 +217,9 @@ simple-expression: additive-expression relop additive-expression {
 relop: LESS | LESSEQUAL | GREATER | GREATEREQUAL | EQUAL | NOTEQUAL;
 
 additive-expression: additive-expression addop term {
-	Token token = tabsim.insert(INT);
-	string t = semantico.suporte.obter_temporario();
-	//tabsim[token].insert((Atributo*)(new IdVal(t)));
-	tabsim[token].insert((Atributo*)(new StrAtt(t)));
+	Token token = semantico.tempGen.gerar();
 
-	cout << const_name(token) << " = " << const_name($1) << " " << const_name($2) << " " << const_name($3) << endl;
+	cout << tokenStrAtt(token) << " = " << tokenStrAtt($1) << " " << tokenStrAtt($2) << " " << tokenStrAtt($3) << endl;
 	$$ = token;
 }
 	| term ;
@@ -221,12 +227,8 @@ additive-expression: additive-expression addop term {
 addop: SUM | SUB ;
 
 term: term mulop factor {
-	Token token = tabsim.insert(INT);
-	string t = semantico.suporte.obter_temporario();
-	//tabsim[token].insert((Atributo*)(new IdVal(t)));
-	tabsim[token].insert((Atributo*)(new StrAtt(t)));
-
-	cout << const_name(token) << " = " << const_name($1) << " " << const_name($2) << " " << const_name($3) << endl;
+	Token token = semantico.tempGen.gerar();
+	cout << tokenStrAtt(token) << " = " << tokenStrAtt($1) << " " << tokenStrAtt($2) << " " << tokenStrAtt($3) << endl;
 	$$ = token;
 }
 	| factor ;
@@ -236,14 +238,11 @@ mulop: MUL | DIV ;
 factor: LPAREN expression RPAREN | var | call | NUM ;
 
 call: ID LPAREN begin-call args RPAREN { 
-	semantico.tabela.verificar(token_name($1), Simb::Tipo::VOID);
+	semantico.tabela.verificar(tokenIdVal($1), Simb::Tipo::VOID);
 
-	Token token = tabsim.insert(INT);
-	string t = semantico.suporte.obter_temporario();
-	//tabsim[token].insert((Atributo*)(new IdVal(t)));
-	tabsim[token].insert((Atributo*)(new StrAtt(t)));
+	Token token = semantico.tempGen.gerar();
 
-	cout << const_name(token) << " = " << "call " << const_name($1) << endl;
+	cout << tokenStrAtt(token) << " = " << "call " << tokenStrAtt($1) << endl;
 	$$ = token;
 };
 
@@ -251,8 +250,8 @@ begin-call: %empty { cout << "begin call" << endl; } ;
 
 args: arg-list | %empty ;
 
-arg-list: arg-list COMMA expression { cout << "param " << const_name($3) << endl;	}
-	| expression { cout << "param " << const_name($1) << endl; }| %empty;
+arg-list: arg-list COMMA expression { cout << "param " << tokenStrAtt($3) << endl;	}
+	| expression { cout << "param " << tokenStrAtt($1) << endl; }| %empty;
 
 NUM: C_INT | C_FLOAT ;
 

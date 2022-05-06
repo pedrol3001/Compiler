@@ -19,7 +19,7 @@ struct Semantico {
 	bool good();
 	
 	TabelaSemantica tabela;
-	Suporte suporte;
+	TempGenerator tempGen;
 	int &escopo;
 	private:
 		void gerarIntermediario();
