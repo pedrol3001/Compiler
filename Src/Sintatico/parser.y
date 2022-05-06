@@ -196,7 +196,7 @@ var: ID {
 
 
 simple-expression: additive-expression relop additive-expression {
-	Token token = tabsim.insert(285);
+	Token token = tabsim.insert(INT);
 	string t = semantico.suporte.obter_temporario();
 	//tabsim[token].insert((Atributo*)(new IdVal(t)));
 	tabsim[token].insert((Atributo*)(new StrAtt(t)));
@@ -208,7 +208,7 @@ simple-expression: additive-expression relop additive-expression {
 relop: LESS | LESSEQUAL | GREATER | GREATEREQUAL | EQUAL | NOTEQUAL;
 
 additive-expression: additive-expression addop term {
-	Token token = tabsim.insert(285);
+	Token token = tabsim.insert(INT);
 	string t = semantico.suporte.obter_temporario();
 	//tabsim[token].insert((Atributo*)(new IdVal(t)));
 	tabsim[token].insert((Atributo*)(new StrAtt(t)));
@@ -221,7 +221,7 @@ additive-expression: additive-expression addop term {
 addop: SUM | SUB ;
 
 term: term mulop factor {
-	Token token = tabsim.insert(285);
+	Token token = tabsim.insert(INT);
 	string t = semantico.suporte.obter_temporario();
 	//tabsim[token].insert((Atributo*)(new IdVal(t)));
 	tabsim[token].insert((Atributo*)(new StrAtt(t)));
@@ -238,7 +238,7 @@ factor: LPAREN expression RPAREN | var | call | NUM ;
 call: ID LPAREN begin-call args RPAREN { 
 	semantico.tabela.verificar(token_name($1), 1);
 
-	Token token = tabsim.insert(285);
+	Token token = tabsim.insert(INT);
 	string t = semantico.suporte.obter_temporario();
 	//tabsim[token].insert((Atributo*)(new IdVal(t)));
 	tabsim[token].insert((Atributo*)(new StrAtt(t)));

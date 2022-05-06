@@ -1,4 +1,5 @@
 #include "TabelaSemantica.h"
+#include "../../Tipos.h"
 
 #include <iostream>
 
@@ -19,9 +20,9 @@ void TabelaSemantica::adicionar(string nome, int tipo, int natureza, int escopo,
 
 	Simb s{nome, tipo, escopo, natureza, tamanho};
 
-	if(tipo == 285)
+	if(tipo == INT)
 		tipo = 0; // int
-	else if(tipo == 284)
+	else if(tipo == VOID)
 		tipo = 1; // void
 
 	if(natureza == 0 && tipo == 1){ // variavel com tipo void
