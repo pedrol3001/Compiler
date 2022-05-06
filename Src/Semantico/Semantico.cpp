@@ -7,8 +7,12 @@
 using namespace std;
 using namespace Addr3;
 
-bool Semantico::analisar() {
+
+Semantico::Semantico(): tabela(), escopo(tabela.escopo){
 	
+}
+
+bool Semantico::analisar() {
 	ok = true;	// ok eh o resultado da analise
 	
 	gerarIntermediario();

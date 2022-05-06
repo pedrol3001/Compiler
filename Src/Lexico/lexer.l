@@ -90,6 +90,10 @@ Space [\n\t \r]
 
 "char" {match("char", CHAR);}
 
+"input" {match("input", INPUT);}
+
+"output" {match("output", OUTPUT);}
+
 "(" {match("(", LPAREN);}
 
 ")" {match(")", RPAREN);}

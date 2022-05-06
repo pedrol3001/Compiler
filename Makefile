@@ -32,8 +32,9 @@ $(foreach obj,$(OBJ),$(eval $(call make_obj,$(obj))))
 
 # Geracao do .y do bison
 Y = $(wildcard $(SRC)/*/*.y)
+BISON_NAME = bison
 build_bison:
-	cd "$(SRC)/Sintatico" && bison -d "../../$(Y)" --output="../bison.c"  --header="../bison.h" 
+	cd "$(SRC)/Sintatico" && bison -d "../../$(Y)" --output="../$(BISON_NAME).c"  --header="../$(BISON_NAME).h" 
 
 #  Geracao do .l do flex
 L = $(wildcard $(SRC)/*/*.l)
@@ -48,6 +49,8 @@ build: build_bison build_flex $(OBJ)
 # Limpeza de arquivos objeto
 clear:
 	rm -f $(OBJ)
+	rm -f $(SRC)/$(BISON_NAME).c  $(SRC)/$(BISON_NAME).h
+	rm -f $(SRC)/Lexico/lex.yy.c
 
 # ===============================================
 

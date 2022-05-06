@@ -45,7 +45,10 @@ bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::I
 	// Gera codigo
 	linha = 0;
 	for(shared_ptr<Assembly> assembly: codigoGerado) 
-		dst_stream << linha++ << ": " << setw(3) << assembly->str() << '\n';
+		if(assembly->is_label())
+			dst_stream << "* label: " << assembly->str() << '\n'; 
+		else
+			dst_stream << linha++ << ": " << setw(3) << assembly->str() << '\n';
 	
 	ok = true;
 	return ok;
