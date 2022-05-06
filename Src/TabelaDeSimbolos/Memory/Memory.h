@@ -8,20 +8,20 @@
 
 struct Variavel: public Atributo {
 	long int offset_;
-	long int bytes;
+	long int size;
 	
-	Variavel(std::string _nome, long int _offset, int _bytes);
+	Variavel(std::string _nome, long int _offset, int _size);
 	virtual ~Variavel();
 	
 	long int offset();
 };
 
 struct VarLocal: public Variavel {	// Variaveis estaticas
-	VarLocal(long int _offset, int _bytes);	// space = 
+	VarLocal(long int _offset, int _size);	// space = 
 };
 
 struct VarGlobal: public Variavel {	// Variaveis globais
-	VarGlobal(long int _offset, int _bytes);	// space = 
+	VarGlobal(long int _offset, int _size);	// space = 
 };
 
 #endif
