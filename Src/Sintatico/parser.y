@@ -28,11 +28,22 @@ void debug(string s);
 void yyerror(Lexico& lexico, Semantico& semantico, string s);
 int yylex(Lexico& lexico);
 
+TabSim& tabsim = TabSim::getInstance();
+
+string token_name(Token t){
+	return ((IdVal*) tabsim[t]["IdVal"])->val;
+}
+
+string const_name(Token t){
+	return ((StrAtt*) tabsim[t]["StrAtt"])->str;
+}
+	
 %}
 
 // yylval ======================================================== 
 
 %{
+	
 	struct Value {
 		vector<Token> tokens;
 		Value(): tokens() {}
@@ -46,120 +57,6 @@ int yylex(Lexico& lexico);
 		ret.tokens.insert(ret.tokens.end(),r.tokens.begin(),r.tokens.end());
 		return ret;
 	}
-
-	TabSim& tabsim = TabSim::getInstance();
-
-	string token_name(Token t){
-		return ((IdVal*) tabsim[t]["IdVal"])->val;
-	}
-
-	string const_name(Token t){
-		return ((StrAtt*) tabsim[t]["StrAtt"])->str;
-	}
-
-	struct Simb {
-		string nome;
-		int tipo; // 0 = int, 1 = void
-		int escopo;
-		int natureza; // 0 = var, 1 = funcao, 2 = array
-		string tamanho = "1";
-		bool usado = false;
-	};
-
-	int erros_semantico = 0, escopo = 0;
-
-	struct Gerenciador {
-		vector<Simb> vars;
-		vector<Simb> globais;
-
-		Gerenciador(){
-			vars.push_back(Simb{"input", 1, 0, 1});
-			vars.push_back(Simb{"output", 1, 0, 1});
-		}
-
-		void adicionar(string nome, int tipo, int natureza, int escopo, string tamanho){
-			int st = this->existe(nome);
-			if(st != -1 && vars[st].escopo < escopo){
-				std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
-			}else if(st != -1 && vars[st].escopo == escopo){
-				std::cout << "Erro: variável \"" << nome << "\" sendo redeclarada." << std::endl;
-			}
-
-			Simb s{nome, tipo, escopo, natureza, tamanho};
-
-			if(tipo == 285)
-				tipo = 0; // int
-			else if(tipo == 284)
-				tipo = 1; // void
-
-			if(natureza == 0 && tipo == 1){ // variavel com tipo void
-				std::cout << "Erro: variável \"" << nome << "\" não pode ser do tipo void." << std::endl;
-				erros_semantico++;
-			}
-
-			this->vars.push_back(s);
-			if(s.escopo == 0)
-				this->globais.push_back(s);
-			else
-				cout << "aloca " << s.nome << " " << s.tamanho << "\n";
-		}
-		int existe(string nome){
-			for(auto it = vars.rbegin(); it != vars.rend(); it++)
-				if(it->nome == nome) return distance(it, vars.rend());
-			return -1;
-		}
-		int offset(string nome){
-			return existe(nome) - globais.size();
-		}
-		bool verificar(string nome, int tipo){
-			for(auto it = vars.rbegin(); it != vars.rend(); it++){
-				if(it->nome == nome){
-					if(it->natureza != 1 && tipo == 1){ // não-função sendo usada como função
-						std::cout << "Erro: variável \"" << nome << "\" não pode ser usada como uma função." << std::endl;
-						erros_semantico++;
-						return false;
-					}
-					if(it->natureza == 0 && tipo == 2){ // variável normal sendo usada como array
-						std::cout << "Erro: variável \"" << nome << "\" não pode ser usada como um array." << std::endl;
-						erros_semantico++;
-						return false;
-					}
-
-					it->usado = true;
-					return true;
-				};
-			}
-			std::cout << "Erro: variável \"" << nome << "\" não declarada." << std::endl;
-			erros_semantico++;
-			return false;
-		}
-		void desalocar(){
-			while(!vars.empty() && vars.back().escopo > escopo){
-				cout << "desaloca " << vars.back().nome << " " << vars.back().tamanho << std::endl;
-				vars.pop_back();
-			}
-		}
-		void mostrar_globais(){
-			cout << "=============================================\n";
-			for(auto it = globais.begin(); it != globais.end(); it++)
-				cout << "global: " << it->nome << " " << it->tamanho << std::endl; 
-		}
-	};
-
-	struct Suporte{
-		int temp_index = 0;
-		
-		string obter_temporario(){
-			return "t" + std::to_string(temp_index++);
-		}
-		void reset_index(){
-			temp_index = 0;
-		}
-
-	};
-
-	Gerenciador tabela;
-	Suporte suporte;
 %}
 
 //%define api.value.type {Value}
@@ -216,37 +113,40 @@ int yylex(Lexico& lexico);
 
 %%
 
-program: declaration-list { tabela.mostrar_globais(); };
+program: declaration-list { 
+	semantico.tabela.mostrar_globais();
+	semantico.analisar();	// Setar como ok
+};
 
 declaration-list: declaration-list declaration | declaration ;
 
 declaration: var-declaration | fun-declaration ;
 
 var-declaration: type-specifier ID SEMICOLON {
-		tabela.adicionar(token_name($2), $1.tipo, 0, escopo, "1");
+		semantico.tabela.adicionar(token_name($2), $1.tipo, 0, semantico.escopo, "1");
 	}
 	| type-specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
-		tabela.adicionar(token_name($2), $1.tipo, 2, escopo, token_name($4));
+		semantico.tabela.adicionar(token_name($2), $1.tipo, 2, semantico.escopo, token_name($4));
 	};
 
 type-specifier: INT | VOID ;
 
 fun-declaration: type-specifier ID {
-		tabela.adicionar(token_name($2), $1.tipo, 1, escopo, "1");
+		semantico.tabela.adicionar(token_name($2), $1.tipo, 1, semantico.escopo, "1");
 	} open-esc LPAREN params RPAREN compound-stmt close-esc ;
 
-open-esc: %empty { escopo++; } ;
-close-esc: %empty { escopo--; tabela.desalocar(); } ;
+open-esc: %empty { semantico.escopo++; } ;
+close-esc: %empty { semantico.escopo--; semantico.tabela.desalocar(); } ;
 
 params: param-list | VOID ;
 
 param-list: param-list COMMA param | param ;
 
 param: type-specifier ID {
-		tabela.adicionar(token_name($2), $1.tipo, 0, escopo, "1");
+		semantico.tabela.adicionar(token_name($2), $1.tipo, 0, semantico.escopo, "1");
 	}
 	| type-specifier ID LBRACKET RBRACKET {
-		tabela.adicionar(token_name($2), $1.tipo, 2, escopo, "1"); // mudar tamanho
+		semantico.tabela.adicionar(token_name($2), $1.tipo, 2, semantico.escopo, "1"); // mudar tamanho
 	};
 
 compound-stmt: LBRACE open-esc local-declarations statement-list close-esc RBRACE ;
@@ -277,11 +177,11 @@ expression: var ASSIGN expression {
 
 var: ID { 
 		// Analise semantica
-		tabela.verificar(token_name($1), 0); 
+		semantico.tabela.verificar(token_name($1), 0); 
 		$$=$1;
 	} | ID LBRACKET expression RBRACKET { 
 		// Analise semantica
-		tabela.verificar(token_name($1), 2); 
+		semantico.tabela.verificar(token_name($1), 2); 
 		// Converter vetor [$3 = expression] para:
 		/*cout << "Simplificar x = v[n]" << endl;
 		Token temp1 = tabsim.insert(ID);
@@ -297,7 +197,7 @@ var: ID {
 
 simple-expression: additive-expression relop additive-expression {
 	Token token = tabsim.insert(285);
-	string t = suporte.obter_temporario();
+	string t = semantico.suporte.obter_temporario();
 	//tabsim[token].insert((Atributo*)(new IdVal(t)));
 	tabsim[token].insert((Atributo*)(new StrAtt(t)));
 	cout << const_name(token) << " = " << const_name($1) << " " << const_name($2) << " " << const_name($3) << endl;
@@ -309,7 +209,7 @@ relop: LESS | LESSEQUAL | GREATER | GREATEREQUAL | EQUAL | NOTEQUAL;
 
 additive-expression: additive-expression addop term {
 	Token token = tabsim.insert(285);
-	string t = suporte.obter_temporario();
+	string t = semantico.suporte.obter_temporario();
 	//tabsim[token].insert((Atributo*)(new IdVal(t)));
 	tabsim[token].insert((Atributo*)(new StrAtt(t)));
 
@@ -322,7 +222,7 @@ addop: SUM | SUB ;
 
 term: term mulop factor {
 	Token token = tabsim.insert(285);
-	string t = suporte.obter_temporario();
+	string t = semantico.suporte.obter_temporario();
 	//tabsim[token].insert((Atributo*)(new IdVal(t)));
 	tabsim[token].insert((Atributo*)(new StrAtt(t)));
 
@@ -336,10 +236,10 @@ mulop: MUL | DIV ;
 factor: LPAREN expression RPAREN | var | call | NUM ;
 
 call: ID LPAREN begin-call args RPAREN { 
-	tabela.verificar(token_name($1), 1);
+	semantico.tabela.verificar(token_name($1), 1);
 
 	Token token = tabsim.insert(285);
-	string t = suporte.obter_temporario();
+	string t = semantico.suporte.obter_temporario();
 	//tabsim[token].insert((Atributo*)(new IdVal(t)));
 	tabsim[token].insert((Atributo*)(new StrAtt(t)));
 
