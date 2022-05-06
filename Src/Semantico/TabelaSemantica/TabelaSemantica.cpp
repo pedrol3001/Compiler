@@ -6,11 +6,11 @@
 using namespace std;
 
 TabelaSemantica::TabelaSemantica(){
-	vars.push_back(Simb{"input", 1, 0, 1});
-	vars.push_back(Simb{"output", 1, 0, 1});
+	vars.push_back(Simb{"input", Simb::Tipo::VOID, 0, Simb::Nat::FUNCAO});
+	vars.push_back(Simb{"output", Simb::Tipo::VOID, 0, Simb::Nat::FUNCAO});
 }
 
-void TabelaSemantica::adicionar(string nome, int tipo, int natureza, int escopo, string tamanho){
+void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza, int escopo, string tamanho){
 	int st = this->existe(nome);
 	if(st != -1 && vars[st].escopo < escopo){
 		std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
@@ -18,14 +18,15 @@ void TabelaSemantica::adicionar(string nome, int tipo, int natureza, int escopo,
 		std::cout << "Erro: variável \"" << nome << "\" sendo redeclarada." << std::endl;
 	}
 
+	Simb::Tipo tipo;
+	if(bison_tipo == INT)
+		tipo = Simb::Tipo::INT; // int
+	else if(bison_tipo == VOID)
+		tipo = Simb::Tipo::VOID; // void
+		
 	Simb s{nome, tipo, escopo, natureza, tamanho};
 
-	if(tipo == INT)
-		tipo = 0; // int
-	else if(tipo == VOID)
-		tipo = 1; // void
-
-	if(natureza == 0 && tipo == 1){ // variavel com tipo void
+	if(natureza == Simb::Nat::VAR && tipo == Simb::Tipo::VOID){ // variavel com tipo void
 		std::cout << "Erro: variável \"" << nome << "\" não pode ser do tipo void." << std::endl;
 		erros_semantico++;
 	}
@@ -44,15 +45,15 @@ int TabelaSemantica::existe(string nome){
 int TabelaSemantica::offset(string nome){
 	return existe(nome) - globais.size();
 }
-bool TabelaSemantica::verificar(string nome, int tipo){
+bool TabelaSemantica::verificar(string nome, Simb::Tipo tipo){
 	for(auto it = vars.rbegin(); it != vars.rend(); it++){
 		if(it->nome == nome){
-			if(it->natureza != 1 && tipo == 1){ // não-função sendo usada como função
+			if(it->natureza != Simb::Nat::FUNCAO && tipo == Simb::Tipo::VOID){ // não-função sendo usada como função
 				std::cout << "Erro: variável \"" << nome << "\" não pode ser usada como uma função." << std::endl;
 				erros_semantico++;
 				return false;
 			}
-			if(it->natureza == 0 && tipo == 2){ // variável normal sendo usada como array
+			if(it->natureza == Simb::Nat::VAR && tipo == Simb::Tipo::ARRAY){ // variável normal sendo usada como array
 				std::cout << "Erro: variável \"" << nome << "\" não pode ser usada como um array." << std::endl;
 				erros_semantico++;
 				return false;

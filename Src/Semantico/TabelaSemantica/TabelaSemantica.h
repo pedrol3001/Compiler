@@ -7,13 +7,23 @@
 struct TabelaSemantica;
 using TabSem = TabelaSemantica;
 
+
 struct Simb {
+	enum class Tipo{
+		INT,VOID,ARRAY,
+	};
+	
+	enum class Nat{
+		VAR,FUNCAO,ARRAY,
+	};
+	
 	std::string nome;
-	int tipo; // 0 = int, 1 = void
+	Tipo tipo; // 0 = int, 1 = void
 	int escopo;
-	int natureza; // 0 = var, 1 = funcao, 2 = array
+	Nat natureza; // 0 = var, 1 = funcao, 2 = array
 	std::string tamanho = "1";
 	bool usado = false;
+	
 };
 	
 struct TabelaSemantica {	
@@ -23,10 +33,11 @@ struct TabelaSemantica {
 
 	TabelaSemantica();
 
-	void adicionar(std::string nome, int tipo, int natureza, int escopo, std::string tamanho);
+	// int tipo => bison.h
+	void adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, std::string tamanho);
 	int existe(std::string nome);
 	int offset(std::string nome);
-	bool verificar(std::string nome, int tipo);
+	bool verificar(std::string nome, Simb::Tipo tipo);
 	void desalocar();
 	void mostrar_globais();
 };

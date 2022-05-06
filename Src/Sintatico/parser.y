@@ -123,16 +123,16 @@ declaration-list: declaration-list declaration | declaration ;
 declaration: var-declaration | fun-declaration ;
 
 var-declaration: type-specifier ID SEMICOLON {
-		semantico.tabela.adicionar(token_name($2), $1.tipo, 0, semantico.escopo, "1");
+		semantico.tabela.adicionar(token_name($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, "1");
 	}
 	| type-specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
-		semantico.tabela.adicionar(token_name($2), $1.tipo, 2, semantico.escopo, token_name($4));
+		semantico.tabela.adicionar(token_name($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, token_name($4));
 	};
 
 type-specifier: INT | VOID ;
 
 fun-declaration: type-specifier ID {
-		semantico.tabela.adicionar(token_name($2), $1.tipo, 1, semantico.escopo, "1");
+		semantico.tabela.adicionar(token_name($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, "1");
 	} open-esc LPAREN params RPAREN compound-stmt close-esc ;
 
 open-esc: %empty { semantico.escopo++; } ;
@@ -143,10 +143,10 @@ params: param-list | VOID ;
 param-list: param-list COMMA param | param ;
 
 param: type-specifier ID {
-		semantico.tabela.adicionar(token_name($2), $1.tipo, 0, semantico.escopo, "1");
+		semantico.tabela.adicionar(token_name($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, "1");
 	}
 	| type-specifier ID LBRACKET RBRACKET {
-		semantico.tabela.adicionar(token_name($2), $1.tipo, 2, semantico.escopo, "1"); // mudar tamanho
+		semantico.tabela.adicionar(token_name($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, "1"); // mudar tamanho
 	};
 
 compound-stmt: LBRACE open-esc local-declarations statement-list close-esc RBRACE ;
@@ -177,11 +177,11 @@ expression: var ASSIGN expression {
 
 var: ID { 
 		// Analise semantica
-		semantico.tabela.verificar(token_name($1), 0); 
+		semantico.tabela.verificar(token_name($1), Simb::Tipo::INT); 
 		$$=$1;
 	} | ID LBRACKET expression RBRACKET { 
 		// Analise semantica
-		semantico.tabela.verificar(token_name($1), 2); 
+		semantico.tabela.verificar(token_name($1), Simb::Tipo::ARRAY); 
 		// Converter vetor [$3 = expression] para:
 		/*cout << "Simplificar x = v[n]" << endl;
 		Token temp1 = tabsim.insert(ID);
@@ -236,7 +236,7 @@ mulop: MUL | DIV ;
 factor: LPAREN expression RPAREN | var | call | NUM ;
 
 call: ID LPAREN begin-call args RPAREN { 
-	semantico.tabela.verificar(token_name($1), 1);
+	semantico.tabela.verificar(token_name($1), Simb::Tipo::VOID);
 
 	Token token = tabsim.insert(INT);
 	string t = semantico.suporte.obter_temporario();
