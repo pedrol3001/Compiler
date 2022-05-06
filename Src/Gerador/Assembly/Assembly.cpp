@@ -2,6 +2,6 @@
 
 using namespace std;
 
-Assembly::Assembly(bool _is_label): Code::Codigo(_is_label) {}
+Assembly::Assembly(bool _ignore): Code::Codigo(_ignore) {}
 
 Assembly::~Assembly() {}

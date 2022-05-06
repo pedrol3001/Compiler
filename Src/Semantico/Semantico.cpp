@@ -15,7 +15,7 @@ Semantico::Semantico(): tabela(), escopo(tabela.escopo){
 bool Semantico::analisar() {
 	ok = true;	// ok eh o resultado da analise
 	
-	gerarIntermediario();
+	//gerarIntermediario();
 	
 	return ok;
 }
@@ -23,15 +23,15 @@ bool Semantico::analisar() {
 void Semantico::gerarIntermediario() {
 	assert(ok);
 	
-	instrucoesGeradas.clear();
+	code.clear();
 	
 	// Geracao de codigo intermediario
 	// TODO: é um teste
 }
-
+#include <iostream>
 std::list<std::shared_ptr<Addr3::Instrucao> > Semantico::instrucoes() {
 	assert(ok);
-	return instrucoesGeradas;
+	return code;
 }
 
 bool Semantico::good() {return ok;}

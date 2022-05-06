@@ -47,10 +47,7 @@ Simb TabelaSemantica::operator[](string nome) {
 	assert(existe(nome));
 	return variaveis[nome].back();
 }
-bool TabelaSemantica::existe(string nome,int escopo){
-	existe(nome);
-	return (*this)[nome].escopo==escopo;
-}
+
 bool TabelaSemantica::verificar(string nome, Simb::Nat natureza){
 	if(!existe(nome)) {
 		cout << "Erro: variável \"" << nome << "\" não declarada." << endl;

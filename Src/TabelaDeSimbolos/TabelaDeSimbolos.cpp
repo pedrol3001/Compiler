@@ -62,11 +62,8 @@ void Simbolo::free() {
 		delete p.second;
 }
 
-
 Atributo::Atributo(string _nome): nome(_nome) {}
 
 Atributo::~Atributo() {}
-
-
 
 

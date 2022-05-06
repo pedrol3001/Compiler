@@ -14,7 +14,7 @@
 namespace Addr3{
 	struct Instrucao: public Code::Codigo {
 		std::string classe;		
-		Instrucao(std::string _classe, bool _is_label=false);
+		Instrucao(std::string _classe, bool _ignore=false);
 		virtual ~Instrucao();
 		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;
 	};
@@ -24,7 +24,7 @@ namespace Addr3{
 		Label(Token _label);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();
 	};	
-
+	
 	// Input/output =================================
 	
 	struct Read: public Instrucao {		// Read x;
@@ -118,8 +118,14 @@ namespace Addr3{
 	};
 
 	struct Call: public Instrucao {		// Call function;
-		Token funcao;		
-		Call(Token _funcao);
+		Token ret,funcao;		
+		Call(Token _ret, Token _funcao);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+	};
+	
+	struct Return: public Instrucao {		// Return ;
+		Token ret;		
+		Return(Token _ret);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 
@@ -151,6 +157,21 @@ namespace Addr3{
 		std::vector<Assembly> gera_codigo();		
 	};
 	*/
+	
+	// Outros ===========================================
+	
+	struct SizeOf: public Instrucao {
+		Token op;
+		SizeOf(Token _op);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();
+	};
+	
+	struct Comentario: public Instrucao {
+		std::string str;
+		Comentario(std::string _str);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();
+	};
+
 }
 
 #endif

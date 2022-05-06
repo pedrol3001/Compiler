@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <cassert>
 
 // Unidade de acesso
 struct Token;		
@@ -41,6 +42,12 @@ struct Simbolo {
 	bool has(std::string key);
 	void insert(Atributo* att);	
 	void free();
+	
+	template<class T>
+	T* getAtt(std::string att) {
+		assert(has(att));
+		return (T*)(*this)[att];
+	}
 };
 
 struct Atributo{

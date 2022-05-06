@@ -5,7 +5,7 @@
 #include "../Codigo/Codigo.h"
 
 struct Assembly: public Code::Codigo {
-	Assembly(bool _is_label);
+	Assembly(bool _ignore);
 	virtual ~Assembly();
 	virtual std::string str()=0;
 };

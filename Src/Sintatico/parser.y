@@ -41,6 +41,25 @@ long long int tokenIntVal(Token t){
 bool isTemp(Token t) {
 	return tabsim[t].has("IsTemp");
 }
+
+
+void updateTabSim(Token t, Semantico& semantico) {
+	if(isTemp(t)) {
+		tabsim[t].insert((Atributo*) new VarLocal(1));
+		return;
+	}
+
+	if(semantico.tabela.existe(tokenIdVal(t))) {
+		Simb simb = semantico.tabela[tokenIdVal(t)];
+		if(simb.escopo==GLOBAL) {
+			if(!tabsim[t].has("VarGlobal"))
+				tabsim[t].insert((Atributo*) new VarGlobal(simb.tamanho));
+		} else {
+			if(!tabsim[t].has("VarLocal"))
+				tabsim[t].insert((Atributo*) new VarLocal(simb.tamanho));
+		}
+	}
+}
 	
 %}
 
@@ -121,133 +140,144 @@ bool isTemp(Token t) {
 
 %%
 
-program: declaration-list { 
+program: declaration_list { 
 	semantico.tabela.mostrar_globais();
 	semantico.analisar();	// Setar como ok
 };
 
-declaration-list: declaration-list declaration | declaration ;
+declaration_list: declaration_list declaration | declaration ;
 
-declaration: var-declaration | fun-declaration ;
+declaration: var_declaration | fun_declaration ;
 
-var-declaration: type-specifier ID SEMICOLON {
+var_declaration: type_specifier ID SEMICOLON {
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, 1);
-	}
-	| type-specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
+	} | type_specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, tokenIntVal($4));
 	};
 
-type-specifier: INT | VOID ;
+type_specifier: INT | VOID ;
 
-fun-declaration: type-specifier ID {
+fun_declaration: type_specifier ID {
+		
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, 1);
-	} open-esc LPAREN params RPAREN compound-stmt close-esc ;
+		//semantico.code.emplace_back(new Label());
+	} open_esc LPAREN params RPAREN compound_stmt close_esc ;
 
-open-esc: %empty { semantico.escopo++; } ;
-close-esc: %empty { semantico.escopo--; semantico.tabela.remover(); } ;
+open_esc: %empty { semantico.escopo++; } ;
+close_esc: %empty { semantico.escopo--; semantico.tabela.remover(); } ;
 
-params: param-list | VOID ;
+params: param_list | VOID ;
 
-param-list: param-list COMMA param | param ;
+param_list: param_list COMMA param | param ;
 
-param: type-specifier ID {
+param: type_specifier ID {
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, 1);
 	}
-	| type-specifier ID LBRACKET RBRACKET {
+	| type_specifier ID LBRACKET RBRACKET {
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, 1); // mudar tamanho
 	};
 
-compound-stmt: LBRACE open-esc local-declarations statement-list close-esc RBRACE ;
+compound_stmt: LBRACE open_esc local_declarations statement_list close_esc RBRACE ;
 
-local-declarations: local-declarations var-declaration | %empty ;
+local_declarations: local_declarations var_declaration | %empty ;
 
-statement-list: statement-list statement | %empty ;
+statement_list: statement_list statement | %empty ;
 
-statement: expression-stmt | compound-stmt | selection-stmt | iteration-stmt | input-stmt | output-stmt | return-stmt ;
+statement: expression_stmt | compound_stmt | selection_stmt | iteration_stmt | input_stmt | output_stmt | return_stmt ;
 
-input-stmt: INPUT var SEMICOLON { /*Gerar intermediario Input() */  } ;
+input_stmt: INPUT var SEMICOLON { semantico.code.emplace_back(new Addr3::Read($2)); } ;
 
-output-stmt: OUTPUT expression SEMICOLON;
+output_stmt: OUTPUT expression SEMICOLON { semantico.code.emplace_back(new Addr3::Print($2)); } ;
 
-expression-stmt: expression SEMICOLON | SEMICOLON ;
+expression_stmt: expression SEMICOLON | SEMICOLON ;
 
-selection-stmt: IF LPAREN expression RPAREN statement | IF LPAREN expression RPAREN statement ELSE statement ;
+selection_stmt: IF LPAREN expression RPAREN statement | IF LPAREN expression RPAREN statement ELSE statement ;
 
-iteration-stmt: WHILE LPAREN expression RPAREN statement ;
+iteration_stmt: WHILE LPAREN expression RPAREN statement ;
 
-return-stmt: RETURN SEMICOLON | RETURN expression SEMICOLON ;
+return_stmt: RETURN SEMICOLON | RETURN expression SEMICOLON ;
 
 expression: var ASSIGN expression {
-	cout << tokenStrAtt($1) << " = " << tokenStrAtt($3) << endl;
-	$$ = $3; // para retornar o resultado da igualdade
-}
-	| simple-expression ;
+		semantico.code.emplace_back(new Addr3::Atribuicao($1,$3));
+	
+		cout << tokenStrAtt($1) << " = " << tokenStrAtt($3) << endl;
+		$$ = $1; // para retornar o resultado da igualdade
+	} | simple_expression {
+		semantico.tempGen.reset_index();
+		$$ = $1;
+	} ;
 
-var: ID { 
-		// Analise semantica
-		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR); 
+var: ID {	
+		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR);
+		updateTabSim($1,semantico);
 		$$=$1;
-	} | ID LBRACKET expression RBRACKET { 
-		// Analise semantica
+		
+	} | ID LBRACKET expression RBRACKET { 	
 		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::ARRAY); 
-		// Converter vetor [$3 = expression] para:
-		/*cout << "Simplificar x = v[n]" << endl;
-		Token temp1 = tabsim.insert(ID);
-		tabsim[temp].insert(new StrAtt("ArrayTemp1"));
-		cout << '\t' << const_name(temp1) << " = " << const_name($1) << " + " << const_name($3) << " (temp1 = var + n)"; //Adicao(temp1,$1,$3);
-		cout << '\t' <<;
-			// temp1 = criar novo token
-			// Adicao(temp1,$1,$3) temp1 = vetor(ponteiro) + expression 
-		*/	// temp2 = *temp1
+		updateTabSim($1,semantico);
+		$$=$1;
 	} ;
 
 
 
-simple-expression: additive-expression relop additive-expression {
+simple_expression: additive_expression relop additive_expression {
 	Token token = semantico.tempGen.gerar();
+	updateTabSim(token,semantico);
+	
 	cout << tokenStrAtt(token) << " = " << tokenStrAtt($1) << " " << tokenStrAtt($2) << " " << tokenStrAtt($3) << endl;
 	$$ = token;
-}
-	| additive-expression ;
+} | additive_expression ;
 
 relop: LESS | LESSEQUAL | GREATER | GREATEREQUAL | EQUAL | NOTEQUAL;
 
-additive-expression: additive-expression addop term {
+additive_expression: additive_expression addop term {
 	Token token = semantico.tempGen.gerar();
-
+	updateTabSim(token,semantico);
+	
+	semantico.code.emplace_back(new Addr3::Adicao(token,$1,$3));	// token = $1 + $3
 	cout << tokenStrAtt(token) << " = " << tokenStrAtt($1) << " " << tokenStrAtt($2) << " " << tokenStrAtt($3) << endl;
 	$$ = token;
-}
-	| term ;
+} | term ;
 
 addop: SUM | SUB ;
 
 term: term mulop factor {
 	Token token = semantico.tempGen.gerar();
+	updateTabSim(token,semantico);
+	
+	semantico.code.emplace_back(new Addr3::Multiplicacao(token,$1,$3) );	// token = $1 * $3
 	cout << tokenStrAtt(token) << " = " << tokenStrAtt($1) << " " << tokenStrAtt($2) << " " << tokenStrAtt($3) << endl;
 	$$ = token;
-}
-	| factor ;
+} | factor ;
 
 mulop: MUL | DIV ;
 
 factor: LPAREN expression RPAREN | var | call | NUM ;
 
-call: ID LPAREN begin-call args RPAREN { 
+call: ID LPAREN Addr3_BeginCall args RPAREN { 
 	semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR);
 
 	Token token = semantico.tempGen.gerar();
+	
+	updateTabSim($1,semantico);
+	updateTabSim(token,semantico);
 
 	cout << tokenStrAtt(token) << " = " << "call " << tokenStrAtt($1) << endl;
 	$$ = token;
 };
 
-begin-call: %empty { cout << "begin call" << endl; } ;
+Addr3_BeginCall: %empty { 
+	cout << "begin call" << endl; 
+	semantico.code.emplace_back(new Addr3::BeginCall);
+} ;
 
-args: arg-list | %empty ;
+args: arg_list | %empty ;
 
-arg-list: arg-list COMMA expression { cout << "param " << tokenStrAtt($3) << endl;	}
-	| expression { cout << "param " << tokenStrAtt($1) << endl; }| %empty;
+arg_list: arg_list COMMA expression addr3_param | addr3_param | %empty;
+	
+addr3_param: expression { 
+	cout << "param " << tokenStrAtt($1) << endl;
+}
 
 NUM: C_INT | C_FLOAT ;
 

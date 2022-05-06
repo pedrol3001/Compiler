@@ -21,10 +21,10 @@ struct Semantico {
 	TabelaSemantica tabela;
 	TempGenerator tempGen;
 	int &escopo;
+	
+	std::list<std::shared_ptr<Addr3::Instrucao> > code;
 	private:
 		void gerarIntermediario();
-		
-		std::list<std::shared_ptr<Addr3::Instrucao> > instrucoesGeradas;
 		bool ok=false;
 	
 };

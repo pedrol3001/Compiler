@@ -9,14 +9,17 @@
 using namespace Addr3;
 using namespace std;
 
-Instrucao::Instrucao(std::string _classe, bool _is_label): classe(_classe), Code::Codigo(_is_label) {}
+string showToken(Token t) {
+	return TabSim::getInstance()[t].getAtt<StrAtt>("StrAtt")->str;
+}
+
+Instrucao::Instrucao(std::string _classe, bool _ignore): classe(_classe), Code::Codigo(_ignore) {}
 Instrucao::~Instrucao() {}
 
 // Funcoes auxiliares ===========================
 	
-void loadReg(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg) {
+void loadReg(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg) {	
 	TabSim &ts = TabSim::getInstance();
-	
 	assert(ts[op].has("VarGlobal") || ts[op].has("VarLocal") || ts[op].has("IntVal"));
 	assert(!(ts[op].has("VarGlobal")&& ts[op].has("VarLocal")));
 	assert(!(ts[op].has("VarLocal")&& ts[op].has("IntVal")));
@@ -78,6 +81,7 @@ Label::Label(Token _label): Code::Label(_label), Instrucao("Label",true) {}
 	
 list<shared_ptr<Assembly> > Read::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("Read"));
 	// Le input
 	code.emplace_back(new TM::IN(TM::t0,TM::t0,TM::t0));		// IN t0,t0,t0	
 	// Armazena input	
@@ -89,6 +93,7 @@ Read::Read(Token _op): op(_op), Instrucao("Read") {}
 
 list<shared_ptr<Assembly> > Print::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("Print " + TabSim::getInstance()[op].getAtt<IdVal>("IdVal")->val));
 	
 	// Carrega operando	
 	loadReg(code,op,TM::t0);
@@ -102,6 +107,7 @@ Print::Print(Token _op): op(_op), Instrucao("Print") {}
 // Declaracao ==================================
 list<shared_ptr<Assembly> > Global::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("Global"));
 	int space = 1;	// normalmente, deveria ser extraido de Token op
 	alocar(code,space,TM::t0,TM::gp);		
 	return code;
@@ -110,6 +116,7 @@ Global::Global(Token _op): op(_op), Instrucao("Global") {}
 
 list<shared_ptr<Assembly> > Aloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("Aloca"));
 	int space = 1;	// normalmente, deveria ser extraido de Token op
 	alocar(code,space,TM::t0,TM::sp);		
 	return code;
@@ -118,6 +125,7 @@ Aloca::Aloca(Token _op): op(_op), Instrucao("Aloca") {}
 
 list<shared_ptr<Assembly> > Desaloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("Desaloca"));
 	int space = 1;	// normalmente, deveria ser extraido de Token op
 	desalocar(code,space,TM::t0,TM::sp);		
 	return code;
@@ -138,6 +146,7 @@ Operacao::Operacao(string _classe, Token _dst, Token _op1, Token _op2): dst(_dst
 // Adicao	
 list<shared_ptr<Assembly> > Adicao::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("Adicao"));
 	// Carregar operandos (op[0], op[1])
 	loadReg(code,op[0],TM::t0);
 	loadReg(code,op[1],TM::t1);
@@ -153,6 +162,7 @@ Adicao::Adicao(Token _dst, Token _op1, Token _op2): Operacao("Adicao",_dst,_op1,
 // Multiplicacao
 list<shared_ptr<Assembly> > Multiplicacao::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
+	code.emplace_back(new TM::Comentario("Multiplicacao"));
 	// Carregar operandos (op[0], op[1])
 	loadReg(code,op[0],TM::t0);
 	loadReg(code,op[1],TM::t1);
@@ -169,6 +179,7 @@ Multiplicacao::Multiplicacao(Token _dst, Token _op1, Token _op2): Operacao("Mult
 // Divisao
 list<shared_ptr<Assembly> > Divisao::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("Divisao"));
 	// Carregar operandos (op[0], op[1])
 	loadReg(code,op[0],TM::t0);
 	loadReg(code,op[1],TM::t1);
@@ -184,6 +195,7 @@ Divisao::Divisao(Token _dst, Token _op1, Token _op2): Operacao("Divisao",_dst,_o
 // Subtracao
 list<shared_ptr<Assembly> > Subtracao::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
+	code.emplace_back(new TM::Comentario("Subtracao"));
 	// Carregar operandos (op[0], op[1])
 	loadReg(code,op[0],TM::t0);
 	loadReg(code,op[1],TM::t1);
@@ -202,6 +214,7 @@ Atribuicao::Atribuicao(Token _dst, Token _op): Operacao("Atribuicao",_dst,_op) {
 
 list<shared_ptr<Assembly> > Atribuicao::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
+	code.emplace_back(new TM::Comentario("Atribuicao"));
 	// Carregar operando op[0]
 	loadReg(code,op[0],TM::t0);
 	// Realiza atribuicao, no temp t2
@@ -216,6 +229,7 @@ LoadFromRef::LoadFromRef(Token _dst, Token _pointer): Instrucao("RefLoad"), dst(
 
 std::list<std::shared_ptr<Assembly> > LoadFromRef::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
+	code.emplace_back(new TM::Comentario("LoadFromRef"));
 	// Carrega ponteiro
 	loadReg(code,pointer,TM::t0);
 	// Le do ponteiro
@@ -230,6 +244,7 @@ StoreInRef::StoreInRef(Token _src, Token _pointer): Instrucao("RefStore"),src(_s
 
 std::list<std::shared_ptr<Assembly> > StoreInRef::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
+	code.emplace_back(new TM::Comentario("StoreInRef"));
 	// Carrega ponteiro
 	loadReg(code,pointer,TM::t0);
 	// Carrega operando src
@@ -244,6 +259,7 @@ std::list<std::shared_ptr<Assembly> > StoreInRef::gera_codigo() {
 // Chamada de funcao============================
 std::list<std::shared_ptr<Assembly> > BeginCall::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
+	code.emplace_back(new TM::Comentario("BeginCall"));
 	// Aloca espaco para guardar o ra na pilha
 	alocar(code,1,TM::t0,TM::sp);
 	// Guarda ra na pilha
@@ -256,6 +272,7 @@ BeginCall::BeginCall(): Instrucao("BeginCall") {}
 
 std::list<std::shared_ptr<Assembly> > Param::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
+	code.emplace_back(new TM::Comentario("Param"));
 	// Aloca espaco para guardar o argumento na pilha
 	int space = 1;	// normalmente, deveria ser extraido de Token op
 	alocar(code,space,TM::t0,TM::sp);
@@ -268,6 +285,7 @@ Param::Param(Token _parametro): parametro(_parametro), Instrucao("Param") {}
 
 list<shared_ptr<Assembly> > Call::gera_codigo() {
 	list<shared_ptr<Assembly> > code;	
+	code.emplace_back(new TM::Comentario("Call"));
 	// Configurar ra
 	code.emplace_back(new TM::LDA(TM::ra,3,TM::pc));	// LA ra,3(pc)
 	// TODO: Configura destino do salto
@@ -280,13 +298,24 @@ list<shared_ptr<Assembly> > Call::gera_codigo() {
 	
 	return code;
 }
-Call::Call(Token _funcao): funcao(_funcao), Instrucao("Call") {}
+Call::Call(Token _ret, Token _funcao): ret(_ret), funcao(_funcao), Instrucao("Call") {}
 
+	
+list<shared_ptr<Assembly> > Return::gera_codigo() {
+	list<shared_ptr<Assembly> > code;	
+	code.emplace_back(new TM::Comentario("Return"));
+
+	// retornar para ra, empilhando retorno
+
+	return code;
+}	
+Return::Return(Token _ret): ret(_ret), Instrucao("Return") {}
 
 // Saltos ======================================
 
 list<shared_ptr<Assembly> > Goto::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("Goto " + showToken(label)));
 	/*
 	
 	// Carregar constante
@@ -303,6 +332,7 @@ SaltoCondicional::SaltoCondicional(string _classe, Token _label): Code::Goto(_la
 
 list<shared_ptr<Assembly> > Beq::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("Beq"));
 	/*
 	
 	// Carregar operandos (op1, op2)
@@ -317,7 +347,29 @@ list<shared_ptr<Assembly> > Beq::gera_codigo() {
 }
 Beq::Beq(Token _op1, Token _op2, Token _label): SaltoCondicional("Beq",_label), op1(_op1), op2(_op2) {}
 
+// Outros =================================================================================================
 
+std::list<std::shared_ptr<Assembly> > SizeOf::gera_codigo() {
+	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("SizeOf"));
+	/*
+	
+	// Carregar operandos (op1, op2)
+	loadReg(code,op1,TM::t0);
+	loadReg(code,op2,TM::t1);
+	// Subtrair
+	code.emplace_back(new TM::SUB(TM::t2,TM::t0,TM::t1));	// SUB t2,t0,t1
+	code.emplace_back(new TM::JEQ(TM::t2,distancia,TM::pc));	// JEQ t2,distancia(pc)
+	*/
+	
+	return code;
+}
+SizeOf::SizeOf(Token _op): Instrucao("SizeOf"), op(_op) {}
 
-
+std::list<std::shared_ptr<Assembly> > Comentario::gera_codigo() {
+	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario(str));
+	return code;
+}
+Comentario::Comentario(std::string _str): Instrucao("Comentario",true), str(_str) {}
 

@@ -7,21 +7,21 @@
 #include <string>
 
 struct Variavel: public Atributo {
-	long int offset_;
+	long int offset_=0;
 	long int size;
 	
-	Variavel(std::string _nome, long int _offset, int _size);
+	Variavel(std::string _nome, int _size);
 	virtual ~Variavel();
 	
 	long int offset();
 };
 
 struct VarLocal: public Variavel {	// Variaveis estaticas
-	VarLocal(long int _offset, int _size);	// space = 
+	VarLocal(int _size);	// space = 
 };
 
 struct VarGlobal: public Variavel {	// Variaveis globais
-	VarGlobal(long int _offset, int _size);	// space = 
+	VarGlobal(int _size);	// space = 
 };
 
 #endif

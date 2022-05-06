@@ -1,12 +1,13 @@
 #include "LourdenTM.h"
+#include "../../TabelaDeSimbolos/TabelaDeSimbolos.h"
 
 #include <sstream>
+#include <cassert>
 
 using namespace std;
 using namespace TM;
 
-
-Instrucao::Instrucao(string _nome, bool _is_label): nome(_nome), Assembly(_is_label) {}
+Instrucao::Instrucao(string _nome, bool _ignore): nome(_nome), Assembly(_ignore) {}
 
 string Instrucao::str() {
 	stringstream ss;
@@ -18,7 +19,18 @@ Instrucao::~Instrucao() {}
 
 // Label
 Label::Label(Token _label): Instrucao("Label",true),Code::Label(_label) {}
-std::string Label::str() {return string();}	
+std::string Label::str() {
+	assert(TabSim::getInstance()[label].has("LabelVal"));
+	stringstream ss;
+	ss << TabSim::getInstance()[label].getAtt<LabelVal>("LabelVal")->getLinha();
+	return ss.str();
+}	
+
+// Comentario
+Comentario::Comentario(std::string _comentario): Instrucao("Comentario",true), comentario(_comentario) {}
+std::string Comentario::str() {
+	return comentario;
+}
 
 // Tipo RO
 tipoRO::tipoRO(string _nome, Reg _r1, Reg _r2, Reg _r3): Instrucao(_nome), r1(_r1), r2(_r2), r3(_r3) {}

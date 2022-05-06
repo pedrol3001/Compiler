@@ -38,20 +38,20 @@ bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::I
 	long long int linha=0;
 	for(shared_ptr<Assembly> assembly: codigoGerado) {
 		assembly->update(linha);
-		if(!assembly->is_label())
+		if(!assembly->ignore())
 			linha++;
 	}
 	
 	// Gera codigo
 	linha = 0;
-	for(shared_ptr<Assembly> assembly: codigoGerado) 
-		if(assembly->is_label())
-			dst_stream << "* label: " << assembly->str() << '\n'; 
+	for(shared_ptr<Assembly> assembly: codigoGerado) {
+		if(assembly->ignore())
+			dst_stream << "*" << assembly->str() << '\n'; 
 		else
 			dst_stream << linha++ << ": " << setw(3) << assembly->str() << '\n';
+	}
 	
-	ok = true;
-	return ok;
+	return ok = true;
 }
 
 void Gerador::otimizarIntermediario() {

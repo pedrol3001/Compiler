@@ -33,10 +33,12 @@ struct Simb {
 	bool usado = false;
 };
 
+enum {GLOBAL=0};
+
 struct TabelaSemantica {
 	std::map<std::string,std::list<Simb> > variaveis;
 
-	int erros_semantico = 0, escopo = 0;
+	int erros_semantico = 0, escopo = GLOBAL;
 
 	TabelaSemantica();
 
@@ -46,13 +48,13 @@ struct TabelaSemantica {
 	void mostrar_globais();
 
 	bool existe(std::string nome);
+	Simb operator()(std::string nome,int escopo);
 	bool existe(std::string nome,int escopo);
 	Simb operator[](std::string nome);
 };
 
 struct TempGenerator{
 	int temp_index = 0;
-	
 	Token gerar();
 	void reset_index();
 };

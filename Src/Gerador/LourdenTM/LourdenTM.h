@@ -16,7 +16,7 @@ namespace TM {
 	
 	struct Instrucao: public Assembly {
 		virtual std::string str();	
-		Instrucao(std::string _nome, bool _is_label=false);
+		Instrucao(std::string _nome, bool _ignore=false);
 		virtual ~Instrucao();
 		protected:
 			virtual std::string InstStr();
@@ -26,6 +26,12 @@ namespace TM {
 	
 	struct Label: public Instrucao, public Code::Label {	// opcode r1,r2,r3
 		Label(Token _label);
+		std::string str();	
+	};
+	
+	struct Comentario: public Instrucao {
+		std::string comentario;
+		Comentario(std::string _comentario);
 		std::string str();	
 	};
 
@@ -90,7 +96,7 @@ namespace TM {
 	INST_RM_REL(RJLT,"JLT")	// r1< 0? jump pc+label_distance
 	INST_RM_REL(RJLE,"JLE")	// r1<=0? jump pc+label_distance
 	INST_RM_REL(RJGT,"JGT")	// r1> 0? jump pc+label_distance
-	INST_RM_REL(RJGE,"JGE")	// r1>=0? jump pc+label_distance
+	INST_RM_REL(RJGE,"JGE")	// r1>=0? jump pc+label_distance	
 }
 
 

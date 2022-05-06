@@ -10,15 +10,15 @@ namespace Code {
 	struct Codigo {	// Usado para atualizar linhas polimorficamente
 		long long int linha=-1;
 		
-		Codigo(bool _is_label);
+		Codigo(bool _ignore=false);
 		
-		bool is_label();
+		bool ignore();
 		
 		virtual void update(long long int _linha);	// Atualiza linha
 		long long int getLinha();	// Atualiza linha
 		virtual ~Codigo();	
 		private:
-			bool flag_is_label;	
+			bool ignore_;	
 	};
 
 	struct Goto {	// Classes que precisam se referir a uma label

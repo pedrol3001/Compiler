@@ -5,8 +5,8 @@
 using namespace Code;
 using namespace std;
 
-Codigo::Codigo(bool _is_label): flag_is_label(_is_label) {}
-bool Codigo::is_label() {return flag_is_label;}
+Codigo::Codigo(bool _ignore): ignore_(_ignore) {}
+bool Codigo::ignore() {return ignore_;}
 
 void Codigo::update(long long int _linha) {linha=_linha;}	// Atualiza linha
 long long int Codigo::getLinha() {
