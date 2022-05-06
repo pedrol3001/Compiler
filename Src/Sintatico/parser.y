@@ -37,6 +37,10 @@ long long int tokenIntVal(Token t){
 	assert(tabsim[t].has("IntVal"));
 	return ((IntVal*) tabsim[t]["IntVal"])->val;
 }
+
+bool isTemp(Token t) {
+	return tabsim[t].has("IsTemp");
+}
 	
 %}
 
@@ -140,7 +144,7 @@ fun-declaration: type-specifier ID {
 	} open-esc LPAREN params RPAREN compound-stmt close-esc ;
 
 open-esc: %empty { semantico.escopo++; } ;
-close-esc: %empty { semantico.escopo--; semantico.tabela.desalocar(); } ;
+close-esc: %empty { semantico.escopo--; semantico.tabela.remover(); } ;
 
 params: param-list | VOID ;
 
@@ -181,11 +185,11 @@ expression: var ASSIGN expression {
 
 var: ID { 
 		// Analise semantica
-		semantico.tabela.verificar(tokenIdVal($1), Simb::Tipo::INT); 
+		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR); 
 		$$=$1;
 	} | ID LBRACKET expression RBRACKET { 
 		// Analise semantica
-		semantico.tabela.verificar(tokenIdVal($1), Simb::Tipo::ARRAY); 
+		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::ARRAY); 
 		// Converter vetor [$3 = expression] para:
 		/*cout << "Simplificar x = v[n]" << endl;
 		Token temp1 = tabsim.insert(ID);
@@ -230,7 +234,7 @@ mulop: MUL | DIV ;
 factor: LPAREN expression RPAREN | var | call | NUM ;
 
 call: ID LPAREN begin-call args RPAREN { 
-	semantico.tabela.verificar(tokenIdVal($1), Simb::Tipo::VOID);
+	semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR);
 
 	Token token = semantico.tempGen.gerar();
 

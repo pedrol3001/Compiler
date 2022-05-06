@@ -6,92 +6,89 @@
 
 using namespace std;
 
-long long int Simb::max_distance_to_base=0;
+//Simbolo ==============================================================================================================
 
-Simb::Simb(std::string _nome, Tipo _tipo, int _escopo, Nat _natureza, long long int _tamanho): nome(_nome), tipo(_tipo), escopo(_escopo), natureza(_natureza), tamanho(_tamanho) {
-	distance_to_base = (Simb::max_distance_to_base += tamanho);
-}
-long long int Simb::offset() {
-	return Simb::max_distance_to_base - distance_to_base + 1;
-}
+Simb::Simb(std::string _nome, Tipo _tipo, int _escopo, Nat _natureza, long long int _tamanho): 
+	nome(_nome), tipo(_tipo), escopo(_escopo), natureza(_natureza), tamanho(_tamanho) {}
 
-Simb::~Simb() {
-	//assert(Simb::max_distance_to_base == distance_to_base);	// Verificar se a remocao faz sentido (desalocar primeiro o que esta no topo da pilha)
-	Simb::max_distance_to_base -= tamanho;
-}
+// Tabela Semantica ====================================================================================================
 
 TabelaSemantica::TabelaSemantica(){}
 
 void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza, int escopo, int tamanho){
-	int st = this->existe(nome);
-	if(st != -1 && locais[st].escopo < escopo){
+	if(existe(nome) && (*this)[nome].escopo < escopo){
 		std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
-	}else if(st != -1 && locais[st].escopo == escopo){
+	}else if(existe(nome) && (*this)[nome].escopo == escopo){
 		std::cout << "Erro: variável \"" << nome << "\" sendo redeclarada." << std::endl;
 	}
 
 	Simb::Tipo tipo;
+	// Converter do tipo bison para o tipo Simb::Tipo
 	switch(bison_tipo) {
 		case INT: tipo =  Simb::Tipo::INT; 
 			break;
 		case VOID: tipo = Simb::Tipo::VOID;
 			break;
-	
 	}
-		
-	Simb s(nome, tipo, escopo, natureza, tamanho);
 
 	if(natureza == Simb::Nat::VAR && tipo == Simb::Tipo::VOID){ // variavel com tipo void
 		std::cout << "Erro: variável \"" << nome << "\" não pode ser do tipo void." << std::endl;
 		erros_semantico++;
 	}
 
-	this->locais.push_back(s);
-	if(s.escopo == 0)
-		this->globais.push_back(s);
-	else
-		cout << "aloca " << s.nome << " " << s.tamanho << "\n";
+	variaveis[nome].push_back(Simb(nome, tipo, escopo, natureza, tamanho));
+	cout << "aloca " << (*this)[nome].nome << " " << (*this)[nome].tamanho << "\n";
 }
-int TabelaSemantica::existe(string nome){
-	for(auto it = locais.rbegin(); it != locais.rend(); it++)
-		if(it->nome == nome) return std::distance(it, locais.rend());
-	return -1;
-}
-long long int TabelaSemantica::offset(string nome){
-	return existe(nome) - globais.size();
-}
-bool TabelaSemantica::verificar(string nome, Simb::Tipo tipo){
-	for(auto it = locais.rbegin(); it != locais.rend(); it++){
-		if(it->nome == nome){
-			if(it->natureza != Simb::Nat::FUNCAO && tipo == Simb::Tipo::VOID){ // não-função sendo usada como função
-				std::cout << "Erro: variável \"" << nome << "\" não pode ser usada como uma função." << std::endl;
-				erros_semantico++;
-				return false;
-			}
-			if(it->natureza == Simb::Nat::VAR && tipo == Simb::Tipo::ARRAY){ // variável normal sendo usada como array
-				std::cout << "Erro: variável \"" << nome << "\" não pode ser usada como um array." << std::endl;
-				erros_semantico++;
-				return false;
-			}
 
-			it->usado = true;
-			return true;
-		};
-	}
-	std::cout << "Erro: variável \"" << nome << "\" não declarada." << std::endl;
-	erros_semantico++;
-	return false;
+bool TabelaSemantica::existe(string nome){
+	return variaveis.count(nome)>0 && !variaveis[nome].empty();
 }
-void TabelaSemantica::desalocar(){
-	while(!locais.empty() && locais.back().escopo > escopo){
-		cout << "desaloca " << locais.back().nome << " " << locais.back().tamanho << std::endl;
-		locais.pop_back();
+Simb TabelaSemantica::operator[](string nome) {
+	assert(existe(nome));
+	return variaveis[nome].back();
+}
+bool TabelaSemantica::existe(string nome,int escopo){
+	existe(nome);
+	return (*this)[nome].escopo==escopo;
+}
+bool TabelaSemantica::verificar(string nome, Simb::Nat natureza){
+	if(!existe(nome)) {
+		cout << "Erro: variável \"" << nome << "\" não declarada." << endl;
+		erros_semantico++;
+		return false;
+	}
+
+	static map<Simb::Nat,string> str = {
+		{Simb::Nat::FUNCAO,"função"},
+		{Simb::Nat::VAR,"variável"},
+		{Simb::Nat::ARRAY,"array"}
+	};
+	if((*this)[nome].natureza != natureza) {
+		cout << "Erro: " << str[(*this)[nome].natureza] << " \"" << nome << "\" ";
+		cout<<  "usado(a) como " << str[natureza] << "." << endl;
+		erros_semantico++;
+		return false;
+	}
+	return true;
+}
+void TabelaSemantica::remover(){
+	for(pair<const string,list<Simb> >& p: variaveis) {
+		list<Simb>& lista = p.second;
+		while(!lista.empty() && lista.back().escopo > escopo) {
+			cout << "desaloca " << lista.back().nome << " " << lista.back().tamanho << std::endl;
+			lista.pop_back();
+		}
 	}
 }
 void TabelaSemantica::mostrar_globais(){
 	cout << "=============================================\n";
-	for(auto it = globais.begin(); it != globais.end(); it++)
-		cout << "global: " << it->nome << " " << it->tamanho << std::endl; 
+	for(pair<string,list<Simb> > p: variaveis) {
+		list<Simb> &lista = p.second;
+		if(lista.empty()) continue;
+		for(Simb s: lista)
+			if(s.escopo==0)
+				cout << "global: " << p.first << " " << s.tamanho << std::endl; 
+	}
 }
 
 	
@@ -104,7 +101,5 @@ Token TempGenerator::gerar(){
 	tabsim[token].insert((Atributo*)(new IsTemp));
 	return token;
 }
-void TempGenerator::reset_index(){
-	temp_index = 0;
-}
+void TempGenerator::reset_index(){temp_index = 0;}
 

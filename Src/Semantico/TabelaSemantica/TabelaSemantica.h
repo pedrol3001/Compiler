@@ -2,7 +2,9 @@
 #define TabelaSemantica_h
 
 #include <string>
-#include <vector>
+#include <utility>
+#include <map>
+#include <list>
 #include "../../Token/Token.h"
 
 struct TabelaSemantica;
@@ -13,7 +15,7 @@ struct Simb {
 	friend class TabelaSemantica;
 
 	enum class Tipo{
-		INT,VOID,ARRAY,
+		INT,VOID,
 	};
 	
 	enum class Nat{
@@ -29,40 +31,23 @@ struct Simb {
 	long long int tamanho = 1;
 	
 	bool usado = false;
-	
-	long long int offset();
-	
-	~Simb();	// Atualiza max_distance_to_base
-	
-	private:
-		static long long int max_distance_to_base;
-		long long int distance_to_base;	// distancia ate o valor minimo do ponteiro 
-	
-	
 };
 
-struct LocalSimb: public Simb {
+struct TabelaSemantica {
+	std::map<std::string,std::list<Simb> > variaveis;
 
-};
-
-struct GlobalSimb: public Simb {
-
-};
-	
-struct TabelaSemantica {	
 	int erros_semantico = 0, escopo = 0;
-	std::vector<Simb> locais;
-	std::vector<Simb> globais;
 
 	TabelaSemantica();
 
-	// int tipo => bison.h
-	void adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, int tamanho);
-	int existe(std::string nome);
-	long long int offset(std::string nome);
-	bool verificar(std::string nome, Simb::Tipo tipo);
-	void desalocar();
+	void adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, int tamanho);	// int tipo => bison.h
+	bool verificar(std::string nome, Simb::Nat natureza);
+	void remover();
 	void mostrar_globais();
+
+	bool existe(std::string nome);
+	bool existe(std::string nome,int escopo);
+	Simb operator[](std::string nome);
 };
 
 struct TempGenerator{
