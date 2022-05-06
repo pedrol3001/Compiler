@@ -97,10 +97,11 @@ void TabelaSemantica::mostrar_globais(){
 	
 Token TempGenerator::gerar(){
 	TabSim &tabsim = TabSim::getInstance();
-	Token token = tabsim.insert(TEMP);
+	Token token = tabsim.insert(ID);
 	string name = "$t" + to_string(temp_index++);
 	tabsim[token].insert((Atributo*)(new IdVal(name)));
 	tabsim[token].insert((Atributo*)(new StrAtt(name)));
+	tabsim[token].insert((Atributo*)(new IsTemp));
 	return token;
 }
 void TempGenerator::reset_index(){

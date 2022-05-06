@@ -54,5 +54,6 @@ struct Atributo{
 #include "Teste/Teste.h"
 #include "Memory/Memory.h"
 #include "Jump/Jump.h"
+#include "SemanticoAtt/SemanticoAtt.h"
 
 #endif

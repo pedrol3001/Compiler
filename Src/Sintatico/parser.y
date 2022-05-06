@@ -1,15 +1,7 @@
 %code requires {
 #include "Lexico/Lexico.h"
 #include "Semantico/Semantico.h"
-#include <vector>
-#include <iostream>
-#include <memory>
 #include "Token/Token.h"
-
-using namespace std;
-
-class Token;
-//class Value;
 }
 
 %{
@@ -26,7 +18,7 @@ using namespace std;
 
 // Implementacao no final do .y
 void debug(string s);
-void yyerror(Lexico& lexico, Semantico& semantico, string s);
+void yyerror(Lexico& lexico, Semantico& semantico, std::string s);
 int yylex(Lexico& lexico);
 
 TabSim& tabsim = TabSim::getInstance();
