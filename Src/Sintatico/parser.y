@@ -210,6 +210,8 @@ selection_stmt: IF LPAREN condition RPAREN statement {
 	| IF LPAREN condition RPAREN statement ELSE {
 		Token token = semantico.tempGen.gerar();
 		updateTabSim(token,semantico);
+		tabsim[token].insert (new LabelVal);
+
 		cout << "goto " << tokenStrAtt(token) << endl;
 		semantico.code.emplace_back(new Addr3::Goto(token));
 		$$ = token;
@@ -225,6 +227,8 @@ selection_stmt: IF LPAREN condition RPAREN statement {
 condition: expression {
 		Token token = semantico.tempGen.gerar();
 		updateTabSim(token,semantico);
+		tabsim[token].insert (new LabelVal);
+
 		cout << "if " << tokenStrAtt($1) << " == " << tokenStrAtt($1) << " goto " << tokenStrAtt(token) << endl;
 		semantico.code.emplace_back(new Addr3::Beq($1, $1, token));
 		$$ = token;
@@ -233,6 +237,8 @@ condition: expression {
 iteration_stmt: WHILE {
 		Token token = semantico.tempGen.gerar();
 		updateTabSim(token,semantico);
+		tabsim[token].insert (new LabelVal);
+
 		$$ = token;
 	}	
 	LPAREN condition RPAREN statement {

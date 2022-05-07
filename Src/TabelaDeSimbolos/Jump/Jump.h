@@ -8,7 +8,7 @@ struct LabelVal: Atributo {
 	long long int getLinha();
 	LabelVal();
 	private:
-		long long int linha=-1;
+		long long int linha=0;
 };
 
 #endif
