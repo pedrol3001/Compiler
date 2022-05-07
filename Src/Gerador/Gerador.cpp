@@ -8,6 +8,7 @@
 
 #include "tresEnderecos/tresEnderecos.h"
 #include "Assembly/Assembly.h"
+#include "Corretor/Corretor.h"
 
 using namespace std;
 using namespace Addr3;
@@ -20,19 +21,18 @@ list<std::shared_ptr<Assembly> > Gerador::codigo() {
 }
 
 bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::Instrucao> > instrucoes) {
-	codigoGerado.clear();
+	codigoGerado.clear();	
 	
+	if(oI) otimizarIntermediario(instrucoes);
 	
-	if(oI) otimizarIntermediario();
+	corrigir(instrucoes);
 	
 	for(shared_ptr<Instrucao> instrucao: instrucoes)  {
 		list<shared_ptr<Assembly> > codigo = instrucao->gera_codigo();
 		codigoGerado.insert(codigoGerado.end(),codigo.begin(),codigo.end());
 	}
 	
-	setOffsets();
-	
-	if(oM) otimizarTmLourden();
+	if(oM) otimizarTmLourden(codigoGerado);
 	
 	// Atualiza labels
 	long long int linha=0;
@@ -54,15 +54,15 @@ bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::I
 	return ok = true;
 }
 
-void Gerador::setOffsets() {
-	for(shared_ptr<Instrucao> instrucao: instrucoes)  {
-	}
+void Gerador::corrigir(list<shared_ptr<Addr3::Instrucao> >& instrucoes) {
+	Corretor corretor(instrucoes);
+	corretor.corrigir();
 }
 
-void Gerador::otimizarIntermediario() {
+void Gerador::otimizarIntermediario(list<shared_ptr<Addr3::Instrucao> >& instrucoes) {
 	// nada
 }
 
-void Gerador::otimizarTmLourden() {
+void Gerador::otimizarTmLourden(list<shared_ptr<Assembly> >& codigo) {
 	// nada
 }

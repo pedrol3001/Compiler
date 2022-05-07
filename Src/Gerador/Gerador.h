@@ -22,14 +22,13 @@ struct Gerador {
 		bool oI=false,oM=false;
 		bool ok=false;
 	
-		void setOffsets();
+		void corrigir(std::list<std::shared_ptr<Addr3::Instrucao> >& instrucoes);
 		
-		void otimizarIntermediario();
-		void otimizarTmLourden();
+		void otimizarIntermediario(std::list<std::shared_ptr<Addr3::Instrucao> >& instrucoes);
+		void otimizarTmLourden(std::list<std::shared_ptr<Assembly> >& codigo);
 		
 		std::list<std::shared_ptr<Addr3::Instrucao> > instrucoes;
 		std::list<std::shared_ptr<Assembly> > codigoGerado;
 };
-
 
 #endif

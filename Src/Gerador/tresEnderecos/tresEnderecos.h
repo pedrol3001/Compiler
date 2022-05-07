@@ -2,21 +2,32 @@
 #define tresEnderecos_h
 
 #include "../Assembly/Assembly.h"
+struct Corretor;
 #include "../Codigo/Codigo.h"
 
 #include "../../Token/Token.h"
+
 
 #include <string>
 #include <list>
 #include <memory>
 #include <vector>
 
+
 namespace Addr3{
 	struct Instrucao: public Code::Codigo {
-		std::string classe;		
 		Instrucao(std::string _classe, bool _ignore=false);
+		Instrucao(std::string _classe, Token _op, bool _ignore=false);
+		Instrucao(std::string _classe, Token _op1, Token _op2, bool _ignore=false);
+		Instrucao(std::string _classe, Token _op1, Token _op2, Token _op3, bool _ignore=false);
+		Instrucao(std::string _classe, std::vector<Token>& _ops, bool _ignore=false);
 		virtual ~Instrucao();
 		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;
+		virtual void acao(Corretor& corretor);
+		//virtual void acao(Otimizador& otimizador);
+		public:
+			std::string classe;		
+			std::vector<Token> ops;
 	};
 	
 	// Label ========================================
@@ -56,19 +67,22 @@ namespace Addr3{
 	struct AlocaGlobal: public Instrucao {	
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
-		AlocaGlobal(Token _op); 	
+		AlocaGlobal(Token _op); 
+		void acao(Corretor& corretor);	
 	};
 
 	struct Aloca: public Instrucao {	// Aloca x;
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 		Aloca(Token _op); 	
+		void acao(Corretor& corretor);
 	};
 	
 	struct Desaloca: public Instrucao {	// Desaloca x;
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 		Desaloca(Token _op); 	
+		void acao(Corretor& corretor);
 	};
 
 	// Operacao ====================================
@@ -146,12 +160,14 @@ namespace Addr3{
 	// Saltos ======================================
 	
 	struct Goto: public Instrucao, public Code::Goto {	// Goto label
+		Token label;
 		Goto(Token _label);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	
 
 	struct SaltoCondicional: public Instrucao, public Code::Goto {	// 
+		Token label;
 		SaltoCondicional(std::string _classe, Token _label);
 		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;		
 	};
@@ -174,18 +190,13 @@ namespace Addr3{
 	
 	// Outros ===========================================
 	
-	struct SizeOf: public Instrucao {
-		Token op;
-		SizeOf(Token _op);
-		std::list<std::shared_ptr<Assembly> > gera_codigo();
-	};
-	
 	struct Comentario: public Instrucao {
 		std::string str;
 		Comentario(std::string _str);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();
 	};
-
 }
+
+#include "../Corretor/Corretor.h"
 
 #endif

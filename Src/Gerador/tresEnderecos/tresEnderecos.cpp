@@ -9,11 +9,42 @@
 using namespace Addr3;
 using namespace std;
 
+
+TabSim& Addr3ts =TabSim::getInstance();
+
 string showToken(Token t) {
 	return TabSim::getInstance()[t].getAtt<StrAtt>("StrAtt")->str;
 }
+void Instrucao::acao(Corretor& corretor) {
+	TabSim& Addr3ts=TabSim::getInstance();
+	for(Token token: ops) {
+		if(Addr3ts[token].has("VarLocal"))
+			Addr3ts[token].getAtt<VarLocal>("VarLocal")->setOffset(corretor.sp);
+		if(Addr3ts[token].has("VarGlobal"))
+			Addr3ts[token].getAtt<VarGlobal>("VarGlobal")->setOffset(corretor.gp);
+	}
+}
 
-Instrucao::Instrucao(std::string _classe, bool _ignore): classe(_classe), Code::Codigo(_ignore) {}
+Instrucao::Instrucao(std::string _classe, bool _ignore): 
+	classe(_classe), Code::Codigo(_ignore), ops() {}
+	
+Instrucao::Instrucao(std::string _classe, Token _op, bool _ignore): 
+	classe(_classe), Code::Codigo(_ignore), ops() {
+	ops.push_back(_op);
+}
+Instrucao::Instrucao(std::string _classe, Token _op1, Token _op2, bool _ignore): 
+	classe(_classe), Code::Codigo(_ignore), ops() {
+	ops.push_back(_op1);
+	ops.push_back(_op2);
+}
+Instrucao::Instrucao(std::string _classe, Token _op1, Token _op2, Token _op3, bool _ignore): 
+	classe(_classe), Code::Codigo(_ignore), ops() {
+	ops.push_back(_op1);
+	ops.push_back(_op2);
+	ops.push_back(_op3);
+}
+Instrucao::Instrucao(std::string _classe, vector<Token>& _ops, bool _ignore): 
+	classe(_classe), Code::Codigo(_ignore), ops(_ops){}
 Instrucao::~Instrucao() {}
 
 // Funcoes auxiliares ===========================
@@ -60,7 +91,7 @@ void alocar(list<shared_ptr<Assembly> >& code, int space,TM::Reg temp,TM::Reg po
 	code.emplace_back(new TM::LDC(temp,space,temp));	//  LDC temp,space(temp)	
 	// Aloca espaco na pilha
 	code.emplace_back(new TM::SUB(pointer,pointer,temp));	//  SUB pointer,pointer,temp		
-}
+}	
 
 void desalocar(list<shared_ptr<Assembly> >& code, int space,TM::Reg temp,TM::Reg pointer) {
 	// Carregar constante
@@ -105,7 +136,7 @@ list<shared_ptr<Assembly> > Read::gera_codigo() {
 		
 	return code;
 }	
-Read::Read(Token _op): op(_op), Instrucao("Read") {}
+Read::Read(Token _op): op(_op), Instrucao("Read",op) {}
 
 list<shared_ptr<Assembly> > Print::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
@@ -118,7 +149,7 @@ list<shared_ptr<Assembly> > Print::gera_codigo() {
 		
 	return code;
 }	
-Print::Print(Token _op): op(_op), Instrucao("Print") {}
+Print::Print(Token _op): op(_op), Instrucao("Print",op) {}
 
 // Declaracao ==================================
 list<shared_ptr<Assembly> > AlocaGlobal::gera_codigo() {
@@ -128,7 +159,14 @@ list<shared_ptr<Assembly> > AlocaGlobal::gera_codigo() {
 	alocar(code,space,TM::t0,TM::gp);		
 	return code;
 }	
-AlocaGlobal::AlocaGlobal(Token _op): op(_op), Instrucao("AlocaGlobal") {}
+AlocaGlobal::AlocaGlobal(Token _op): op(_op), Instrucao("AlocaGlobal",op) {}
+void AlocaGlobal::acao(Corretor& corretor) {
+	assert(Addr3ts[op].has("VarGlobal"));
+	// Configurar distancia da variavel
+	Addr3ts[op].getAtt<VarGlobal>("VarGlobal")->setDist(corretor.sp);
+	// Incrementar sp
+	corretor.gp += Addr3ts[op].getAtt<VarGlobal>("VarGlobal")->size;
+}
 
 list<shared_ptr<Assembly> > Aloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
@@ -137,7 +175,14 @@ list<shared_ptr<Assembly> > Aloca::gera_codigo() {
 	alocar(code,space,TM::t0,TM::sp);		
 	return code;
 }	
-Aloca::Aloca(Token _op): op(_op), Instrucao("Aloca") {}
+Aloca::Aloca(Token _op): op(_op), Instrucao("Aloca",op) {}
+void Aloca::acao(Corretor& corretor) {
+	assert(Addr3ts[op].has("VarLocal"));
+	// Configurar distancia da variavel
+	Addr3ts[op].getAtt<VarLocal>("VarLocal")->setDist(corretor.sp);
+	// Incrementar sp
+	corretor.sp += Addr3ts[op].getAtt<VarLocal>("VarLocal")->size;
+}
 
 list<shared_ptr<Assembly> > Desaloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
@@ -146,15 +191,21 @@ list<shared_ptr<Assembly> > Desaloca::gera_codigo() {
 	desalocar(code,space,TM::t0,TM::sp);		
 	return code;
 }	
-Desaloca::Desaloca(Token _op): op(_op), Instrucao("Desaloca") {}
+Desaloca::Desaloca(Token _op): op(_op), Instrucao("Desaloca",op) {}
+void Desaloca::acao(Corretor& corretor) {
+	assert(Addr3ts[op].has("VarLocal"));
+	// Decrementar sp
+	corretor.sp -= Addr3ts[op].getAtt<VarLocal>("VarLocal")->size;
+}
 
 // Operacao ====================================
 Operacao::~Operacao() {}
-Operacao::Operacao(string _classe, Token _dst, vector<Token>& _op): dst(_dst), op(_op), Instrucao(_classe) {}
-Operacao::Operacao(string _classe, Token _dst, Token _op): dst(_dst), Instrucao(_classe) {
+Operacao::Operacao(string _classe, Token _dst, vector<Token>& _op): dst(_dst), op(_op), Instrucao(_classe,op) {}
+Operacao::Operacao(string _classe, Token _dst, Token _op): dst(_dst), Instrucao(_classe,dst,_op) {
 	op.emplace_back(_op);
 }	
-Operacao::Operacao(string _classe, Token _dst, Token _op1, Token _op2): dst(_dst), Instrucao(_classe) {
+Operacao::Operacao(string _classe, Token _dst, Token _op1, Token _op2): 
+	dst(_dst), Instrucao(_classe,dst,_op1,_op2) {
 	op.emplace_back(_op1);
 	op.emplace_back(_op2);
 }		
@@ -241,7 +292,7 @@ list<shared_ptr<Assembly> > Atribuicao::gera_codigo() {
 
 // Ponteiros=====================================
 
-LoadFromRef::LoadFromRef(Token _dst, Token _pointer): Instrucao("RefLoad"), dst(_dst),pointer(_pointer) {}
+LoadFromRef::LoadFromRef(Token _dst, Token _pointer): Instrucao("RefLoad",dst,pointer), dst(_dst),pointer(_pointer) {}
 
 std::list<std::shared_ptr<Assembly> > LoadFromRef::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
@@ -256,7 +307,7 @@ std::list<std::shared_ptr<Assembly> > LoadFromRef::gera_codigo() {
 	return code;
 }	
 
-StoreInRef::StoreInRef(Token _src, Token _pointer): Instrucao("RefStore"),src(_src),pointer(_pointer) {}
+StoreInRef::StoreInRef(Token _src, Token _pointer): Instrucao("RefStore",src,pointer),src(_src),pointer(_pointer) {}
 
 std::list<std::shared_ptr<Assembly> > StoreInRef::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
@@ -300,6 +351,7 @@ Param::Param(Token _parametro): parametro(_parametro), Instrucao("Param") {}
 
 
 list<shared_ptr<Assembly> > Call::gera_codigo() {
+		
 	list<shared_ptr<Assembly> > code;	
 	code.emplace_back(new TM::Comentario("Call"));
 	// Configurar ra
@@ -314,10 +366,11 @@ list<shared_ptr<Assembly> > Call::gera_codigo() {
 	
 	return code;
 }
-Call::Call(Token _ret, Token _funcao): ret(_ret), funcao(_funcao), Instrucao("Call") {}
+Call::Call(Token _ret, Token _funcao): ret(_ret), funcao(_funcao), Instrucao("Call",ret,funcao) {}
 
 	
 list<shared_ptr<Assembly> > Return::gera_codigo() {
+		
 	list<shared_ptr<Assembly> > code;	
 	code.emplace_back(new TM::Comentario("Return"));
 	if(has_value) {
@@ -327,7 +380,7 @@ list<shared_ptr<Assembly> > Return::gera_codigo() {
 
 	return code;
 }	
-Return::Return(Token _ret): ret(_ret), Instrucao("Return") {has_value=true;}
+Return::Return(Token _ret): ret(_ret), Instrucao("Return",ret) {has_value=true;}
 Return::Return(): Instrucao("Return") {}
 
 // Saltos ======================================
@@ -343,13 +396,14 @@ list<shared_ptr<Assembly> > Goto::gera_codigo() {
 	*/
 	return code;
 }
-Goto::Goto(Token _label): Code::Goto(_label), Instrucao("Goto") {}
+Goto::Goto(Token _label): Code::Goto(_label), Instrucao("Goto",label) {}
 	
 	
-SaltoCondicional::SaltoCondicional(string _classe, Token _label): Code::Goto(_label), Instrucao(_classe) {}
+SaltoCondicional::SaltoCondicional(string _classe, Token _label): Code::Goto(_label), Instrucao(_classe,label) {}
 
 
 list<shared_ptr<Assembly> > Beq::gera_codigo() {
+	
 	list<shared_ptr<Assembly> >  code;
 	code.emplace_back(new TM::Comentario("Beq"));
 	/*
@@ -364,26 +418,10 @@ list<shared_ptr<Assembly> > Beq::gera_codigo() {
 	
 	return code;
 }
-Beq::Beq(Token _op1, Token _op2, Token _label): SaltoCondicional("Beq",_label), op1(_op1), op2(_op2) {}
+Beq::Beq(Token _op1, Token _op2, Token _label): 
+	SaltoCondicional("Beq",_label), op1(_op1), op2(_op2) {}
 
 // Outros =================================================================================================
-
-std::list<std::shared_ptr<Assembly> > SizeOf::gera_codigo() {
-	list<shared_ptr<Assembly> >  code;
-	code.emplace_back(new TM::Comentario("SizeOf"));
-	/*
-	
-	// Carregar operandos (op1, op2)
-	loadReg(code,op1,TM::t0);
-	loadReg(code,op2,TM::t1);
-	// Subtrair
-	code.emplace_back(new TM::SUB(TM::t2,TM::t0,TM::t1));	// SUB t2,t0,t1
-	code.emplace_back(new TM::JEQ(TM::t2,distancia,TM::pc));	// JEQ t2,distancia(pc)
-	*/
-	
-	return code;
-}
-SizeOf::SizeOf(Token _op): Instrucao("SizeOf"), op(_op) {}
 
 std::list<std::shared_ptr<Assembly> > Comentario::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
