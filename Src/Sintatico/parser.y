@@ -230,9 +230,14 @@ condition: expression {
 		$$ = token;
 	};
 
-iteration_stmt: WHILE LPAREN condition RPAREN statement {
-		cout << "goto " << tokenStrAtt($1) << endl;
-		semantico.code.emplace_back(new Addr3::Goto($1));
+iteration_stmt: WHILE {
+		Token token = semantico.tempGen.gerar();
+		updateTabSim(token,semantico);
+		$$ = token;
+	}	
+	LPAREN condition RPAREN statement {
+		cout << "goto " << tokenStrAtt($$) << endl;
+		semantico.code.emplace_back(new Addr3::Goto($$));
 
 		cout << "LABEL " << tokenStrAtt($3) << endl;
 		semantico.code.emplace_back(new Addr3::Label($3));
