@@ -169,15 +169,15 @@ declaration_list: declaration_list declaration | declaration ;
 declaration: var_declaration | fun_declaration ;
 
 var_declaration: type_specifier ID SEMICOLON {
-		//cout<< "Aloca " << tokenIdVal($2) << endl;
-		//semantico.code.emplace_back(new Addr3::Aloca($2));
+		cout<< "Aloca " << tokenIdVal($2) << endl;
+		semantico.code.emplace_back(new Addr3::Aloca($2));
 		cout << tokenStrAtt($1) << " " << tokenStrAtt($2) << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, $2, 1);
 		updateTabSim($2,semantico);
 
 	} | type_specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
-		//cout<< "Aloca " << tokenIdVal($2) << endl;
-		//semantico.code.emplace_back(new Addr3::Aloca($2));
+		cout<< "Aloca " << tokenIdVal($2) << endl;
+		semantico.code.emplace_back(new Addr3::Aloca($2));
 		cout << tokenStrAtt($1) << " " << tokenStrAtt($2) << "[" << tokenStrAtt($4) << "]" << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, $2, tokenIntVal($4));
 		updateTabSim($2,semantico);
@@ -186,8 +186,8 @@ var_declaration: type_specifier ID SEMICOLON {
 type_specifier: INT | VOID ;
 
 fun_declaration: type_specifier ID {
-		//cout<< "Aloca " << tokenIdVal($2) << endl;
-		//semantico.code.emplace_back(new Addr3::Aloca($2));
+		cout<< "Aloca " << tokenIdVal($2) << endl;
+		semantico.code.emplace_back(new Addr3::AlocaGlobal($2));
 		cout << tokenStrAtt($1) << " " << tokenStrAtt($2) << "()" << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, $2, 1);
 		updateTabSim($2,semantico);
@@ -199,9 +199,9 @@ close_esc: %empty {
 	semantico.escopo--;
 
 	for(auto const& [key, val] : semantico.tabela.variaveis) {
-		if(semantico.tabela.variaveis[key].back().escopo > semantico.escopo){
-			//cout << "Desaloca " << key << endl;
-			//semantico.code.emplace_back(new Addr3::Desaloca(semantico.tabela.variaveis[key].back().token));
+		if(!semantico.tabela.variaveis[key].empty() && semantico.tabela.variaveis[key].back().escopo > semantico.escopo){
+			cout << "Desaloca " << key << endl;
+			semantico.code.emplace_back(new Addr3::Desaloca(semantico.tabela.variaveis[key].back().token));
 		}
 	}
 
@@ -213,15 +213,15 @@ params: param_list | VOID ;
 param_list: param_list COMMA param | param ;
 
 param: type_specifier ID {
-		//cout<< "Aloca " << tokenIdVal($2) << endl;
-		//semantico.code.emplace_back(new Addr3::Aloca($2));
+		cout<< "Aloca " << tokenIdVal($2) << endl;
+		semantico.code.emplace_back(new Addr3::Aloca($2));
 		cout << "param " << tokenStrAtt($1) << " " << tokenStrAtt($2) << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, $2, 1);
 		updateTabSim($2,semantico);
 	}
 	| type_specifier ID LBRACKET RBRACKET {
-		//cout<< "Aloca " << tokenIdVal($2) << endl;
-		//semantico.code.emplace_back(new Addr3::Aloca($2));
+		cout<< "Aloca " << tokenIdVal($2) << endl;
+		semantico.code.emplace_back(new Addr3::Aloca($2));
 		cout << "param " << tokenStrAtt($1) << " " << tokenStrAtt($2) << "[]" << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, $2, 1); // mudar tamanho
 		updateTabSim($2,semantico);
