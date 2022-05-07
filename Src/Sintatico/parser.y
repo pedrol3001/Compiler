@@ -81,7 +81,8 @@ void updateTabSim(Token t, Semantico& semantico) {
 		return ret;
 	}
 
-	Token True, False;
+	Token zero = ts.insert(C_INT);
+	ts[token].insert(new IntVal("0"));
 
 %}
 
@@ -230,7 +231,7 @@ condition: expression {
 		tabsim[token].insert (new LabelVal);
 
 		cout << "if " << tokenStrAtt($1) << " == " << tokenStrAtt($1) << " goto " << tokenStrAtt(token) << endl;
-		semantico.code.emplace_back(new Addr3::Beq($1, $1, token));
+		semantico.code.emplace_back(new Addr3::beq($1, zero, token));
 		$$ = token;
 	};
 
