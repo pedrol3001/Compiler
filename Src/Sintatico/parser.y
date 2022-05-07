@@ -346,20 +346,20 @@ var: ID {
 simple_expression: additive_expression relop additive_expression {
 	Token token = semantico.tempGen.gerar();
 	updateTabSim(token,semantico);
-	/*
+	
 	if($2.tipo == LESS)
-		semantico.code.emplace_back(new Addr3::Menor(token,$1,$3));
+		semantico.code.emplace_back(new Addr3::Less(token,$1,$3));
 	else if($2.tipo == LESSEQUAL)
-		semantico.code.emplace_back(new Addr3::MenorIgual(token,$1,$3));
+		semantico.code.emplace_back(new Addr3::LessEqual(token,$1,$3));
 	else if($2.tipo == GREATER)
-		semantico.code.emplace_back(new Addr3::Maior(token,$1,$3));
+		semantico.code.emplace_back(new Addr3::Less(token,$3,$1));
 	else if($2.tipo == GREATEREQUAL)
-		semantico.code.emplace_back(new Addr3::MaiorIgual(token,$1,$3));
+		semantico.code.emplace_back(new Addr3::LessEqual(token,$3,$1));
 	else if($2.tipo == EQUAL)
-		semantico.code.emplace_back(new Addr3::Igual(token,$1,$3));
+		semantico.code.emplace_back(new Addr3::Equal(token,$1,$3));
 	else if($2.tipo == NOTEQUAL)
-		semantico.code.emplace_back(new Addr3::Diferente(token,$1,$3));
-	*/
+		semantico.code.emplace_back(new Addr3::NotEqual(token,$1,$3));
+	
 	cout << tokenStrAtt(token) << " = " << tokenStrAtt($1) << " " << tokenStrAtt($2) << " " << tokenStrAtt($3) << endl;
 	$$ = token;
 } | additive_expression ;
