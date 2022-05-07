@@ -35,6 +35,12 @@ namespace TM {
 		Comentario(std::string _comentario);
 		std::string str();	
 	};
+	
+	struct LoadLabel: public Instrucao, public Code::Goto {
+		Reg r1;	
+		LoadLabel(Reg _r1, Token _label);	// LDC r1,LABEL(zero)
+		std::string str();	
+	};
 
 	struct tipoRO: public Instrucao {	// opcode r1,r2,r3
 		Reg r1,r2,r3;

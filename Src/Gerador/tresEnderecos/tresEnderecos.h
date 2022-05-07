@@ -38,6 +38,11 @@ namespace Addr3{
 	
 	// Inicializacao ================================
 	
+	struct SetZero: public Instrucao {
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		SetZero(); 	
+	};
+	
 	struct SetGlobal: public Instrucao {
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 		SetGlobal(); 	

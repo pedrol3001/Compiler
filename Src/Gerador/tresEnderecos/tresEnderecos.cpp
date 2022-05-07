@@ -51,10 +51,7 @@ Instrucao::~Instrucao() {}
 	
 void loadReg(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg) {	
 	TabSim &ts = TabSim::getInstance();
-	assert(ts[op].has("VarGlobal") || ts[op].has("VarLocal") || ts[op].has("IntVal"));
-	assert(!(ts[op].has("VarGlobal")&& ts[op].has("VarLocal")));
-	assert(!(ts[op].has("VarLocal")&& ts[op].has("IntVal")));
-	assert(!(ts[op].has("IntVal")&& ts[op].has("VarGlobal")));
+	assert(ts[op].has("VarGlobal") || ts[op].has("VarLocal") || ts[op].has("IntVal") || ts[op].has("LabelVal"));
 	
 	if(ts[op].has("IntVal")) {
 		long long int imm =  ((IntVal*)ts[op]["IntVal"])->val;
@@ -67,6 +64,9 @@ void loadReg(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg) {
 	if(ts[op].has("VarLocal")) {
 		long int offset = ((VarLocal*)ts[op]["VarLocal"])->offset();
 		code.emplace_back(new TM::LD(reg,offset,TM::sp));			// loadl: LD reg,-offset(sp)
+	}
+	if(ts[op].has("LabelVal")) {
+		code.emplace_back(new TM::LoadLabel(reg,op));		// loadl: LD reg,LABEL(zero)
 	}
 }
 
@@ -109,17 +109,33 @@ std::list<std::shared_ptr<Assembly> > Label::gera_codigo() {
 Label::Label(Token _label): Code::Label(_label), Instrucao("Label",true) {}
 
 // Inicializacao ================================
+
+list<shared_ptr<Assembly> > SetZero::gera_codigo() {
+	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("SetZero"));
+	// Configura global para ser o ultimo endereco valido
+	code.emplace_back(new TM::LDC(TM::zero,0,TM::zero)); // LDC zero,0(zero)    # zero = 0
 	
-std::list<std::shared_ptr<Assembly> > SetGlobal::gera_codigo() {
+	return code;
+}	
+SetZero::SetZero(): Instrucao("SetZero") {}
+
+list<shared_ptr<Assembly> > SetGlobal::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	code.emplace_back(new TM::Comentario("SetGlobal"));
+	// Configura global para ser o ultimo endereco valido
+	code.emplace_back(new TM::LD(TM::gp,0,TM::zero)); // LD gp,0(zero)        # gp = endereço de maior tamanho permitido
+	
 	return code;
 }
 SetGlobal::SetGlobal(): Instrucao("SetGlobal") {}
 
-std::list<std::shared_ptr<Assembly> > SetLocal::gera_codigo() {
+list<shared_ptr<Assembly> > SetLocal::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	code.emplace_back(new TM::Comentario("SetLocal"));
+	// Configura ponteiro de pilha para ser apos gp
+	code.emplace_back(new TM::LDA(TM::sp,-1,TM::gp)); // LDA sp,-1(gp)    # Pilha começa após variáveis globais
+
 	return code;
 }
 SetLocal::SetLocal(): Instrucao("SetLocal") {}
@@ -403,19 +419,17 @@ SaltoCondicional::SaltoCondicional(string _classe, Token _label): Code::Goto(_la
 
 
 list<shared_ptr<Assembly> > Beq::gera_codigo() {
-	
 	list<shared_ptr<Assembly> >  code;
-	code.emplace_back(new TM::Comentario("Beq"));
 	/*
-	
+	code.emplace_back(new TM::Comentario("Beq"));	
 	// Carregar operandos (op1, op2)
 	loadReg(code,op1,TM::t0);
 	loadReg(code,op2,TM::t1);
 	// Subtrair
 	code.emplace_back(new TM::SUB(TM::t2,TM::t0,TM::t1));	// SUB t2,t0,t1
-	code.emplace_back(new TM::JEQ(TM::t2,distancia,TM::pc));	// JEQ t2,distancia(pc)
+	// Realizar salto
+	code.emplace_back(new TM::RJEQ(TM::t2,label));		// JEQ t2,distancia(pc)
 	*/
-	
 	return code;
 }
 Beq::Beq(Token _op1, Token _op2, Token _label): 

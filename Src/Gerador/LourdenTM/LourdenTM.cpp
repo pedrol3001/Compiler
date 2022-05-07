@@ -35,6 +35,15 @@ std::string Comentario::str() {
 	return comentario;
 }
 
+// Load label
+LoadLabel::LoadLabel(Reg _r1, Token _label): Instrucao("LoadLabel"), Code::Goto(_label), r1(_r1) {}	
+std::string LoadLabel::str() {
+	stringstream ss;
+	long long int distance = readRef()-getLinha();		// Distancia ate a label
+	ss << "LDC " << r1 << ',' << distance << '(' << TM::zero << ')';	// LDC r1,LABEL(zero)
+	return ss.str();
+}
+
 // Tipo RO
 tipoRO::tipoRO(string _nome, Reg _r1, Reg _r2, Reg _r3): Instrucao(_nome), r1(_r1), r2(_r2), r3(_r3) {}
 std::string tipoRO::InstStr() {

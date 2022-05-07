@@ -21,18 +21,20 @@ list<std::shared_ptr<Assembly> > Gerador::codigo() {
 }
 
 bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::Instrucao> > instrucoes) {
-	codigoGerado.clear();	
+	instrucoes.emplace_front(new SetZero);	
 	
 	if(oI) otimizarIntermediario(instrucoes);
 	
 	corrigir(instrucoes);
 	
+	codigoGerado.clear();	// limpar antes de usra
 	for(shared_ptr<Instrucao> instrucao: instrucoes)  {
 		list<shared_ptr<Assembly> > codigo = instrucao->gera_codigo();
 		codigoGerado.insert(codigoGerado.end(),codigo.begin(),codigo.end());
 	}
 	
 	if(oM) otimizarTmLourden(codigoGerado);
+	
 	
 	// Atualiza labels
 	long long int linha=0;
