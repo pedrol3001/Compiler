@@ -104,3 +104,12 @@ Token TempGenerator::gerar(){
 
 void TempGenerator::reset_index(){temp_index = 0;}
 
+Token LabelGenerator::gerar(){
+	TabSim &tabsim = TabSim::getInstance();
+	Token token = tabsim.insert(ID);
+	string name = "$L" + to_string(label_index++);
+	tabsim[token].insert((Atributo*)(new IdVal(name)));
+	tabsim[token].insert((Atributo*)(new StrAtt(name)));
+	tabsim[token].insert((Atributo*)(new IsTemp));
+	return token;
+}

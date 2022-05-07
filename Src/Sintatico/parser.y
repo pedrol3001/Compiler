@@ -214,7 +214,7 @@ selection_stmt: IF LPAREN condition RPAREN statement {
 		semantico.code.emplace_back(new Addr3::Label($3));
 	}
 	| IF LPAREN condition RPAREN statement ELSE {
-		Token token = semantico.tempGen.gerar();
+		Token token = semantico.labelGen.gerar();
 		updateTabSim(token,semantico);
 		tabsim[token].insert (new LabelVal);
 
@@ -231,17 +231,17 @@ selection_stmt: IF LPAREN condition RPAREN statement {
 	};
 
 condition: expression {
-		Token token = semantico.tempGen.gerar();
+		Token token = semantico.labelGen.gerar();
 		updateTabSim(token,semantico);
 		tabsim[token].insert (new LabelVal);
 
-		cout << "if " << tokenStrAtt($1) << " == " << tokenStrAtt($1) << " goto " << tokenStrAtt(token) << endl;
+		cout << "if " << tokenStrAtt($1) << " == " << tokenStrAtt(zero.get()) << " goto " << tokenStrAtt(token) << endl;
 		semantico.code.emplace_back(new Addr3::Beq($1, zero.get(), token));
 		$$ = token;
 	};
 
 iteration_stmt: WHILE {
-		Token token = semantico.tempGen.gerar();
+		Token token = semantico.labelGen.gerar();
 		updateTabSim(token,semantico);
 		tabsim[token].insert (new LabelVal);
 
@@ -355,12 +355,13 @@ NUM: C_INT | C_FLOAT ;
 Zero::Zero() {
     token = tabsim.insert(C_INT);
 	tabsim[token].insert(new IntVal("0"));
+	tabsim[token].insert(new StrAtt("0"));
 }
 Token Zero::get() {return token;}
 
 Token zeroIntVal() {
     Token token = tabsim.insert(C_INT);
-     return token;
+    return token;
 }
 
 void yyerror(Lexico& lexico, Semantico& semantico , string s) {

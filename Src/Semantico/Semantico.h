@@ -20,6 +20,7 @@ struct Semantico {
 	
 	TabelaSemantica tabela;
 	TempGenerator tempGen;
+	LabelGenerator labelGen;
 	int &escopo;
 	
 	std::list<std::shared_ptr<Addr3::Instrucao> > code;

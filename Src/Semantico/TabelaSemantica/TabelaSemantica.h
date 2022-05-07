@@ -59,4 +59,9 @@ struct TempGenerator{
 	void reset_index();
 };
 
+struct LabelGenerator{
+	int label_index = 0;
+	Token gerar();
+};
+
 #endif
