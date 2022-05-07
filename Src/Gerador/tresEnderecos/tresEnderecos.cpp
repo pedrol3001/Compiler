@@ -58,7 +58,7 @@ void loadReg(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg) {
 	
 	if(ts[op].has("IntVal")) {
 		long long int imm =  ((IntVal*)ts[op]["IntVal"])->val;
-		code.emplace_back(new TM::LDC(reg,imm,reg));			// loadl: LDC reg,val,reg 
+		code.emplace_back(new TM::LDC(reg,imm,TM::zero));			// loadl: LDC reg,val(zero) 
 	}
 	if(ts[op].has("VarGlobal")) {
 		long int offset = ((VarGlobal*)ts[op]["VarGlobal"])->offset();
@@ -164,7 +164,7 @@ void AlocaGlobal::acao(Corretor& corretor) {
 	assert(Addr3ts[op].has("VarGlobal"));
 	// Configurar distancia da variavel
 	Addr3ts[op].getAtt<VarGlobal>("VarGlobal")->setDist(corretor.sp);
-	// Incrementar sp
+	// Incrementar gp
 	corretor.gp += Addr3ts[op].getAtt<VarGlobal>("VarGlobal")->size;
 }
 
