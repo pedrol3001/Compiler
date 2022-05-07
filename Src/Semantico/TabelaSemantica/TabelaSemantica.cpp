@@ -18,8 +18,11 @@ TabelaSemantica::TabelaSemantica(){}
 void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza, int escopo, int tamanho){
 	if(existe(nome) && (*this)[nome].escopo < escopo){
 		std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
+		avisos_semantico++;
 	}else if(existe(nome) && (*this)[nome].escopo == escopo){
 		std::cout << "Erro: variável \"" << nome << "\" sendo redeclarada." << std::endl;
+		erros_semantico++;
+		return;
 	}
 
 	Simb::Tipo tipo;
@@ -34,6 +37,7 @@ void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza,
 	if(natureza == Simb::Nat::VAR && tipo == Simb::Tipo::VOID){ // variavel com tipo void
 		std::cout << "Erro: variável \"" << nome << "\" não pode ser do tipo void." << std::endl;
 		erros_semantico++;
+		return;
 	}
 
 	variaveis[nome].push_back(Simb(nome, tipo, escopo, natureza, tamanho));
@@ -42,6 +46,10 @@ void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza,
 
 bool TabelaSemantica::existe(string nome){
 	return variaveis.count(nome)>0 && !variaveis[nome].empty();
+}
+
+void TabelaSemantica::marcar_usado(string nome){
+	variaveis[nome].back().usado = true;
 }
 
 Simb TabelaSemantica::operator[](string nome) {
@@ -76,6 +84,10 @@ void TabelaSemantica::remover(){
 		list<Simb>& lista = p.second;
 		while(!lista.empty() && lista.back().escopo > escopo) {
 			//cout << "desaloca " << lista.back().nome << " " << lista.back().tamanho << std::endl;
+			if(lista.back().usado == false){
+				cout << "Aviso: variável \"" << lista.back().nome << "\" não usada." << endl;
+				avisos_semantico++;
+			}
 			lista.pop_back();
 		}
 	}
@@ -90,6 +102,7 @@ void TabelaSemantica::mostrar_globais(){
 			if(s.escopo==0)
 				cout << "global: " << p.first << " " << s.tamanho << std::endl; 
 	}
+	cout << "=============================================\n";
 }
 	
 Token TempGenerator::gerar(){

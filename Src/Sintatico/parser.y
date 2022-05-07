@@ -149,8 +149,12 @@ void updateTabSim(Token t, Semantico& semantico) {
 
 %%
 
-program: declaration_list { 
+program: declaration_list {
 	semantico.tabela.mostrar_globais();
+
+	cout << "Resultado do analisador semântico: ";
+	cout << semantico.tabela.erros_semantico << " erro(s), " << semantico.tabela.avisos_semantico << " aviso(s)." << endl;
+
 	semantico.analisar();	// Setar como ok
 };
 
@@ -279,11 +283,13 @@ var: ID {
 		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR);
 		updateTabSim($1,semantico);
 		$$=$1;
-		
+		semantico.tabela.marcar_usado(tokenStrAtt($1));
+
 	} | ID LBRACKET expression RBRACKET { 	
 		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::ARRAY); 
 		updateTabSim($1,semantico);
 		$$=$1;
+		semantico.tabela.marcar_usado(tokenStrAtt($1));
 	} ;
 
 

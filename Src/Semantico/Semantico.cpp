@@ -13,7 +13,7 @@ Semantico::Semantico(): tabela(), escopo(tabela.escopo){
 }
 
 bool Semantico::analisar() {
-	ok = true;	// ok eh o resultado da analise
+	ok = this->tabela.erros_semantico == 0;	// ok eh o resultado da analise
 	
 	//gerarIntermediario();
 	

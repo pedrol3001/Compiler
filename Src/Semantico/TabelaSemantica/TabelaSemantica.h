@@ -38,7 +38,7 @@ enum {GLOBAL=0};
 struct TabelaSemantica {
 	std::map<std::string,std::list<Simb> > variaveis;
 
-	int erros_semantico = 0, escopo = GLOBAL;
+	int erros_semantico = 0, avisos_semantico = 0, escopo = GLOBAL;
 
 	TabelaSemantica();
 
@@ -48,6 +48,7 @@ struct TabelaSemantica {
 	void mostrar_globais();
 
 	bool existe(std::string nome);
+	void marcar_usado(std::string nome);
 	Simb operator()(std::string nome,int escopo);
 	bool existe(std::string nome,int escopo);
 	Simb operator[](std::string nome);
