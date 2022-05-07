@@ -81,8 +81,13 @@ void updateTabSim(Token t, Semantico& semantico) {
 		return ret;
 	}
 
-	Token zero = ts.insert(C_INT);
-	ts[token].insert(new IntVal("0"));
+
+	struct Zero {
+		Token token;
+		Zero();
+		Token get();
+	};
+	Zero zero;
 
 %}
 
@@ -231,7 +236,7 @@ condition: expression {
 		tabsim[token].insert (new LabelVal);
 
 		cout << "if " << tokenStrAtt($1) << " == " << tokenStrAtt($1) << " goto " << tokenStrAtt(token) << endl;
-		semantico.code.emplace_back(new Addr3::beq($1, zero, token));
+		semantico.code.emplace_back(new Addr3::Beq($1, zero.get(), token));
 		$$ = token;
 	};
 
@@ -346,6 +351,18 @@ addr3_param: expression {
 NUM: C_INT | C_FLOAT ;
 
 %%
+
+Zero::Zero() {
+    token = tabsim.insert(C_INT);
+	tabsim[token].insert(new IntVal("0"));
+}
+Token Zero::get() {return token;}
+
+Token zeroIntVal() {
+    Token token = tabsim.insert(C_INT);
+     return token;
+}
+
 void yyerror(Lexico& lexico, Semantico& semantico , string s) {
 	fprintf(stderr, "error: %s\n", s.c_str());
 	erros++;
