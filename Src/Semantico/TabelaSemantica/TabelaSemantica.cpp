@@ -15,7 +15,7 @@ Simb::Simb(std::string _nome, Tipo _tipo, int _escopo, Nat _natureza, Token _tok
 
 TabelaSemantica::TabelaSemantica(){}
 
-void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza, int escopo, int tamanho, Token token){
+void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza, int escopo, Token token, int tamanho){
 	if(existe(nome) && (*this)[nome].escopo < escopo){
 		std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
 		avisos_semantico++;
@@ -41,6 +41,7 @@ void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza,
 	}
 
 	variaveis[nome].push_back(Simb(nome, tipo, escopo, natureza, token, tamanho));
+	
 	//cout << "aloca " << (*this)[nome].nome << " " << (*this)[nome].tamanho << "\n";
 }
 

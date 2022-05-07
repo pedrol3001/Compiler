@@ -43,7 +43,7 @@ struct TabelaSemantica {
 
 	TabelaSemantica();
 
-	void adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, int tamanho, Token token);	// int tipo => bison.h
+	void adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, Token token, int tamanho);	// int tipo => bison.h
 	bool verificar(std::string nome, Simb::Nat natureza);
 	void remover();
 	void mostrar_globais();
