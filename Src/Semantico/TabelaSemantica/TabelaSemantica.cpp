@@ -37,12 +37,13 @@ void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza,
 	}
 
 	variaveis[nome].push_back(Simb(nome, tipo, escopo, natureza, tamanho));
-	cout << "aloca " << (*this)[nome].nome << " " << (*this)[nome].tamanho << "\n";
+	//cout << "aloca " << (*this)[nome].nome << " " << (*this)[nome].tamanho << "\n";
 }
 
 bool TabelaSemantica::existe(string nome){
 	return variaveis.count(nome)>0 && !variaveis[nome].empty();
 }
+
 Simb TabelaSemantica::operator[](string nome) {
 	assert(existe(nome));
 	return variaveis[nome].back();
@@ -60,6 +61,7 @@ bool TabelaSemantica::verificar(string nome, Simb::Nat natureza){
 		{Simb::Nat::VAR,"variável"},
 		{Simb::Nat::ARRAY,"array"}
 	};
+	
 	if((*this)[nome].natureza != natureza) {
 		cout << "Erro: " << str[(*this)[nome].natureza] << " \"" << nome << "\" ";
 		cout<<  "usado(a) como " << str[natureza] << "." << endl;
@@ -68,15 +70,17 @@ bool TabelaSemantica::verificar(string nome, Simb::Nat natureza){
 	}
 	return true;
 }
+
 void TabelaSemantica::remover(){
 	for(pair<const string,list<Simb> >& p: variaveis) {
 		list<Simb>& lista = p.second;
 		while(!lista.empty() && lista.back().escopo > escopo) {
-			cout << "desaloca " << lista.back().nome << " " << lista.back().tamanho << std::endl;
+			//cout << "desaloca " << lista.back().nome << " " << lista.back().tamanho << std::endl;
 			lista.pop_back();
 		}
 	}
 }
+
 void TabelaSemantica::mostrar_globais(){
 	cout << "=============================================\n";
 	for(pair<string,list<Simb> > p: variaveis) {
@@ -87,7 +91,6 @@ void TabelaSemantica::mostrar_globais(){
 				cout << "global: " << p.first << " " << s.tamanho << std::endl; 
 	}
 }
-
 	
 Token TempGenerator::gerar(){
 	TabSim &tabsim = TabSim::getInstance();
@@ -98,5 +101,6 @@ Token TempGenerator::gerar(){
 	tabsim[token].insert((Atributo*)(new IsTemp));
 	return token;
 }
+
 void TempGenerator::reset_index(){temp_index = 0;}
 
