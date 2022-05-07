@@ -175,6 +175,7 @@ list<shared_ptr<Assembly> > AlocaGlobal::gera_codigo() {
 	alocar(code,space,TM::t0,TM::gp);		
 	return code;
 }	
+
 AlocaGlobal::AlocaGlobal(Token _op): op(_op), Instrucao("AlocaGlobal",_op) {}
 void AlocaGlobal::acao(Corretor& corretor) {
 	assert(Addr3ts[op].has("VarGlobal"));

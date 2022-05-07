@@ -13,7 +13,29 @@ Simb::Simb(std::string _nome, Tipo _tipo, int _escopo, Nat _natureza, Token _tok
 
 // Tabela Semantica ====================================================================================================
 
-TabelaSemantica::TabelaSemantica(){}
+TabelaSemantica::TabelaSemantica(): tabsim(TabSim::getInstance()) {}
+
+void TabelaSemantica::updateTabSim(Token t) {
+	if(tabsim[t].has("IsTemp")) {
+		if(!tabsim[t].has("VarLocal"))
+			tabsim[t].insert((Atributo*) new VarLocal(1));
+		return;
+	}
+
+	assert(tabsim[t].has("IdVal"));
+	string idval = ((IdVal*)tabsim[t]["IdVal"])->val;
+	if(existe(idval)) {
+		Simb simb = (*this)[idval];
+		cout << simb.escopo << ": " << idval << endl;
+		if(simb.escopo==GLOBAL) {
+			if(!tabsim[t].has("VarGlobal"))
+				tabsim[t].insert((Atributo*) new VarGlobal(simb.tamanho));
+		} else {
+			if(!tabsim[t].has("VarLocal"))
+				tabsim[t].insert((Atributo*) new VarLocal(simb.tamanho));
+		}
+	}
+}
 
 void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza, int escopo, Token token, int tamanho){
 	if(existe(nome) && (*this)[nome].escopo < escopo){
@@ -41,6 +63,7 @@ void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza,
 	}
 
 	variaveis[nome].push_back(Simb(nome, tipo, escopo, natureza, token, tamanho));
+	updateTabSim(token);
 	
 	//cout << "aloca " << (*this)[nome].nome << " " << (*this)[nome].tamanho << "\n";
 }
@@ -129,5 +152,6 @@ Token LabelGenerator::gerar(){
 	tabsim[token].insert((Atributo*)(new IdVal(name)));
 	tabsim[token].insert((Atributo*)(new StrAtt(name)));
 	tabsim[token].insert((Atributo*)(new IsTemp));
+	tabsim[token].insert((Atributo*)new LabelVal);
 	return token;
 }

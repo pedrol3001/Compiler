@@ -6,6 +6,7 @@
 #include <map>
 #include <list>
 #include "../../Token/Token.h"
+#include "../../TabelaDeSimbolos/TabelaDeSimbolos.h"
 
 struct TabelaSemantica;
 using TabSem = TabelaSemantica;
@@ -54,6 +55,10 @@ struct TabelaSemantica {
 	Simb operator()(std::string nome,int escopo);
 	bool existe(std::string nome,int escopo);
 	Simb operator[](std::string nome);
+	
+	private:
+	void updateTabSim(Token t);
+	TabSim& tabsim;
 };
 
 struct TempGenerator{

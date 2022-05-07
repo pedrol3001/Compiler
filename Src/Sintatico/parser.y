@@ -38,28 +38,16 @@ long long int tokenIntVal(Token t){
 	return ((IntVal*) tabsim[t]["IntVal"])->val;
 }
 
-bool isTemp(Token t) {
-	return tabsim[t].has("IsTemp");
+void aloca_global(Token token, Semantico &semantico) {
+	cout<< "Aloca global " << tokenIdVal(token) << endl;
+	semantico.code.emplace_back(new Addr3::AlocaGlobal(token));
 }
 
-
-void updateTabSim(Token t, Semantico& semantico) {
-	if(isTemp(t)) {
-		tabsim[t].insert((Atributo*) new VarLocal(1));
-		return;
-	}
-
-	if(semantico.tabela.existe(tokenIdVal(t))) {
-		Simb simb = semantico.tabela[tokenIdVal(t)];
-		if(simb.escopo==GLOBAL) {
-			if(!tabsim[t].has("VarGlobal"))
-				tabsim[t].insert((Atributo*) new VarGlobal(simb.tamanho));
-		} else {
-			if(!tabsim[t].has("VarLocal"))
-				tabsim[t].insert((Atributo*) new VarLocal(simb.tamanho));
-		}
-	}
+void aloca_local(Token token, Semantico &semantico) {
+	cout<< "Aloca local " << tokenIdVal(token) << endl;
+	semantico.code.emplace_back(new Addr3::Aloca(token));
 }
+	
 	
 %}
 
@@ -150,17 +138,23 @@ void updateTabSim(Token t, Semantico& semantico) {
 %%
 
 program: declaration_list {
-
+	list<shared_ptr<Addr3::Instrucao> > init_code;
+	init_code.emplace_back(new Addr3::SetGlobal);
+	
 	for(auto const& [key, val] : semantico.tabela.variaveis) {
-		//cout<< "AlocaGlobal " << key << endl;
-		//semantico.code.emplace_front(new Addr3::AlocaGlobal(semantico.tabela.variaveis[key].back().token));
+		cout<< "AlocaGlobal " << key << endl;
+		// aloca_global();
+		//assert(semantico.tabela.existe(key));
+		//init_code.emplace_back(new Addr3::AlocaGlobal(semantico.tabela[key].token));
 	}
+	init_code.emplace_back(new Addr3::SetLocal);
 
 	semantico.tabela.mostrar_globais();
 
 	cout << "Resultado do analisador semântico: ";
 	cout << semantico.tabela.erros_semantico << " erro(s), " << semantico.tabela.avisos_semantico << " aviso(s)." << endl;
 
+	semantico.code.insert(semantico.code.begin(),init_code.begin(), init_code.end());
 	semantico.analisar();	// Setar como ok
 };
 
@@ -169,29 +163,22 @@ declaration_list: declaration_list declaration | declaration ;
 declaration: var_declaration | fun_declaration ;
 
 var_declaration: type_specifier ID SEMICOLON {
-		cout<< "Aloca " << tokenIdVal($2) << endl;
-		semantico.code.emplace_back(new Addr3::Aloca($2));
+		aloca_local($2,semantico);
 		cout << tokenStrAtt($1) << " " << tokenStrAtt($2) << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, $2, 1);
-		updateTabSim($2,semantico);
 
 	} | type_specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
-		cout<< "Aloca " << tokenIdVal($2) << endl;
-		semantico.code.emplace_back(new Addr3::Aloca($2));
+		aloca_local($2,semantico);
 		cout << tokenStrAtt($1) << " " << tokenStrAtt($2) << "[" << tokenStrAtt($4) << "]" << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, $2, tokenIntVal($4));
-		updateTabSim($2,semantico);
 	};
 
 type_specifier: INT | VOID ;
 
 fun_declaration: type_specifier ID {
-		cout<< "Aloca " << tokenIdVal($2) << endl;
-		semantico.code.emplace_back(new Addr3::AlocaGlobal($2));
 		cout << tokenStrAtt($1) << " " << tokenStrAtt($2) << "()" << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, $2, 1);
-		updateTabSim($2,semantico);
-	} open_esc LPAREN params RPAREN compound_stmt close_esc ;
+	} LPAREN open_esc params RPAREN compound_stmt close_esc ;
 
 open_esc: %empty { cout << "// abrindo escopo" << endl; semantico.escopo++; } ;
 close_esc: %empty { 
@@ -213,18 +200,14 @@ params: param_list | VOID ;
 param_list: param_list COMMA param | param ;
 
 param: type_specifier ID {
-		cout<< "Aloca " << tokenIdVal($2) << endl;
-		semantico.code.emplace_back(new Addr3::Aloca($2));
+		aloca_local($2,semantico);
 		cout << "param " << tokenStrAtt($1) << " " << tokenStrAtt($2) << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, $2, 1);
-		updateTabSim($2,semantico);
 	}
 	| type_specifier ID LBRACKET RBRACKET {
-		cout<< "Aloca " << tokenIdVal($2) << endl;
-		semantico.code.emplace_back(new Addr3::Aloca($2));
+		aloca_local($2,semantico);
 		cout << "param " << tokenStrAtt($1) << " " << tokenStrAtt($2) << "[]" << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, $2, 1); // mudar tamanho
-		updateTabSim($2,semantico);
 	};
 
 compound_stmt: LBRACE open_esc local_declarations statement_list close_esc RBRACE ;
@@ -236,13 +219,13 @@ statement_list: statement_list statement | %empty ;
 statement: expression_stmt | compound_stmt | selection_stmt | iteration_stmt | input_stmt | output_stmt | return_stmt ;
 
 input_stmt: INPUT var SEMICOLON { 
-	cout << "input " << tokenStrAtt($2) << endl;
-	semantico.code.emplace_back(new Addr3::Read($2));
+		cout << "input " << tokenStrAtt($2) << endl;
+		semantico.code.emplace_back(new Addr3::Read($2));
 	};
 
 output_stmt: OUTPUT expression SEMICOLON {
-	cout << "output " << tokenStrAtt($2) << endl;
-	semantico.code.emplace_back(new Addr3::Print($2));
+		cout << "output " << tokenStrAtt($2) << endl;
+		semantico.code.emplace_back(new Addr3::Print($2));
 	};
 
 expression_stmt: expression SEMICOLON | SEMICOLON ;
@@ -253,8 +236,6 @@ selection_stmt: IF LPAREN condition RPAREN statement {
 	}
 	| IF LPAREN condition RPAREN statement ELSE {
 		Token token = semantico.labelGen.gerar();
-		updateTabSim(token,semantico);
-		tabsim[token].insert (new LabelVal);
 
 		cout << "goto " << tokenStrAtt(token) << endl;
 		semantico.code.emplace_back(new Addr3::Goto(token));
@@ -270,8 +251,6 @@ selection_stmt: IF LPAREN condition RPAREN statement {
 
 condition: expression {
 		Token token = semantico.labelGen.gerar();
-		updateTabSim(token,semantico);
-		tabsim[token].insert (new LabelVal);
 
 		cout << "if " << tokenStrAtt($1) << " == " << tokenStrAtt(zero.get()) << " goto " << tokenStrAtt(token) << endl;
 		semantico.code.emplace_back(new Addr3::Beq($1, zero.get(), token));
@@ -280,8 +259,6 @@ condition: expression {
 
 iteration_stmt: WHILE {
 		Token token = semantico.labelGen.gerar();
-		updateTabSim(token,semantico);
-		tabsim[token].insert (new LabelVal);
 
 		cout << "LABEL " << tokenStrAtt(token);
 		semantico.code.emplace_back(new Addr3::Label(token));
@@ -299,14 +276,18 @@ iteration_stmt: WHILE {
 
 return_stmt: RETURN SEMICOLON {
 		cout << "ret" << endl;
-		//semantico.code.emplace_back(new Addr3::Return());
+		semantico.code.emplace_back(new Addr3::Return());
 	}
 	| RETURN expression SEMICOLON {
 		cout << "ret " << tokenStrAtt($2) << endl;
 		semantico.code.emplace_back(new Addr3::Return($2));
 	};
 
-expression: var ASSIGN expression {
+expression: var ASSIGN open_esc aux_expression {
+		semantico.code.emplace_back(new Addr3::Atribuicao($1,$4));
+	} close_esc |  simple_expression ;	// TODO simple_expression
+
+aux_expression: var ASSIGN aux_expression {
 		semantico.code.emplace_back(new Addr3::Atribuicao($1,$3));
 	
 		cout << tokenStrAtt($1) << " = " << tokenStrAtt($3) << endl;
@@ -318,22 +299,19 @@ expression: var ASSIGN expression {
 
 var: ID {	
 		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR);
-		updateTabSim($1,semantico);
+		
 		$$ = semantico.tabela.obter_token(tokenIdVal($1));
 		semantico.tabela.marcar_usado(tokenIdVal($1));
 
 	} | ID LBRACKET expression RBRACKET { 	
 		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::ARRAY);
-		updateTabSim($1,semantico);
 
 		$$ = semantico.tabela.obter_token(tokenIdVal($1));
 
 		Token token = semantico.tempGen.gerar();
-		updateTabSim(token,semantico);
 
-		//cout<< "Aloca " << tokenIdVal(token) << endl;
-		//semantico.code.emplace_back(new Addr3::Aloca(token));
-		//semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+		aloca_local(token,semantico);
+		semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
 		
 		semantico.code.emplace_back(new Addr3::Adicao(token,$$,$3));	// token = $1 + $3
 		cout << tokenStrAtt(token) << " = " << tokenStrAtt($$) << " + " << tokenStrAtt($3) << endl;
@@ -349,11 +327,9 @@ var: ID {
 
 simple_expression: additive_expression relop additive_expression {
 	Token token = semantico.tempGen.gerar();
-	updateTabSim(token,semantico);
-
-	//cout<< "Aloca " << tokenIdVal(token) << endl;
-	//semantico.code.emplace_back(new Addr3::Aloca(token));
-	//semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+	
+	aloca_local(token,semantico);
+	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
 	
 	if($2.tipo == LESS)
 		semantico.code.emplace_back(new Addr3::Less(token,$1,$3));
@@ -376,11 +352,9 @@ relop: LESS | LESSEQUAL | GREATER | GREATEREQUAL | EQUAL | NOTEQUAL;
 
 additive_expression: additive_expression addop term {
 	Token token = semantico.tempGen.gerar();
-	updateTabSim(token,semantico);
 
-	//cout<< "Aloca " << tokenIdVal(token) << endl;
-	//semantico.code.emplace_back(new Addr3::Aloca(token));
-	//semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+	aloca_local(token,semantico);
+	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
 	
 	if($2.tipo == SUM)
 		semantico.code.emplace_back(new Addr3::Adicao(token,$1,$3));	// token = $1 + $3
@@ -394,11 +368,9 @@ addop: SUM | SUB ;
 
 term: term mulop factor {
 	Token token = semantico.tempGen.gerar();
-	updateTabSim(token,semantico);
 
-	//cout<< "Aloca " << tokenIdVal(token) << endl;
-	//semantico.code.emplace_back(new Addr3::Aloca(token));
-	//semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+	aloca_local(token,semantico);
+	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
 	
 	if($2.tipo == MUL)
 		semantico.code.emplace_back(new Addr3::Multiplicacao(token,$1,$3) );	// token = $1 * $3
@@ -410,19 +382,15 @@ term: term mulop factor {
 
 mulop: MUL | DIV ;
 
-factor: LPAREN expression RPAREN | var | call | NUM ;
+factor: LPAREN aux_expression RPAREN {$$=$2;} | var | call | NUM ;
 
 call: ID LPAREN Addr3_BeginCall args RPAREN { 
 	semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::FUNCAO);
 
 	Token token = semantico.tempGen.gerar();
-	
-	updateTabSim($1,semantico);
-	updateTabSim(token,semantico);
 
-	//cout<< "Aloca " << tokenIdVal(token) << endl;
-	//semantico.code.emplace_back(new Addr3::Aloca(token));
-	//semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+	aloca_local(token,semantico);
+	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
 
 	Token token_original = semantico.tabela.obter_token(tokenIdVal($1));
 
@@ -439,7 +407,7 @@ Addr3_BeginCall: %empty {
 
 args: arg_list | %empty ;
 
-arg_list: arg_list COMMA expression addr3_param | addr3_param | %empty;
+arg_list: arg_list COMMA addr3_param | addr3_param ;
 	
 addr3_param: expression { 
 	cout << "arg " << tokenStrAtt($1) << endl;
