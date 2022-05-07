@@ -8,14 +8,14 @@ using namespace std;
 
 //Simbolo ==============================================================================================================
 
-Simb::Simb(std::string _nome, Tipo _tipo, int _escopo, Nat _natureza, long long int _tamanho): 
-	nome(_nome), tipo(_tipo), escopo(_escopo), natureza(_natureza), tamanho(_tamanho) {}
+Simb::Simb(std::string _nome, Tipo _tipo, int _escopo, Nat _natureza, Token _token, long long int _tamanho) :
+	nome(_nome), tipo(_tipo), escopo(_escopo), natureza(_natureza), token(_token), tamanho(_tamanho) {}
 
 // Tabela Semantica ====================================================================================================
 
 TabelaSemantica::TabelaSemantica(){}
 
-void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza, int escopo, int tamanho){
+void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza, int escopo, int tamanho, Token token){
 	if(existe(nome) && (*this)[nome].escopo < escopo){
 		std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
 		avisos_semantico++;
@@ -40,7 +40,7 @@ void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza,
 		return;
 	}
 
-	variaveis[nome].push_back(Simb(nome, tipo, escopo, natureza, tamanho));
+	variaveis[nome].push_back(Simb(nome, tipo, escopo, natureza, token, tamanho));
 	//cout << "aloca " << (*this)[nome].nome << " " << (*this)[nome].tamanho << "\n";
 }
 
@@ -50,6 +50,10 @@ bool TabelaSemantica::existe(string nome){
 
 void TabelaSemantica::marcar_usado(string nome){
 	variaveis[nome].back().usado = true;
+}
+
+Token TabelaSemantica::obter_token(string nome){
+	return variaveis[nome].back().token;
 }
 
 Simb TabelaSemantica::operator[](string nome) {

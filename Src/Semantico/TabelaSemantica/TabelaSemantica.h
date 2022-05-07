@@ -22,13 +22,14 @@ struct Simb {
 		VAR,FUNCAO,ARRAY,
 	};
 	
-	Simb(std::string _nome, Tipo _tipo, int _escopo, Nat _natureza, long long int _tamanho = 1);
+	Simb(std::string _nome, Tipo _tipo, int _escopo, Nat _natureza, Token token, long long int _tamanho = 1);
 	
 	std::string nome;
 	Tipo tipo; // 0 = int, 1 = void
 	int escopo;	// Nivel do escopo
 	Nat natureza; // 0 = var, 1 = funcao, 2 = array	
 	long long int tamanho = 1;
+	Token token;
 	
 	bool usado = false;
 };
@@ -42,13 +43,14 @@ struct TabelaSemantica {
 
 	TabelaSemantica();
 
-	void adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, int tamanho);	// int tipo => bison.h
+	void adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, int tamanho, Token token);	// int tipo => bison.h
 	bool verificar(std::string nome, Simb::Nat natureza);
 	void remover();
 	void mostrar_globais();
 
 	bool existe(std::string nome);
 	void marcar_usado(std::string nome);
+	Token obter_token(std::string nome);
 	Simb operator()(std::string nome,int escopo);
 	bool existe(std::string nome,int escopo);
 	Simb operator[](std::string nome);
