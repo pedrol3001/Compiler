@@ -426,7 +426,7 @@ SaltoCondicional::SaltoCondicional(string _classe, Token _label): Code::Goto(_la
 
 list<shared_ptr<Assembly> > Beq::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	/*
+	
 	code.emplace_back(new TM::Comentario("Beq"));	
 	// Carregar operandos (op1, op2)
 	loadReg(code,op1,TM::t0);
@@ -435,7 +435,7 @@ list<shared_ptr<Assembly> > Beq::gera_codigo() {
 	code.emplace_back(new TM::SUB(TM::t2,TM::t0,TM::t1));	// SUB t2,t0,t1
 	// Realizar salto
 	code.emplace_back(new TM::RJEQ(TM::t2,label));		// JEQ t2,distancia(pc)
-	*/
+	
 	return code;
 }
 Beq::Beq(Token _op1, Token _op2, Token _label): 

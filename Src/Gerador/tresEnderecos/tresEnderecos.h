@@ -166,14 +166,12 @@ namespace Addr3{
 	// Saltos ======================================
 	
 	struct Goto: public Instrucao, public Code::Goto {	// Goto label
-		Token label;
 		Goto(Token _label);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	
 
 	struct SaltoCondicional: public Instrucao, public Code::Goto {	// 
-		Token label;
 		SaltoCondicional(std::string _classe, Token _label);
 		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;		
 	};
