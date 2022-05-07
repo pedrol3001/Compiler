@@ -22,9 +22,12 @@ Label::Label(Token _label): Instrucao("Label",true),Code::Label(_label) {}
 std::string Label::str() {
 	assert(TabSim::getInstance()[label].has("LabelVal"));
 	stringstream ss;
-	ss << TabSim::getInstance()[label].getAtt<LabelVal>("LabelVal")->getLinha();
+	ss << "Label &" << TabSim::getInstance()[label].getAtt<LabelVal>("LabelVal")->getLinha();
 	return ss.str();
 }	
+void Label::update(long long int _linha) {	// Atualiza linha
+	setRef(_linha);
+}
 
 // Comentario
 Comentario::Comentario(std::string _comentario): Instrucao("Comentario",true), comentario(_comentario) {}

@@ -25,6 +25,18 @@ namespace Addr3{
 		std::list<std::shared_ptr<Assembly> > gera_codigo();
 	};	
 	
+	// Inicializacao ================================
+	
+	struct SetGlobal: public Instrucao {
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		SetGlobal(); 	
+	};
+	
+	struct SetLocal: public Instrucao {	
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		SetLocal(); 	
+	};
+	
 	// Input/output =================================
 	
 	struct Read: public Instrucao {		// Read x;
@@ -41,10 +53,10 @@ namespace Addr3{
 
 	// Declaracoes ==================================
 
-	struct Global: public Instrucao {	
+	struct AlocaGlobal: public Instrucao {	
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
-		Global(Token _op); 	
+		AlocaGlobal(Token _op); 	
 	};
 
 	struct Aloca: public Instrucao {	// Aloca x;
@@ -124,11 +136,13 @@ namespace Addr3{
 	};
 	
 	struct Return: public Instrucao {		// Return ;
-		Token ret;		
+		Token ret;	
+		bool has_value=false;	
 		Return(Token _ret);
+		Return();
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
-
+	
 	// Saltos ======================================
 	
 	struct Goto: public Instrucao, public Code::Goto {	// Goto label

@@ -10,7 +10,7 @@
 namespace TM {
 
 	enum Reg {
-		t0,t1,t2,zero,gp,ra,sp,	// zero = 0, gp = global pointer, ra = return adress, sp = stack pointer
+		zero,t0,t1,t2,gp,ra,sp,	// zero = 0, gp = global pointer, ra = return adress, sp = stack pointer
 		pc	// nao use
 	};
 	
@@ -26,6 +26,7 @@ namespace TM {
 	
 	struct Label: public Instrucao, public Code::Label {	// opcode r1,r2,r3
 		Label(Token _label);
+		void update(long long int _linha);	// Atualiza linha
 		std::string str();	
 	};
 	

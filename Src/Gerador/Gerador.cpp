@@ -30,9 +30,9 @@ bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::I
 		codigoGerado.insert(codigoGerado.end(),codigo.begin(),codigo.end());
 	}
 	
-	if(oM) otimizarTmLourden();
+	setOffsets();
 	
-	// Adiciona 
+	if(oM) otimizarTmLourden();
 	
 	// Atualiza labels
 	long long int linha=0;
@@ -52,6 +52,11 @@ bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::I
 	}
 	
 	return ok = true;
+}
+
+void Gerador::setOffsets() {
+	for(shared_ptr<Instrucao> instrucao: instrucoes)  {
+	}
 }
 
 void Gerador::otimizarIntermediario() {

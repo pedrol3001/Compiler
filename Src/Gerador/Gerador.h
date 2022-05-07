@@ -22,6 +22,8 @@ struct Gerador {
 		bool oI=false,oM=false;
 		bool ok=false;
 	
+		void setOffsets();
+		
 		void otimizarIntermediario();
 		void otimizarTmLourden();
 		

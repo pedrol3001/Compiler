@@ -77,6 +77,22 @@ std::list<std::shared_ptr<Assembly> > Label::gera_codigo() {
 }
 Label::Label(Token _label): Code::Label(_label), Instrucao("Label",true) {}
 
+// Inicializacao ================================
+	
+std::list<std::shared_ptr<Assembly> > SetGlobal::gera_codigo() {
+	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("SetGlobal"));
+	return code;
+}
+SetGlobal::SetGlobal(): Instrucao("SetGlobal") {}
+
+std::list<std::shared_ptr<Assembly> > SetLocal::gera_codigo() {
+	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("SetLocal"));
+	return code;
+}
+SetLocal::SetLocal(): Instrucao("SetLocal") {}
+
 // Input/output =================================
 	
 list<shared_ptr<Assembly> > Read::gera_codigo() {
@@ -105,14 +121,14 @@ list<shared_ptr<Assembly> > Print::gera_codigo() {
 Print::Print(Token _op): op(_op), Instrucao("Print") {}
 
 // Declaracao ==================================
-list<shared_ptr<Assembly> > Global::gera_codigo() {
+list<shared_ptr<Assembly> > AlocaGlobal::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	code.emplace_back(new TM::Comentario("Global"));
+	code.emplace_back(new TM::Comentario("AlocaGlobal"));
 	int space = 1;	// normalmente, deveria ser extraido de Token op
 	alocar(code,space,TM::t0,TM::gp);		
 	return code;
 }	
-Global::Global(Token _op): op(_op), Instrucao("Global") {}
+AlocaGlobal::AlocaGlobal(Token _op): op(_op), Instrucao("AlocaGlobal") {}
 
 list<shared_ptr<Assembly> > Aloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
@@ -304,12 +320,15 @@ Call::Call(Token _ret, Token _funcao): ret(_ret), funcao(_funcao), Instrucao("Ca
 list<shared_ptr<Assembly> > Return::gera_codigo() {
 	list<shared_ptr<Assembly> > code;	
 	code.emplace_back(new TM::Comentario("Return"));
-
+	if(has_value) {
+	
+	}
 	// retornar para ra, empilhando retorno
 
 	return code;
 }	
-Return::Return(Token _ret): ret(_ret), Instrucao("Return") {}
+Return::Return(Token _ret): ret(_ret), Instrucao("Return") {has_value=true;}
+Return::Return(): Instrucao("Return") {}
 
 // Saltos ======================================
 
