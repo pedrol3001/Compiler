@@ -28,6 +28,7 @@ namespace Addr3{
 		public:
 			std::string classe;		
 			std::vector<Token> ops;
+			std::vector<long int> offsets;
 	};
 	
 	// Label ========================================
@@ -190,13 +191,11 @@ namespace Addr3{
 	
 
 	struct SaltoCondicional: public Instrucao, public Code::Goto {	// 
-		SaltoCondicional(std::string _classe, Token _label);
+		SaltoCondicional(std::string _classe, Token _op1, Token _op2, Token _label);
 		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;		
 	};
 	
 	struct Beq: public SaltoCondicional {	// if op1 == op2 goto label
-		Token op1, op2; 
-		
 		Beq(Token _op1, Token _op2, Token _label);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();		
 	};
