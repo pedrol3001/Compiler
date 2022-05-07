@@ -331,9 +331,9 @@ var: ID {
 		Token token = semantico.tempGen.gerar();
 		updateTabSim(token,semantico);
 
-		cout<< "Aloca " << tokenIdVal(token) << endl;
-		semantico.code.emplace_back(new Addr3::Aloca(token));
-		semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+		//cout<< "Aloca " << tokenIdVal(token) << endl;
+		//semantico.code.emplace_back(new Addr3::Aloca(token));
+		//semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
 		
 		semantico.code.emplace_back(new Addr3::Adicao(token,$$,$3));	// token = $1 + $3
 		cout << tokenStrAtt(token) << " = " << tokenStrAtt($$) << " + " << tokenStrAtt($3) << endl;
@@ -351,9 +351,9 @@ simple_expression: additive_expression relop additive_expression {
 	Token token = semantico.tempGen.gerar();
 	updateTabSim(token,semantico);
 
-	cout<< "Aloca " << tokenIdVal(token) << endl;
-	semantico.code.emplace_back(new Addr3::Aloca(token));
-	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+	//cout<< "Aloca " << tokenIdVal(token) << endl;
+	//semantico.code.emplace_back(new Addr3::Aloca(token));
+	//semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
 	
 	if($2.tipo == LESS)
 		semantico.code.emplace_back(new Addr3::Less(token,$1,$3));
@@ -378,9 +378,9 @@ additive_expression: additive_expression addop term {
 	Token token = semantico.tempGen.gerar();
 	updateTabSim(token,semantico);
 
-	cout<< "Aloca " << tokenIdVal(token) << endl;
-	semantico.code.emplace_back(new Addr3::Aloca(token));
-	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+	//cout<< "Aloca " << tokenIdVal(token) << endl;
+	//semantico.code.emplace_back(new Addr3::Aloca(token));
+	//semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
 	
 	if($2.tipo == SUM)
 		semantico.code.emplace_back(new Addr3::Adicao(token,$1,$3));	// token = $1 + $3
@@ -396,9 +396,9 @@ term: term mulop factor {
 	Token token = semantico.tempGen.gerar();
 	updateTabSim(token,semantico);
 
-	cout<< "Aloca " << tokenIdVal(token) << endl;
-	semantico.code.emplace_back(new Addr3::Aloca(token));
-	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+	//cout<< "Aloca " << tokenIdVal(token) << endl;
+	//semantico.code.emplace_back(new Addr3::Aloca(token));
+	//semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
 	
 	if($2.tipo == MUL)
 		semantico.code.emplace_back(new Addr3::Multiplicacao(token,$1,$3) );	// token = $1 * $3
@@ -420,9 +420,9 @@ call: ID LPAREN Addr3_BeginCall args RPAREN {
 	updateTabSim($1,semantico);
 	updateTabSim(token,semantico);
 
-	cout<< "Aloca " << tokenIdVal(token) << endl;
-	semantico.code.emplace_back(new Addr3::Aloca(token));
-	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+	//cout<< "Aloca " << tokenIdVal(token) << endl;
+	//semantico.code.emplace_back(new Addr3::Aloca(token));
+	//semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
 
 	Token token_original = semantico.tabela.obter_token(tokenIdVal($1));
 
