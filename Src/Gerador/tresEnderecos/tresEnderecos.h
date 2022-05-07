@@ -102,7 +102,25 @@ namespace Addr3{
 		Operacao(std::string _classe, Token _dst, std::vector<Token>& _op); 	
 		virtual std::list<std::shared_ptr<Assembly> > gera_codigo()=0;	
 	};
+	// Booleanas
+	struct Less: public Operacao {
+		Less(Token _dst, Token _op1, Token _op2);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();		
+	};
+	struct LessEqual: public Operacao {
+		LessEqual(Token _dst, Token _op1, Token _op2);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();		
+	};
+	struct Equal: public Operacao {
+		Equal(Token _dst, Token _op1, Token _op2);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();		
+	};
+	struct NotEqual: public Operacao {
+		NotEqual(Token _dst, Token _op1, Token _op2);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();		
+	};
 	
+	// Aritmeticas
 	struct Adicao: public Operacao {
 		Adicao(Token _dst, Token _op1, Token _op2);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();		

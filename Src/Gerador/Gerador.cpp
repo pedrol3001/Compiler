@@ -53,6 +53,8 @@ bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::I
 		else
 			dst_stream << linha++ << ": " << setw(3) << assembly->str() << '\n';
 	}
+	dst_stream << "* HALT de precaucao \n";
+	dst_stream << linha << ": HALT 0,0,0 \n";
 	
 	return ok = true;
 }

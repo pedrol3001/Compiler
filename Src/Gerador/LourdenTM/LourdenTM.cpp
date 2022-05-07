@@ -23,6 +23,7 @@ std::string Label::str() {
 	assert(TabSim::getInstance()[label].has("LabelVal"));
 	stringstream ss;
 	ss << "Label &" << TabSim::getInstance()[label].getAtt<LabelVal>("LabelVal")->getLinha();
+	ss << " (aka " << TabSim::getInstance()[label].getAtt<StrAtt>("StrAtt")->str << ")";
 	return ss.str();
 }	
 void Label::update(long long int _linha) {	// Atualiza linha
