@@ -152,7 +152,7 @@ list<shared_ptr<Assembly> > Read::gera_codigo() {
 		
 	return code;
 }	
-Read::Read(Token _op): op(_op), Instrucao("Read",op) {}
+Read::Read(Token _op): op(_op), Instrucao("Read",_op) {}
 
 list<shared_ptr<Assembly> > Print::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
@@ -165,7 +165,7 @@ list<shared_ptr<Assembly> > Print::gera_codigo() {
 		
 	return code;
 }	
-Print::Print(Token _op): op(_op), Instrucao("Print",op) {}
+Print::Print(Token _op): op(_op), Instrucao("Print",_op) {}
 
 // Declaracao ==================================
 list<shared_ptr<Assembly> > AlocaGlobal::gera_codigo() {
@@ -175,7 +175,7 @@ list<shared_ptr<Assembly> > AlocaGlobal::gera_codigo() {
 	alocar(code,space,TM::t0,TM::gp);		
 	return code;
 }	
-AlocaGlobal::AlocaGlobal(Token _op): op(_op), Instrucao("AlocaGlobal",op) {}
+AlocaGlobal::AlocaGlobal(Token _op): op(_op), Instrucao("AlocaGlobal",_op) {}
 void AlocaGlobal::acao(Corretor& corretor) {
 	assert(Addr3ts[op].has("VarGlobal"));
 	// Configurar distancia da variavel
@@ -191,7 +191,7 @@ list<shared_ptr<Assembly> > Aloca::gera_codigo() {
 	alocar(code,space,TM::t0,TM::sp);		
 	return code;
 }	
-Aloca::Aloca(Token _op): op(_op), Instrucao("Aloca",op) {}
+Aloca::Aloca(Token _op): op(_op), Instrucao("Aloca",_op) {}
 void Aloca::acao(Corretor& corretor) {
 	assert(Addr3ts[op].has("VarLocal"));
 	// Configurar distancia da variavel
@@ -207,7 +207,7 @@ list<shared_ptr<Assembly> > Desaloca::gera_codigo() {
 	desalocar(code,space,TM::t0,TM::sp);		
 	return code;
 }	
-Desaloca::Desaloca(Token _op): op(_op), Instrucao("Desaloca",op) {}
+Desaloca::Desaloca(Token _op): op(_op), Instrucao("Desaloca",_op) {}
 void Desaloca::acao(Corretor& corretor) {
 	assert(Addr3ts[op].has("VarLocal"));
 	// Decrementar sp
@@ -216,12 +216,12 @@ void Desaloca::acao(Corretor& corretor) {
 
 // Operacao ====================================
 Operacao::~Operacao() {}
-Operacao::Operacao(string _classe, Token _dst, vector<Token>& _op): dst(_dst), op(_op), Instrucao(_classe,op) {}
-Operacao::Operacao(string _classe, Token _dst, Token _op): dst(_dst), Instrucao(_classe,dst,_op) {
+Operacao::Operacao(string _classe, Token _dst, vector<Token>& _op): dst(_dst), op(_op), Instrucao(_classe,_op) {}
+Operacao::Operacao(string _classe, Token _dst, Token _op): dst(_dst), Instrucao(_classe,_dst,_op) {
 	op.emplace_back(_op);
 }	
 Operacao::Operacao(string _classe, Token _dst, Token _op1, Token _op2): 
-	dst(_dst), Instrucao(_classe,dst,_op1,_op2) {
+	dst(_dst), Instrucao(_classe,_dst,_op1,_op2) {
 	op.emplace_back(_op1);
 	op.emplace_back(_op2);
 }		
@@ -294,6 +294,7 @@ Subtracao::Subtracao(Token _dst, Token _op1, Token _op2): Operacao("Subtracao",_
 
 // Assign
 Atribuicao::Atribuicao(Token _dst, Token _op): Operacao("Atribuicao",_dst,_op) {}
+Atribuicao::Atribuicao(Token _ret, Token _dst, Token _op): Operacao("Atribuicao",_dst,_op,_ret) {}
 
 list<shared_ptr<Assembly> > Atribuicao::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
@@ -302,13 +303,17 @@ list<shared_ptr<Assembly> > Atribuicao::gera_codigo() {
 	loadReg(code,op[0],TM::t0);
 	// Realiza atribuicao, no temp t2
 	storeReg(code,dst,TM::t0);	// dst = op[0]
+	if(op.size()==2) {
+		// Copia o mesmo valor para ret
+		storeReg(code,op[1],TM::t0);	// ret = op[1]
+	}
 	
 	return code;
 }	
 
 // Ponteiros=====================================
 
-LoadFromRef::LoadFromRef(Token _dst, Token _pointer): Instrucao("RefLoad",dst,pointer), dst(_dst),pointer(_pointer) {}
+LoadFromRef::LoadFromRef(Token _dst, Token _pointer): Instrucao("RefLoad",_dst,_pointer), dst(_dst),pointer(_pointer) {}
 
 std::list<std::shared_ptr<Assembly> > LoadFromRef::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
@@ -323,7 +328,7 @@ std::list<std::shared_ptr<Assembly> > LoadFromRef::gera_codigo() {
 	return code;
 }	
 
-StoreInRef::StoreInRef(Token _src, Token _pointer): Instrucao("RefStore",src,pointer),src(_src),pointer(_pointer) {}
+StoreInRef::StoreInRef(Token _src, Token _pointer): Instrucao("RefStore",_src,_pointer),src(_src),pointer(_pointer) {}
 
 std::list<std::shared_ptr<Assembly> > StoreInRef::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
@@ -363,13 +368,14 @@ std::list<std::shared_ptr<Assembly> > Param::gera_codigo() {
 	storeReg(code,parametro,TM::sp);		
 	return code;
 }
-Param::Param(Token _parametro): parametro(_parametro), Instrucao("Param") {}
+Param::Param(Token _parametro): parametro(_parametro), Instrucao("Param",_parametro) {}
 
 
 list<shared_ptr<Assembly> > Call::gera_codigo() {
 		
 	list<shared_ptr<Assembly> > code;	
 	code.emplace_back(new TM::Comentario("Call"));
+	/*
 	// Configurar ra
 	code.emplace_back(new TM::LDA(TM::ra,3,TM::pc));	// LA ra,3(pc)
 	// TODO: Configura destino do salto
@@ -378,11 +384,11 @@ list<shared_ptr<Assembly> > Call::gera_codigo() {
 	//code.emplace_back(new TM::LD(reg,offset_jump,TM::gp));				// ST reg,offset_jump(sp)
 	// Realiza salto
 	code.emplace_back(new TM::JEQ(TM::zero,0,TM::t0));	// JEQ zero,0(t0)
-	
+	*/
 	
 	return code;
 }
-Call::Call(Token _ret, Token _funcao): ret(_ret), funcao(_funcao), Instrucao("Call",ret,funcao) {}
+Call::Call(Token _ret, Token _funcao): ret(_ret), funcao(_funcao), Instrucao("Call",_ret,_funcao) {}
 
 	
 list<shared_ptr<Assembly> > Return::gera_codigo() {
@@ -396,7 +402,7 @@ list<shared_ptr<Assembly> > Return::gera_codigo() {
 
 	return code;
 }	
-Return::Return(Token _ret): ret(_ret), Instrucao("Return",ret) {has_value=true;}
+Return::Return(Token _ret): ret(_ret), Instrucao("Return",_ret) {has_value=true;}
 Return::Return(): Instrucao("Return") {}
 
 // Saltos ======================================
@@ -412,10 +418,10 @@ list<shared_ptr<Assembly> > Goto::gera_codigo() {
 	*/
 	return code;
 }
-Goto::Goto(Token _label): Code::Goto(_label), Instrucao("Goto",label) {}
+Goto::Goto(Token _label): Code::Goto(_label), Instrucao("Goto",_label) {}
 	
 	
-SaltoCondicional::SaltoCondicional(string _classe, Token _label): Code::Goto(_label), Instrucao(_classe,label) {}
+SaltoCondicional::SaltoCondicional(string _classe, Token _label): Code::Goto(_label), Instrucao(_classe,_label) {}
 
 
 list<shared_ptr<Assembly> > Beq::gera_codigo() {

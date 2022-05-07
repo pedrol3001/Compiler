@@ -21,6 +21,7 @@ list<std::shared_ptr<Assembly> > Gerador::codigo() {
 }
 
 bool Gerador::gerar(std::ostream& dst_stream, std::list<std::shared_ptr<Addr3::Instrucao> > instrucoes) {
+
 	instrucoes.emplace_front(new SetZero);	
 	
 	if(oI) otimizarIntermediario(instrucoes);

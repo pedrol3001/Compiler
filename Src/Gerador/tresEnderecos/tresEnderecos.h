@@ -119,8 +119,9 @@ namespace Addr3{
 		Divisao(Token _dst, Token _op1, Token _op2);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
-	struct Atribuicao: public Operacao {	// x = y
+	struct Atribuicao: public Operacao {	// x = y ou temp = (x=y)
 		Atribuicao(Token _dst, Token _op);
+		Atribuicao(Token _ret, Token _dst, Token _op);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	// Ponteiros=====================================
