@@ -76,6 +76,8 @@ void aloca_local(Token token, Semantico &semantico) {
 		Token get();
 	};
 	Zero zero;
+	
+	Token condtoken;
 
 %}
 
@@ -137,7 +139,13 @@ void aloca_local(Token token, Semantico &semantico) {
 
 %%
 
-program: declaration_list {
+program: {
+	pair<bool, Token> p = semantico.tempGen.obter();
+	condtoken = p.second;
+
+	aloca_local(condtoken,semantico);
+	semantico.tabela.adicionar(tokenIdVal(condtoken), INT, Simb::Nat::ARRAY, semantico.escopo, condtoken, 1, true);
+	} declaration_list {
 	list<shared_ptr<Addr3::Instrucao> > init_code;
 	init_code.emplace_back(new Addr3::SetGlobal);
 	
@@ -250,18 +258,23 @@ selection_stmt: IF LPAREN condition RPAREN statement {
 		semantico.code.emplace_back(new Addr3::Label($6));
 	};
 
-condition: expression {
+condition: open_esc expression {
 		Token token = semantico.labelGen.gerar();
 
-		cout << "if " << tokenStrAtt($1) << " == " << tokenStrAtt(zero.get()) << " goto " << tokenStrAtt(token) << endl;
-		semantico.code.emplace_back(new Addr3::Beq($1, zero.get(), token));
+		cout << tokenIdVal(condtoken) << " = " << tokenStrAtt($2) << endl;
+		semantico.code.emplace_back(new Addr3::Atribuicao(condtoken,$2));
+
 		$$ = token;
+	} close_esc {
+		cout << "if " << tokenStrAtt(condtoken) << " == " << tokenStrAtt(zero.get()) << " goto " << tokenStrAtt($3) << endl;
+		semantico.code.emplace_back(new Addr3::Beq(condtoken, zero.get(), $3));
+		$$ = $3;
 	};
 
 iteration_stmt: WHILE {
 		Token token = semantico.labelGen.gerar();
 
-		cout << "LABEL " << tokenStrAtt(token);
+		cout << "LABEL " << tokenStrAtt(token) << endl;
 		semantico.code.emplace_back(new Addr3::Label(token));
 
 		$$ = token;
