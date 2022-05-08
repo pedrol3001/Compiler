@@ -303,16 +303,35 @@ return_stmt: RETURN SEMICOLON {
 	};
 
 expression: var ASSIGN expression {
+		// usar atribuicao
 		cout << tokenIdVal($1) << " = " << tokenStrAtt($3) << endl;
 		semantico.code.emplace_back(new Addr3::Atribuicao($1,$3));
 		$$ = $3;
-	} 
-	|  simple_expression {
-		//cout << "Resetando index" << endl;
-		//semantico.tempGen.reset_index();
+	} | ID LBRACKET expression RBRACKET ASSIGN expression {
+		// usar storeinref
+		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::ARRAY);
 
+		$$ = semantico.tabela.obter_token(tokenIdVal($1));
+		semantico.tabela.marcar_usado(tokenIdVal($1));
 
-	};	// TODO simple_expression
+		pair<bool, Token> p = semantico.tempGen.obter();
+		bool criado = p.first;
+		Token token = p.second;
+
+		if(criado){
+			aloca_local(token,semantico);
+			semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1, true);
+		}
+		
+		semantico.code.emplace_back(new Addr3::Adicao(token,$$,$3));	// token = $1 + $3
+		cout << tokenStrAtt(token) << " = " << tokenStrAtt($$) << " + " << tokenStrAtt($3) << endl;
+
+		semantico.code.emplace_back(new Addr3::StoreInRef(token, $6)); // token = *token
+		cout << "*" << tokenStrAtt(token) << " = " << tokenStrAtt($6) << endl;
+
+		$$ = $6;
+	}
+	|  simple_expression ;
 
 var: ID {	
 		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR);
