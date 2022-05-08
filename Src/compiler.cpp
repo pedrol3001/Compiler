@@ -30,7 +30,7 @@ int main(int argn, char *argv[]) {
 		return 0;
 	}
 	// Lexico
-	Lexico lexico(source,stdout,true);	
+	Lexico lexico(source,stdout,false);	
 	fclose(source);
 	
 	if(!lexico.good()) {
@@ -51,10 +51,14 @@ int main(int argn, char *argv[]) {
 	// Semantico =============================================
 	
 	if(!semantico.good()) {
-		cout << "Analise semantica FALHOU!" << endl;
+		cout << "Analise semantica FALHOU!\n" << endl;
+		semantico.mostrar_analise();
 		return 0;
 	}	
-	cout << "Analise semantica bem sucedida!" << endl;
+	cout << "Analise semantica bem sucedida!\n" << endl;
+	semantico.mostrar_analise();
+	semantico.salvar_pseudoassembly();
+
 	// Geracao de codigo =====================================
 	// Output
 	ofstream ofile(OUTPUT_NAME);

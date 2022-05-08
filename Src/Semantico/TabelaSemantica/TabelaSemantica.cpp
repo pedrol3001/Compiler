@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <string>
 
 using namespace std;
 
@@ -26,7 +27,6 @@ void TabelaSemantica::updateTabSim(Token t) {
 	string idval = ((IdVal*)tabsim[t]["IdVal"])->val;
 	if(existe(idval)) {
 		Simb simb = (*this)[idval];
-		cout << simb.escopo << ": " << idval << endl;
 		if(simb.escopo==GLOBAL) {
 			if(!tabsim[t].has("VarGlobal"))
 				tabsim[t].insert((Atributo*) new VarGlobal(simb.tamanho));
@@ -39,10 +39,10 @@ void TabelaSemantica::updateTabSim(Token t) {
 
 void TabelaSemantica::adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, Token token, int tamanho, bool usado){
 	if(existe(nome) && (*this)[nome].escopo < escopo){
-		std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
+		mensagens.push_back("Aviso: variável \"" + nome + "\" sendo substituída por variável local.");
 		avisos_semantico++;
 	}else if(existe(nome) && (*this)[nome].escopo == escopo){
-		std::cout << "Erro: variável \"" << nome << "\" sendo redeclarada." << std::endl;
+		mensagens.push_back("Erro: variável \"" + nome + "\" sendo redeclarada.");
 		erros_semantico++;
 		return;
 	}
@@ -57,7 +57,7 @@ void TabelaSemantica::adicionar(std::string nome, int bison_tipo, Simb::Nat natu
 	}
 
 	if(natureza == Simb::Nat::VAR && tipo == Simb::Tipo::VOID){ // variavel com tipo void
-		std::cout << "Erro: variável \"" << nome << "\" não pode ser do tipo void." << std::endl;
+		mensagens.push_back("Erro: variável \"" + nome + "\" declarada como void.");
 		erros_semantico++;
 		return;
 	}
@@ -66,8 +66,6 @@ void TabelaSemantica::adicionar(std::string nome, int bison_tipo, Simb::Nat natu
 	if(usado)
 		variaveis[nome].back().usado = true;
 	updateTabSim(token);
-	
-	//cout << "aloca " << (*this)[nome].nome << " " << (*this)[nome].tamanho << "\n";
 }
 
 bool TabelaSemantica::existe(string nome){
@@ -89,7 +87,7 @@ Simb TabelaSemantica::operator[](string nome) {
 
 bool TabelaSemantica::verificar(string nome, Simb::Nat natureza){
 	if(!existe(nome)) {
-		cout << "Erro: variável \"" << nome << "\" não declarada." << endl;
+		mensagens.push_back("Erro: variável \"" + nome + "\" não declarada.");
 		erros_semantico++;
 		return false;
 	}
@@ -101,8 +99,7 @@ bool TabelaSemantica::verificar(string nome, Simb::Nat natureza){
 	};
 	
 	if((*this)[nome].natureza != natureza) {
-		cout << "Erro: " << str[(*this)[nome].natureza] << " \"" << nome << "\" ";
-		cout<<  "usado(a) como " << str[natureza] << "." << endl;
+		mensagens.push_back( "Erro: " + str[(*this)[nome].natureza] + " \"" + nome + "\" usado(a) como " + str[natureza] + ".");
 		erros_semantico++;
 		return false;
 	}
@@ -113,9 +110,8 @@ void TabelaSemantica::remover(){
 	for(pair<const string,list<Simb> >& p: variaveis) {
 		list<Simb>& lista = p.second;
 		while(!lista.empty() && lista.back().escopo > escopo) {
-			//cout << "desaloca " << lista.back().nome << " " << lista.back().tamanho << std::endl;
 			if(lista.back().usado == false){
-				cout << "Aviso: variável \"" << lista.back().nome << "\" não usada." << endl;
+				mensagens.push_back("Aviso: variável \"" + lista.back().nome + "\" não usada.");
 				avisos_semantico++;
 			}
 			lista.pop_back();
@@ -123,16 +119,19 @@ void TabelaSemantica::remover(){
 	}
 }
 
-void TabelaSemantica::mostrar_globais(){
-	cout << "=============================================\n";
+void TabelaSemantica::salvar_globais(list<string> pseudoassembly){
 	for(pair<string,list<Simb> > p: variaveis) {
 		list<Simb> &lista = p.second;
 		if(lista.empty()) continue;
 		for(Simb s: lista)
-			if(s.escopo==0)
-				cout << "global: " << p.first << " " << s.tamanho << std::endl; 
+			if(s.escopo==0){
+				if(s.tamanho == 1)
+					pseudoassembly.emplace_back("global: " + p.first);
+				else
+					pseudoassembly.emplace_back("global: " + p.first + " [" + to_string(s.tamanho) + "]");
+			}
 	}
-	cout << "=============================================\n";
+	pseudoassembly.emplace_back("=============================================");
 }
 	
 Token TempGenerator::gerar(){
@@ -146,7 +145,6 @@ Token TempGenerator::gerar(){
 }
 
 pair<bool, Token> TempGenerator::obter(){
-	//cout << "Token requisitado. temp_index = " << temp_index << ", max_index = " << max_index << endl;
 	if(temp_index == max_index){
 		Token token = gerar();
 		max_index++, temp_index++;
