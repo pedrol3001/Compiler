@@ -185,10 +185,10 @@ close_esc: %empty {
 	cout << "// fechando escopo" << endl; 
 	semantico.escopo--;
 
-	for(auto const& [key, val] : semantico.tabela.variaveis) {
-		if(!semantico.tabela.variaveis[key].empty() && semantico.tabela.variaveis[key].back().escopo > semantico.escopo){
-			cout << "Desaloca " << key << endl;
-			semantico.code.emplace_back(new Addr3::Desaloca(semantico.tabela.variaveis[key].back().token));
+	for(auto it = semantico.tabela.variaveis.rbegin(); it != semantico.tabela.variaveis.rend(); it++) {
+		if(!semantico.tabela.variaveis[it->first].empty() && semantico.tabela.variaveis[it->first].back().escopo > semantico.escopo){
+			cout << "Desaloca " << it->first << endl;
+			semantico.code.emplace_back(new Addr3::Desaloca(semantico.tabela.variaveis[it->first].back().token));
 		}
 	}
 
@@ -283,19 +283,17 @@ return_stmt: RETURN SEMICOLON {
 		semantico.code.emplace_back(new Addr3::Return($2));
 	};
 
-expression: var ASSIGN open_esc aux_expression {
-		semantico.code.emplace_back(new Addr3::Atribuicao($1,$4));
-	} close_esc |  simple_expression ;	// TODO simple_expression
-
-aux_expression: var ASSIGN aux_expression {
+expression: var ASSIGN expression {
+		cout << tokenIdVal($1) << " = " << tokenStrAtt($3) << endl;
 		semantico.code.emplace_back(new Addr3::Atribuicao($1,$3));
-	
-		cout << tokenStrAtt($1) << " = " << tokenStrAtt($3) << endl;
-		$$ = $1; // para retornar o resultado da igualdade
-	} | simple_expression {
-		semantico.tempGen.reset_index();
-		$$ = $1;
-	} ;
+		$$ = $3;
+	} 
+	|  simple_expression {
+		//cout << "Resetando index" << endl;
+		//semantico.tempGen.reset_index();
+
+
+	};	// TODO simple_expression
 
 var: ID {	
 		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR);
@@ -308,10 +306,14 @@ var: ID {
 
 		$$ = semantico.tabela.obter_token(tokenIdVal($1));
 
-		Token token = semantico.tempGen.gerar();
+		pair<bool, Token> p = semantico.tempGen.obter();
+		bool criado = p.first;
+		Token token = p.second;
 
-		aloca_local(token,semantico);
-		semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+		if(criado){
+			aloca_local(token,semantico);
+			semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1, true);
+		}
 		
 		semantico.code.emplace_back(new Addr3::Adicao(token,$$,$3));	// token = $1 + $3
 		cout << tokenStrAtt(token) << " = " << tokenStrAtt($$) << " + " << tokenStrAtt($3) << endl;
@@ -326,10 +328,14 @@ var: ID {
 
 
 simple_expression: additive_expression relop additive_expression {
-	Token token = semantico.tempGen.gerar();
-	
-	aloca_local(token,semantico);
-	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+	pair<bool, Token> p = semantico.tempGen.obter();
+	bool criado = p.first;
+	Token token = p.second;
+
+	if(criado){
+		aloca_local(token,semantico);
+		semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1, true);
+	}
 	
 	if($2.tipo == LESS)
 		semantico.code.emplace_back(new Addr3::Less(token,$1,$3));
@@ -351,11 +357,15 @@ simple_expression: additive_expression relop additive_expression {
 relop: LESS | LESSEQUAL | GREATER | GREATEREQUAL | EQUAL | NOTEQUAL;
 
 additive_expression: additive_expression addop term {
-	Token token = semantico.tempGen.gerar();
+	pair<bool, Token> p = semantico.tempGen.obter();
+	bool criado = p.first;
+	Token token = p.second;
 
-	aloca_local(token,semantico);
-	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
-	
+	if(criado){
+		aloca_local(token,semantico);
+		semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1, true);
+	}
+
 	if($2.tipo == SUM)
 		semantico.code.emplace_back(new Addr3::Adicao(token,$1,$3));	// token = $1 + $3
 	else
@@ -367,10 +377,14 @@ additive_expression: additive_expression addop term {
 addop: SUM | SUB ;
 
 term: term mulop factor {
-	Token token = semantico.tempGen.gerar();
+	pair<bool, Token> p = semantico.tempGen.obter();
+	bool criado = p.first;
+	Token token = p.second;
 
-	aloca_local(token,semantico);
-	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+	if(criado){
+		aloca_local(token,semantico);
+		semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1, true);
+	}
 	
 	if($2.tipo == MUL)
 		semantico.code.emplace_back(new Addr3::Multiplicacao(token,$1,$3) );	// token = $1 * $3
@@ -382,15 +396,19 @@ term: term mulop factor {
 
 mulop: MUL | DIV ;
 
-factor: LPAREN aux_expression RPAREN {$$=$2;} | var | call | NUM ;
+factor: LPAREN expression RPAREN {$$=$2;} | var | call | NUM ;
 
 call: ID LPAREN Addr3_BeginCall args RPAREN { 
 	semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::FUNCAO);
 
-	Token token = semantico.tempGen.gerar();
+	pair<bool, Token> p = semantico.tempGen.obter();
+	bool criado = p.first;
+	Token token = p.second;
 
-	aloca_local(token,semantico);
-	semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1);
+	if(criado){
+		aloca_local(token,semantico);
+		semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1, true);
+	}
 
 	Token token_original = semantico.tabela.obter_token(tokenIdVal($1));
 

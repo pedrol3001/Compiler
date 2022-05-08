@@ -37,7 +37,7 @@ void TabelaSemantica::updateTabSim(Token t) {
 	}
 }
 
-void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza, int escopo, Token token, int tamanho){
+void TabelaSemantica::adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, Token token, int tamanho, bool usado){
 	if(existe(nome) && (*this)[nome].escopo < escopo){
 		std::cout << "Aviso: variável \"" << nome << "\" sendo substituída por variável local." << std::endl;
 		avisos_semantico++;
@@ -63,6 +63,8 @@ void TabelaSemantica::adicionar(string nome, int bison_tipo, Simb::Nat natureza,
 	}
 
 	variaveis[nome].push_back(Simb(nome, tipo, escopo, natureza, token, tamanho));
+	if(usado)
+		variaveis[nome].back().usado = true;
 	updateTabSim(token);
 	
 	//cout << "aloca " << (*this)[nome].nome << " " << (*this)[nome].tamanho << "\n";
@@ -136,11 +138,23 @@ void TabelaSemantica::mostrar_globais(){
 Token TempGenerator::gerar(){
 	TabSim &tabsim = TabSim::getInstance();
 	Token token = tabsim.insert(ID);
-	string name = "$t" + to_string(temp_index++);
+	string name = "$t" + to_string(temp_index);
 	tabsim[token].insert((Atributo*)(new IdVal(name)));
 	tabsim[token].insert((Atributo*)(new StrAtt(name)));
 	tabsim[token].insert((Atributo*)(new IsTemp));
 	return token;
+}
+
+pair<bool, Token> TempGenerator::obter(){
+	//cout << "Token requisitado. temp_index = " << temp_index << ", max_index = " << max_index << endl;
+	if(temp_index == max_index){
+		Token token = gerar();
+		max_index++, temp_index++;
+		temps.push_back(token);
+		return {true, token};
+	}
+	return {false, temps[temp_index++]};
+	
 }
 
 void TempGenerator::reset_index(){temp_index = 0;}

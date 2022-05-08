@@ -5,6 +5,7 @@
 #include <utility>
 #include <map>
 #include <list>
+#include <vector>
 #include "../../Token/Token.h"
 #include "../../TabelaDeSimbolos/TabelaDeSimbolos.h"
 
@@ -44,7 +45,7 @@ struct TabelaSemantica {
 
 	TabelaSemantica();
 
-	void adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, Token token, int tamanho);	// int tipo => bison.h
+	void adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, Token token, int tamanho, bool usado = false);	// int tipo => bison.h
 	bool verificar(std::string nome, Simb::Nat natureza);
 	void remover();
 	void mostrar_globais();
@@ -62,8 +63,10 @@ struct TabelaSemantica {
 };
 
 struct TempGenerator{
-	int temp_index = 0;
+	int temp_index = 0, max_index = 0;
+	std::vector<Token> temps;
 	Token gerar();
+	std::pair<bool, Token> obter();
 	void reset_index();
 };
 
