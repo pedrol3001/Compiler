@@ -140,11 +140,15 @@ void aloca_local(Token token, Semantico &semantico) {
 %%
 
 program: {
-	pair<bool, Token> p = semantico.tempGen.obter();
-	condtoken = p.second;
 
-	aloca_local(condtoken,semantico);
+	condtoken = tabsim.insert(ID);
+	string name = "$cond";
+	tabsim[condtoken].insert((Atributo*)(new IdVal(name)));
+	tabsim[condtoken].insert((Atributo*)(new StrAtt(name)));
+
+	aloca_global(condtoken,semantico);
 	semantico.tabela.adicionar(tokenIdVal(condtoken), INT, Simb::Nat::ARRAY, semantico.escopo, condtoken, 1, true);
+
 	} declaration_list {
 	list<shared_ptr<Addr3::Instrucao> > init_code;
 	init_code.emplace_back(new Addr3::SetGlobal);
@@ -185,8 +189,9 @@ var_declaration: type_specifier ID SEMICOLON {
 type_specifier: INT | VOID ;
 
 fun_declaration: type_specifier ID {
+		aloca_global($2, semantico);
 		cout << tokenStrAtt($1) << " " << tokenStrAtt($2) << "()" << endl;
-		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, $2, 1);
+		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, $2, 1, true);
 	} LPAREN open_esc params RPAREN compound_stmt close_esc ;
 
 open_esc: %empty { cout << "// abrindo escopo" << endl; semantico.escopo++; } ;
