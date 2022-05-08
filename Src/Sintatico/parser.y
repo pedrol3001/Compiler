@@ -259,8 +259,8 @@ selection_stmt: IF LPAREN condition RPAREN statement {
 		semantico.code.emplace_back(new Addr3::Label($3));
 	}
 	statement {
-		cout << "LABEL " << tokenStrAtt($6) << endl;
-		semantico.code.emplace_back(new Addr3::Label($6));
+		cout << "LABEL " << tokenStrAtt($7) << endl;
+		semantico.code.emplace_back(new Addr3::Label($7));
 	};
 
 condition: open_esc expression {

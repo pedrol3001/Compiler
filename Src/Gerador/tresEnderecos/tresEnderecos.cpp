@@ -157,7 +157,7 @@ Read::Read(Token _op): op(_op), Instrucao("Read",_op) {}
 
 list<shared_ptr<Assembly> > Print::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	code.emplace_back(new TM::Comentario("Print " + TabSim::getInstance()[op].getAtt<IdVal>("IdVal")->val));
+	code.emplace_back(new TM::Comentario("Print " + TabSim::getInstance()[op].getAtt<StrAtt>("StrAtt")->str));
 	
 	// Carrega operando	
 	loadReg(code,op,TM::t0,offsets[0]);
