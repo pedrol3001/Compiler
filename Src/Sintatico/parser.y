@@ -40,14 +40,13 @@ long long int tokenIntVal(Token t){
 
 void aloca_global(Token token, Semantico &semantico) {
 	cout<< "Aloca global " << tokenIdVal(token) << endl;
-	semantico.code.emplace_back(new Addr3::AlocaGlobal(token));
+	semantico.init_code.emplace_back(new Addr3::AlocaGlobal(token));
 }
 
 void aloca_local(Token token, Semantico &semantico) {
 	cout<< "Aloca local " << tokenIdVal(token) << endl;
 	semantico.code.emplace_back(new Addr3::Aloca(token));
 }
-	
 	
 %}
 
@@ -140,6 +139,7 @@ void aloca_local(Token token, Semantico &semantico) {
 %%
 
 program: {
+	semantico.init_code.emplace_back(new Addr3::SetGlobal);
 
 	condtoken = tabsim.insert(ID);
 	string name = "$cond";
@@ -150,8 +150,6 @@ program: {
 	semantico.tabela.adicionar(tokenIdVal(condtoken), INT, Simb::Nat::ARRAY, semantico.escopo, condtoken, 1, true);
 
 	} declaration_list {
-	list<shared_ptr<Addr3::Instrucao> > init_code;
-	init_code.emplace_back(new Addr3::SetGlobal);
 	
 	/*for(auto const& [key, val] : semantico.tabela.variaveis) {
 		cout<< "AlocaGlobal " << key << endl;
@@ -160,14 +158,14 @@ program: {
 		init_code.emplace_back(new Addr3::AlocaGlobal(semantico.tabela[key].token));
 	}*/
 	
-	init_code.emplace_back(new Addr3::SetLocal);
+	semantico.init_code.emplace_back(new Addr3::SetLocal);
 
 	semantico.tabela.mostrar_globais();
 
 	cout << "Resultado do analisador semântico: ";
 	cout << semantico.tabela.erros_semantico << " erro(s), " << semantico.tabela.avisos_semantico << " aviso(s)." << endl;
 
-	semantico.code.insert(semantico.code.begin(),init_code.begin(), init_code.end());
+	semantico.code.insert(semantico.code.begin(),semantico.init_code.begin(), semantico.init_code.end());
 	semantico.analisar();	// Setar como ok
 };
 
@@ -176,12 +174,20 @@ declaration_list: declaration_list declaration | declaration ;
 declaration: var_declaration | fun_declaration ;
 
 var_declaration: type_specifier ID SEMICOLON {
-		aloca_local($2,semantico);
+		if(semantico.escopo==GLOBAL)
+			aloca_global($2,semantico);
+		else
+			aloca_local($2,semantico);
+			
 		cout << tokenStrAtt($1) << " " << tokenStrAtt($2) << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, $2, 1);
 
 	} | type_specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
-		aloca_local($2,semantico);
+		if(semantico.escopo==GLOBAL)
+			aloca_global($2,semantico);
+		else
+			aloca_local($2,semantico);
+			
 		cout << tokenStrAtt($1) << " " << tokenStrAtt($2) << "[" << tokenStrAtt($4) << "]" << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, $2, tokenIntVal($4));
 	};

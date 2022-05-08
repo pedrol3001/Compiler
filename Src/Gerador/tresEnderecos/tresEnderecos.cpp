@@ -172,7 +172,8 @@ Print::Print(Token _op): op(_op), Instrucao("Print",_op) {}
 list<shared_ptr<Assembly> > AlocaGlobal::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	code.emplace_back(new TM::Comentario("AlocaGlobal"));
-	int space = 1;	// normalmente, deveria ser extraido de Token op
+	assert(Addr3ts[op].has("VarGlobal"));
+	int space = ((VarGlobal*)Addr3ts[op]["VarGlobal"])->size;
 	alocar(code,space,TM::t0,TM::gp);		
 	return code;
 }	
@@ -189,7 +190,8 @@ void AlocaGlobal::acao(Corretor& corretor) {
 list<shared_ptr<Assembly> > Aloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	code.emplace_back(new TM::Comentario("Aloca"));
-	int space = 1;	// normalmente, deveria ser extraido de Token op
+	assert(Addr3ts[op].has("VarLocal"));
+	int space = ((VarLocal*)Addr3ts[op]["VarLocal"])->size;
 	alocar(code,space,TM::t0,TM::sp);		
 	return code;
 }	
@@ -206,7 +208,8 @@ void Aloca::acao(Corretor& corretor) {
 list<shared_ptr<Assembly> > Desaloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	code.emplace_back(new TM::Comentario("Desaloca"));
-	int space = 1;	// normalmente, deveria ser extraido de Token op
+	assert(Addr3ts[op].has("VarLocal"));
+	int space = ((VarLocal*)Addr3ts[op]["VarLocal"])->size;
 	desalocar(code,space,TM::t0,TM::sp);		
 	return code;
 }	

@@ -24,6 +24,9 @@ struct Semantico {
 	int &escopo;
 	
 	std::list<std::shared_ptr<Addr3::Instrucao> > code;
+	
+	public:
+		std::list<std::shared_ptr<Addr3::Instrucao> > init_code;	
 	private:
 		void gerarIntermediario();
 		bool ok=false;
