@@ -70,6 +70,12 @@ namespace Addr3{
 
 	// Declaracoes ==================================
 
+	struct BeginArray: public Instrucao {	
+		Token op;			
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		BeginArray(Token _op); 
+	};
+
 	struct AlocaGlobal: public Instrucao {	
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	

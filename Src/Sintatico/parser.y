@@ -182,14 +182,14 @@ var_declaration: type_specifier ID SEMICOLON {
 		cout << tokenStrAtt($1) << " " << tokenStrAtt($2) << endl;
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, $2, 1);
 
-	} | type_specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
+	} | type_specifier ID LBRACKET C_INT RBRACKET SEMICOLON {	
 		if(semantico.escopo==GLOBAL)
 			aloca_global($2,semantico);
 		else
 			aloca_local($2,semantico);
 			
 		cout << tokenStrAtt($1) << " " << tokenStrAtt($2) << "[" << tokenStrAtt($4) << "]" << endl;
-		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, $2, tokenIntVal($4));
+		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, $2, tokenIntVal($4)+1);
 	};
 
 type_specifier: INT | VOID ;
