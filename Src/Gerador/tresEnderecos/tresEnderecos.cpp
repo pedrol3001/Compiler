@@ -169,6 +169,7 @@ list<shared_ptr<Assembly> > Print::gera_codigo() {
 Print::Print(Token _op): op(_op), Instrucao("Print",_op) {}
 
 // Declaracao ==================================
+
 list<shared_ptr<Assembly> > AlocaGlobal::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	code.emplace_back(new TM::Comentario("AlocaGlobal"));
