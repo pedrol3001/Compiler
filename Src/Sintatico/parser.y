@@ -141,12 +141,13 @@ program: declaration_list {
 	list<shared_ptr<Addr3::Instrucao> > init_code;
 	init_code.emplace_back(new Addr3::SetGlobal);
 	
-	for(auto const& [key, val] : semantico.tabela.variaveis) {
+	/*for(auto const& [key, val] : semantico.tabela.variaveis) {
 		cout<< "AlocaGlobal " << key << endl;
-		// aloca_global();
-		//assert(semantico.tabela.existe(key));
-		//init_code.emplace_back(new Addr3::AlocaGlobal(semantico.tabela[key].token));
-	}
+		aloca_global();
+		assert(semantico.tabela.existe(key));
+		init_code.emplace_back(new Addr3::AlocaGlobal(semantico.tabela[key].token));
+	}*/
+	
 	init_code.emplace_back(new Addr3::SetLocal);
 
 	semantico.tabela.mostrar_globais();
