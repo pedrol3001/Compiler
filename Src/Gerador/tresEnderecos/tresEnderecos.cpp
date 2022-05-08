@@ -454,7 +454,7 @@ list<shared_ptr<Assembly> > Call::gera_codigo() {
 	code.emplace_back(new TM::Comentario("Call"));
 	/*
 	// Configurar ra
-	code.emplace_back(new TM::LDA(TM::ra,3,TM::pc));	// LA ra,3(pc)
+	code.emplace_back(new TM::LDA(TM::ra,2,TM::pc));	// LA ra,2(pc) (pc+1) +1
 	// TODO: Configura destino do salto
 	//assert(ts[funcao].has("Label")) 
 	//long int offset_jump = ((Label*)ts[op]["Label"])->offset();
@@ -486,13 +486,8 @@ Return::Return(): Instrucao("Return") {}
 
 list<shared_ptr<Assembly> > Goto::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	code.emplace_back(new TM::Comentario("Goto " + showToken(label)));
-	/*
-	
-	// Carregar constante
-	code.emplace_back(new TM::LDC(TM::t0,0,TM::t0));		// LDC t0,0(t0)	
-	code.emplace_back(new TM::JEQ(TM::t0,distancia,TM::pc));	// JEQ t0,distancia(pc)
-	*/
+	code.emplace_back(new TM::Comentario("Goto " + showToken(label)));	
+	code.emplace_back(new TM::RJEQ(TM::zero,label));	// JEQ t0,distancia-1(pc)
 	return code;
 }
 Goto::Goto(Token _label): Code::Goto(_label), Instrucao("Goto",_label) {}
