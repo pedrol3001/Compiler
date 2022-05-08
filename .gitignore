@@ -31,3 +31,8 @@ bison.h
 
 */*programa.tm
 *programa.tm
+
+*.tm
+*/*.tm
+
+tm

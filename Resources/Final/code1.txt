@@ -1,0 +1,16 @@
+int main(void) {
+	int a;
+	int b;
+	a = 2;
+	{
+		int c;
+		c=2;
+		b = (2 + 2)*5;
+		c = b==20;
+		output c;
+		c = b<0;
+		output c;
+	}
+	output a;
+	output b;
+}
