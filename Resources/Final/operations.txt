@@ -1,0 +1,16 @@
+int main(void) {
+	int a;
+	input a;
+	/* booleanas */
+	output a<2;
+	output a<=2;
+	output a>=2;
+	output a>2;
+	output a==2;
+	output a!=2;
+	/* aritmeticas */
+	output a+2;
+	output a*2;
+	output a/2;
+	output a-2;
+}

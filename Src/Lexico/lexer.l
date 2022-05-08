@@ -126,7 +126,7 @@ Space [\n\t \r]
 	ts[token].insert((Atributo*)(new StringVal(getToken())));
 }
 
-"/*"[^*]*"*"+([^/][^*]*"*"+)*"/" { match("Comentario", COMMENT);}
+"/*"[^*]*"*"+([^/][^*]*"*"+)*"/" { if(verbose) fprintf(yyout," [%s] ",yytext);} // Util para debug}
 
 {Space}* {}
 

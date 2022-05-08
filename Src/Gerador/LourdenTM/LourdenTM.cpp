@@ -66,7 +66,7 @@ tipoRM::~tipoRM() {}
 tipoRM_Relativo::tipoRM_Relativo(std::string _nome, Reg _r1, Token _label): Instrucao(_nome), r1(_r1), Code::Goto(_label) {}
 std::string tipoRM_Relativo::InstStr() {
 	stringstream ss;
-	long long int distance = readRef()-getLinha();		// Distancia ate a label
+	long long int distance = readRef()-getLinha()-1;		// Distancia ate a label
 	ss << r1 << ',' << distance << '(' << TM::pc << ')';	// opcode r1,distance(pc)
 	return ss.str();
 }

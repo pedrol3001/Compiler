@@ -238,9 +238,9 @@ std::list<std::shared_ptr<Assembly> > Less::gera_codigo() {
 	loadReg(code,ops[1],TM::t0,offsets[1]);
 	loadReg(code,ops[2],TM::t1,offsets[2]);
 	code.emplace_back(new TM::SUB(TM::t2,TM::t0,TM::t1));	// SUB t2,t0,t1	// t2 = t0-t1 (t0?t1 -> t0-t1?0)
-	code.emplace_back(new TM::LDC(TM::t0,0,TM::zero));	// t0 = 0 = false
-	code.emplace_back(new TM::JLT(TM::t2,2,TM::pc));	// if t2<0 goto pc+2
 	code.emplace_back(new TM::LDC(TM::t0,1,TM::zero));	// t0 = 1 = true
+	code.emplace_back(new TM::JLT(TM::t2,1,TM::pc));	// if t2<0 goto (pc+1)+1
+	code.emplace_back(new TM::LDC(TM::t0,0,TM::zero));	// t0 = 0 = false
 	// Armazena valor obtido em t0 no destino
 	storeReg(code,dst,TM::t0,offsets[0]);
 	
@@ -256,9 +256,9 @@ std::list<std::shared_ptr<Assembly> > LessEqual::gera_codigo(){
 	loadReg(code,ops[1],TM::t0,offsets[1]);
 	loadReg(code,ops[2],TM::t1,offsets[2]);
 	code.emplace_back(new TM::SUB(TM::t2,TM::t0,TM::t1));	// SUB t2,t0,t1	// t2 = t0-t1 (t0?t1 -> t0-t1?0)
-	code.emplace_back(new TM::LDC(TM::t0,0,TM::zero));	// t0 = 0 = false
-	code.emplace_back(new TM::JLE(TM::t2,2,TM::pc));		// if t2<=0 goto pc+2
 	code.emplace_back(new TM::LDC(TM::t0,1,TM::zero));	// t0 = 1 = true
+	code.emplace_back(new TM::JLE(TM::t2,1,TM::pc));	// if t2<=0 goto (pc+1)+1
+	code.emplace_back(new TM::LDC(TM::t0,0,TM::zero));	// t0 = 0 = false
 	// Armazena valor obtido em t0 no destino
 	storeReg(code,dst,TM::t0,offsets[0]);
 	
@@ -274,9 +274,9 @@ std::list<std::shared_ptr<Assembly> > Equal::gera_codigo(){
 	loadReg(code,ops[1],TM::t0,offsets[1]);
 	loadReg(code,ops[2],TM::t1,offsets[2]);
 	code.emplace_back(new TM::SUB(TM::t2,TM::t0,TM::t1));	// SUB t2,t0,t1	// t2 = t0-t1 (t0?t1 -> t0-t1?0)
-	code.emplace_back(new TM::LDC(TM::t0,0,TM::zero));	// t0 = 0 = false
-	code.emplace_back(new TM::JEQ(TM::t2,2,TM::pc));		// if t2==0 goto pc+2
 	code.emplace_back(new TM::LDC(TM::t0,1,TM::zero));	// t0 = 1 = true
+	code.emplace_back(new TM::JEQ(TM::t2,1,TM::pc));	// if t2==0 goto (pc+1)+1
+	code.emplace_back(new TM::LDC(TM::t0,0,TM::zero));	// t0 = 0 = false
 	// Armazena valor obtido em t0 no destino
 	storeReg(code,dst,TM::t0,offsets[0]);
 	
@@ -286,14 +286,14 @@ Equal::Equal(Token _dst, Token _op1, Token _op2): Operacao("Equal",_dst,_op1,_op
 	
 std::list<std::shared_ptr<Assembly> > NotEqual::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	code.emplace_back(new TM::Comentario("Equal"));
+	code.emplace_back(new TM::Comentario("NotEqual"));
 	// Carregar operandos (op[0], op[1])
 	loadReg(code,ops[1],TM::t0,offsets[1]);
 	loadReg(code,ops[2],TM::t1,offsets[2]);
 	code.emplace_back(new TM::SUB(TM::t2,TM::t0,TM::t1));	// SUB t2,t0,t1	// t2 = t0-t1 (t0?t1 -> t0-t1?0)
-	code.emplace_back(new TM::LDC(TM::t0,0,TM::zero));	// t0 = 0 = false
-	code.emplace_back(new TM::JNE(TM::t2,2,TM::pc));		// if t2!=0 goto pc+2
 	code.emplace_back(new TM::LDC(TM::t0,1,TM::zero));	// t0 = 1 = true
+	code.emplace_back(new TM::JNE(TM::t2,1,TM::pc));	// if t2!=0 goto (pc+1)+1
+	code.emplace_back(new TM::LDC(TM::t0,0,TM::zero));	// t0 = 0 = false
 	// Armazena valor obtido em t0 no destino
 	storeReg(code,dst,TM::t0,offsets[0]);
 	
