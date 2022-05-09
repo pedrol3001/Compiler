@@ -4,6 +4,11 @@ int fat(void) {
 }
 
 int main(void) {
-	output fat();
+	int a;
+	input a;
+	while(a!=0) {
+		output fat();
+		input a;
+	}
 	return 1;
 }

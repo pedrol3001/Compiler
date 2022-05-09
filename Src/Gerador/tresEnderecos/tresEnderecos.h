@@ -55,6 +55,11 @@ namespace Addr3{
 		SetLocal(); 	
 	};
 	
+	struct SetArray: public Instrucao {	
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		SetArray(); 
+	};
+	
 	
 	// Input/output =================================
 	
@@ -154,7 +159,7 @@ namespace Addr3{
 	};
 	struct StoreInRef: public Instrucao {	// *x = y
 		Token src, pointer;
-		StoreInRef(Token _src, Token _pointer);
+		StoreInRef(Token _pointer, Token _src);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
 	// Chamada de funcao============================
@@ -176,6 +181,13 @@ namespace Addr3{
 	struct Call: public Instrucao {		// Call function;
 		Token funcao;		
 		Call(Token _funcao);
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		void acao(Corretor& corretor);
+	};
+	
+	struct InitialCall: public Instrucao {		// Call function;
+		Token funcao;		
+		InitialCall(Token _funcao);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 		void acao(Corretor& corretor);
 	};

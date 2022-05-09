@@ -15,5 +15,6 @@ void Variavel::setOffset(long int pointer) {offset_=pointer-distance;}
 
 
 VarLocal::VarLocal(int _size): Variavel("VarLocal",_size) {}
+long int VarLocal::offset() {return offset_+1;}
 
 VarGlobal::VarGlobal(int _size): Variavel("VarGlobal",_size) {}

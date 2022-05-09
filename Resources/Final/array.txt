@@ -1,7 +1,8 @@
 int main(void) {
-	int a[2];
+	int a[3];
 	input a[0];
 	input a[1];
-	output a[0]*a[1];
+	input a[2];
+	output a[0]*a[1]*a[2];
 	return 0;
 }

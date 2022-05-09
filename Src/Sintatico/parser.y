@@ -193,11 +193,14 @@ var_declaration: type_specifier ID SEMICOLON {
 		semantico.pseudoassembly.emplace_back("declarar " + tokenStrAtt($1) + " " + tokenStrAtt($2));
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::VAR, semantico.escopo, $2, 1);
 
-	} | type_specifier ID LBRACKET C_INT RBRACKET SEMICOLON {	
+	} | type_specifier ID LBRACKET C_INT RBRACKET SEMICOLON {
+		
 		if(semantico.escopo==GLOBAL)
 			aloca_global($2,semantico);
 		else
 			aloca_local($2,semantico);
+			
+		semantico.code.emplace_back(new Addr3::SetArray);
 			
 		semantico.pseudoassembly.emplace_back("declarar " + tokenStrAtt($1) + " " + tokenStrAtt($2) + "[" + tokenStrAtt($4) + "]");
 		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo, Simb::Nat::ARRAY, semantico.escopo, $2, tokenIntVal($4)+1);
@@ -504,7 +507,7 @@ mulop: MUL | DIV ;
 
 factor: LPAREN expression RPAREN {$$=$2;} | var | call | NUM ;
 
-call: ID LPAREN Addr3_BeginCall args RPAREN { 
+call: ID LPAREN args RPAREN { 
 	semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::FUNCAO);
 
 	Token token_original = semantico.tabela.obter_token(tokenIdVal($1));
@@ -514,11 +517,6 @@ call: ID LPAREN Addr3_BeginCall args RPAREN {
 
 	$$ = TokenGlobal;
 };
-
-Addr3_BeginCall: %empty { 
-	semantico.pseudoassembly.emplace_back("begin call");
-	semantico.code.emplace_back(new Addr3::SalvaRA);
-} ;
 
 args: arg_list | %empty ;
 

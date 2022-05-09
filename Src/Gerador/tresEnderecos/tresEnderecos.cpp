@@ -9,7 +9,6 @@
 using namespace Addr3;
 using namespace std;
 
-
 TabSim& Addr3ts =TabSim::getInstance();
 
 string showToken(Token t) {
@@ -142,11 +141,21 @@ list<shared_ptr<Assembly> > SetLocal::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
 	code.emplace_back(new TM::Comentario("SetLocal"));
 	// Configura ponteiro de pilha para ser apos gp
-	code.emplace_back(new TM::LDA(TM::sp,-1,TM::gp)); // LDA sp,-1(gp)    # Pilha começa após variáveis globais
+	code.emplace_back(new TM::LDA(TM::sp,0,TM::gp)); // LDA sp,0(gp)    # Pilha começa após variáveis globais
 
 	return code;
 }
 SetLocal::SetLocal(): Instrucao("SetLocal") {}
+
+
+std::list<std::shared_ptr<Assembly> > SetArray::gera_codigo() {
+	list<shared_ptr<Assembly> >  code;
+	code.emplace_back(new TM::Comentario("SetArray"));
+	code.emplace_back(new TM::LDA(TM::t0,2,TM::sp)); 	// LDA t0,2(sp)    # Configurar ponteiro de array
+	code.emplace_back(new TM::ST(TM::t0,1,TM::sp)); 	// ST t0,1(sp)    # Salvar ponteiro de array
+	return code;
+}
+SetArray::SetArray(): Instrucao("SetArray") {}
 
 // Input/output =================================
 	
@@ -189,10 +198,10 @@ list<shared_ptr<Assembly> > AlocaGlobal::gera_codigo() {
 AlocaGlobal::AlocaGlobal(Token _op): op(_op), Instrucao("AlocaGlobal",_op) {}
 void AlocaGlobal::acao(Corretor& corretor) {
 	assert(Addr3ts[op].has("VarGlobal"));
-	// Configurar distancia da variavel
-	Addr3ts[op].getAtt<VarGlobal>("VarGlobal")->setDist(corretor.sp);
 	// Incrementar gp
 	corretor.gp += Addr3ts[op].getAtt<VarGlobal>("VarGlobal")->size;
+	// Configurar distancia da variavel
+	Addr3ts[op].getAtt<VarGlobal>("VarGlobal")->setDist(corretor.gp-1);
 }
 
 list<shared_ptr<Assembly> > Aloca::gera_codigo() {
@@ -207,10 +216,10 @@ list<shared_ptr<Assembly> > Aloca::gera_codigo() {
 Aloca::Aloca(Token _op): op(_op), Instrucao("Aloca",_op) {}
 void Aloca::acao(Corretor& corretor) {
 	assert(Addr3ts[op].has("VarLocal"));
-	// Configurar distancia da variavel
-	Addr3ts[op].getAtt<VarLocal>("VarLocal")->setDist(corretor.sp);
 	// Incrementar sp
 	corretor.sp += Addr3ts[op].getAtt<VarLocal>("VarLocal")->size;
+	// Configurar distancia da variavel
+	Addr3ts[op].getAtt<VarLocal>("VarLocal")->setDist(corretor.sp-1);
 }
 
 list<shared_ptr<Assembly> > Desaloca::gera_codigo() {
@@ -227,6 +236,7 @@ void Desaloca::acao(Corretor& corretor) {
 	// Decrementar sp
 	corretor.sp -= Addr3ts[op].getAtt<VarLocal>("VarLocal")->size;
 }
+
 
 // Operacao ====================================
 Operacao::~Operacao() {}
@@ -416,15 +426,15 @@ std::list<std::shared_ptr<Assembly> > LoadFromRef::gera_codigo() {
 	return code;
 }	
 
-StoreInRef::StoreInRef(Token _src, Token _pointer): Instrucao("RefStore",_src,_pointer),src(_src),pointer(_pointer) {}
+StoreInRef::StoreInRef(Token _pointer, Token _src): Instrucao("RefStore",_pointer,_src),src(_src),pointer(_pointer) {}
 
 std::list<std::shared_ptr<Assembly> > StoreInRef::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
 	code.emplace_back(new TM::Comentario("StoreInRef"));
 	// Carrega ponteiro
-	loadReg(code,pointer,TM::t0,offsets[1]);
+	loadReg(code,pointer,TM::t0,offsets[0]);
 	// Carrega operando src
-	loadReg(code,src,TM::t1,offsets[0]);
+	loadReg(code,src,TM::t1,offsets[1]);
 	// Armazena no ponteiro
 	code.emplace_back(new TM::ST(TM::t1,0,TM::t0));	// ST t1,0(t0)
 	
@@ -444,7 +454,6 @@ std::list<std::shared_ptr<Assembly> > SalvaRA::gera_codigo() {
 }
 SalvaRA::SalvaRA(): Instrucao("SalvaRA") {}
 void SalvaRA::acao(Corretor& corretor) {
-	Instrucao::acao(corretor);
 	corretor.param=0;
 }
 
@@ -468,6 +477,31 @@ void Param::acao(Corretor& corretor) {
 list<shared_ptr<Assembly> > Call::gera_codigo() {
 	list<shared_ptr<Assembly> > code;	
 	code.emplace_back(new TM::Comentario("Call"));
+	// Aloca espaco para ra
+	alocar(code,1,TM::t0,TM::sp);
+	// Salva ra
+	code.emplace_back(new TM::ST(TM::ra,1,TM::sp));	// ST ra,1(sp)
+	// Configurar ra
+	code.emplace_back(new TM::LDA(TM::ra,2,TM::pc));	// LA ra,2(pc) (pc+1) +2
+	// Carrega endereco do salto
+	loadReg(code,funcao,TM::t0,offsets[0]);				
+	// Realiza salto
+	code.emplace_back(new TM::JEQ(TM::zero,0,TM::t0));	// JEQ zero,0(t0)
+	// Recupera ra
+	code.emplace_back(new TM::LD(TM::ra,1,TM::sp));	// LD ra,1(sp)
+	// Desaloca espaco do ra
+	desalocar(code,1,TM::t0,TM::sp);
+	return code;
+}
+Call::Call(Token _funcao): funcao(_funcao), Instrucao("Call",_funcao) {}
+void Call::acao(Corretor& corretor) {
+	Instrucao::acao(corretor);
+	corretor.param=0;
+}
+
+list<shared_ptr<Assembly> > InitialCall::gera_codigo() {
+	list<shared_ptr<Assembly> > code;	
+	code.emplace_back(new TM::Comentario("InitialCall"));
 	// Configurar ra
 	code.emplace_back(new TM::LDA(TM::ra,2,TM::pc));	// LA ra,2(pc) (pc+1) +2
 	// Carrega endereco do salto
@@ -476,8 +510,8 @@ list<shared_ptr<Assembly> > Call::gera_codigo() {
 	code.emplace_back(new TM::JEQ(TM::zero,0,TM::t0));	// JEQ zero,0(t0)
 	return code;
 }
-Call::Call(Token _funcao): funcao(_funcao), Instrucao("Call",_funcao) {}
-void Call::acao(Corretor& corretor) {
+InitialCall::InitialCall(Token _funcao): funcao(_funcao), Instrucao("InitialCall",_funcao) {}
+void InitialCall::acao(Corretor& corretor) {
 	Instrucao::acao(corretor);
 	corretor.param=0;
 }

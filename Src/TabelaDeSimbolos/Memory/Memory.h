@@ -13,7 +13,7 @@ struct Variavel: public Atributo {
 	
 	void setDist(long int _distance);
 	void setOffset(long int pointer);
-	long int offset();
+	virtual long int offset();
 	
 	public:
 		long int offset_=0;
@@ -23,6 +23,7 @@ struct Variavel: public Atributo {
 
 struct VarLocal: public Variavel {	// Variaveis estaticas
 	VarLocal(int _size);	// space = 
+	long int offset();
 };
 
 struct VarGlobal: public Variavel {	// Variaveis globais
