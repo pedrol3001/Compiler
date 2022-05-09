@@ -60,13 +60,13 @@ void loadReg(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg, long int o
 	
 	if(ts[op].has("IntVal")) {
 		long long int imm =  ((IntVal*)ts[op]["IntVal"])->val;
-		code.emplace_back(new TM::LDC(reg,imm,TM::zero));			// loadl: LDC reg,val(zero) 
+		code.emplace_back(new TM::LDC(reg,imm,TM::zero));	// loadl: LDC reg,val(zero) 
 	}
 	if(ts[op].has("VarGlobal")) {
-		code.emplace_back(new TM::LD(reg,offset,TM::gp));			// loadl: LD reg,-offset(gp)
+		code.emplace_back(new TM::LD(reg,offset,TM::gp));	// loadl: LD reg,-offset(gp)
 	}
 	if(ts[op].has("VarLocal")) {
-		code.emplace_back(new TM::LD(reg,offset,TM::sp));			// loadl: LD reg,-offset(sp)
+		code.emplace_back(new TM::LD(reg,offset,TM::sp));	// loadl: LD reg,-offset(sp)
 	}
 	if(ts[op].has("LabelVal")) {
 		code.emplace_back(new TM::LoadLabel(reg,op));		// loadl: LD reg,LABEL(zero)
@@ -426,64 +426,59 @@ std::list<std::shared_ptr<Assembly> > StoreInRef::gera_codigo() {
 
 
 // Chamada de funcao============================
-std::list<std::shared_ptr<Assembly> > BeginCall::gera_codigo() {
+std::list<std::shared_ptr<Assembly> > SalvaRA::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
-	code.emplace_back(new TM::Comentario("BeginCall"));
+	code.emplace_back(new TM::Comentario("SalvaRA"));
 	// Aloca espaco para guardar o ra na pilha
 	alocar(code,1,TM::t0,TM::sp);
 	// Guarda ra na pilha
 	code.emplace_back(new TM::ST(TM::ra,1,TM::sp)); // ST ra,1(sp)
-		
 	return code;
 }
-BeginCall::BeginCall(): Instrucao("BeginCall") {}
+SalvaRA::SalvaRA(): Instrucao("SalvaRA") {}
+void SalvaRA::acao(Corretor& corretor) {
+	corretor.param=0;
+}
 
 
 std::list<std::shared_ptr<Assembly> > Param::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
 	code.emplace_back(new TM::Comentario("Param"));
-	// Aloca espaco para guardar o argumento na pilha
-	int space = 1;	// normalmente, deveria ser extraido de Token op
-	alocar(code,space,TM::t0,TM::sp);
-	// Guarda argumento na pilha
-	storeReg(code,parametro,TM::sp,offsets[0]);		
+	// Carrega operando
+	loadReg(code,parametro,TM::t0,offsets[0]);		
+	// Guarda operando alem da pilha
+	code.emplace_back(new TM::ST(TM::t0,param_offset,TM::sp));
 	return code;
 }
 Param::Param(Token _parametro): parametro(_parametro), Instrucao("Param",_parametro) {}
+void Param::acao(Corretor& corretor) {
+	param_offset = corretor.param--;
+}
 
 
 list<shared_ptr<Assembly> > Call::gera_codigo() {
-		
 	list<shared_ptr<Assembly> > code;	
 	code.emplace_back(new TM::Comentario("Call"));
-	/*
 	// Configurar ra
-	code.emplace_back(new TM::LDA(TM::ra,2,TM::pc));	// LA ra,2(pc) (pc+1) +1
-	// TODO: Configura destino do salto
-	//assert(ts[funcao].has("Label")) 
-	//long int offset_jump = ((Label*)ts[op]["Label"])->offset();
-	//code.emplace_back(new TM::LD(reg,offset_jump,TM::gp));				// ST reg,offset_jump(sp)
+	code.emplace_back(new TM::LDA(TM::ra,2,TM::pc));	// LA ra,2(pc) (pc+1) +2
+	// Carrega endereco do salto
+	loadReg(code,funcao,TM::t0,offsets[0]);				
 	// Realiza salto
 	code.emplace_back(new TM::JEQ(TM::zero,0,TM::t0));	// JEQ zero,0(t0)
-	*/
-	
 	return code;
 }
-Call::Call(Token _ret, Token _funcao): ret(_ret), funcao(_funcao), Instrucao("Call",_ret,_funcao) {}
+Call::Call(Token _funcao): funcao(_funcao), Instrucao("Call",_funcao) {}
+void Call::acao(Corretor& corretor) {
+	corretor.param=0;
+}
 
 	
 list<shared_ptr<Assembly> > Return::gera_codigo() {
-		
 	list<shared_ptr<Assembly> > code;	
 	code.emplace_back(new TM::Comentario("Return"));
-	if(has_value) {
-	
-	}
-	// retornar para ra, empilhando retorno
-
+	code.emplace_back(new TM::JEQ(TM::zero,0,TM::ra));	// JEQ 0,0(ra)
 	return code;
 }	
-Return::Return(Token _ret): ret(_ret), Instrucao("Return",_ret) {has_value=true;}
 Return::Return(): Instrucao("Return") {}
 
 // Saltos ======================================
@@ -525,4 +520,12 @@ std::list<std::shared_ptr<Assembly> > Comentario::gera_codigo() {
 	return code;
 }
 Comentario::Comentario(std::string _str): Instrucao("Comentario",true), str(_str) {}
+
+
+std::list<std::shared_ptr<Assembly> > Exit::gera_codigo() {
+	list<shared_ptr<Assembly> > code;
+	code.emplace_back(new TM::HALT(TM::zero,TM::zero,TM::zero));		// HALT 0,0,0
+	return code;
+}
+Exit::Exit(): Instrucao("Exit") {}
 
