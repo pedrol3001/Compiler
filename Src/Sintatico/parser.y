@@ -139,7 +139,6 @@ void aloca_local(Token token, Semantico &semantico) {
 %%
 
 program: {
-	semantico.pseudoassembly.emplace_back("SetGlobal");
 	semantico.init_code.emplace_back(new Addr3::SetGlobal);
 
 	TokenGlobal = tabsim.insert(ID);
@@ -157,24 +156,20 @@ program: {
 		//semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, $2, 1, true);
 
 	for(auto &p : semantico.tabela.funcoes){
-		Token tipo = p.first.first, id = p.first.second, label = p.second;
-		aloca_global(id, semantico);
-		semantico.pseudoassembly.emplace_back("declarar " + tokenStrAtt(tipo) + " " + tokenStrAtt(id) + "()");
-		semantico.tabela.adicionar(tokenIdVal(id), tipo.tipo,  Simb::Nat::FUNCAO, semantico.escopo, id, 1, true);
-	
-		semantico.pseudoassembly.emplace_back(tokenIdVal(id) + " = " + tokenStrAtt(label));
-		semantico.code.emplace_back(new Addr3::Atribuicao(id,label));
+		Token token = p.first, label = p.second;
+		aloca_global(token, semantico);
+		semantico.init_code.emplace_back(new Addr3::Atribuicao(token,label));
 
 	}
 
-	semantico.pseudoassembly.emplace_back("SetLocal");
 	semantico.init_code.emplace_back(new Addr3::SetLocal);
 
 	if(semantico.tabela.variaveis.find("main") != semantico.tabela.variaveis.end()) {
-		Token main_function = semantico.tabela.variaveis["main"].back();
+		Token main_function = semantico.tabela.variaveis["main"].back().token;
 		semantico.code.emplace_back(new Addr3::Call(main_function));
 	}
-	semantico.code.emplace_back(new Addr3::Halt());
+	
+	semantico.code.emplace_back(new Addr3::Exit());
 
 	semantico.tabela.salvar_globais(semantico.pseudoassembly);
 
@@ -215,11 +210,11 @@ fun_declaration: type_specifier ID {
 		semantico.pseudoassembly.emplace_back("Label " + tokenStrAtt(token));
 		semantico.code.emplace_back(new Addr3::Label(token));
 
-		semantico.tabela.funcoes.insert({{$1, $2}, token});
+		semantico.pseudoassembly.emplace_back("declarar " + tokenStrAtt($1) + " " + tokenStrAtt($2) + "()");
+		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, $2, 1, true);
 
-		//aloca_global($2, semantico);
-		//semantico.pseudoassembly.emplace_back("declarar " + tokenStrAtt($1) + " " + tokenStrAtt($2) + "()");
-		//semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, $2, 1, true);
+		semantico.tabela.funcoes.push_back({$2, token});
+
 	} LPAREN open_esc params RPAREN compound_stmt close_esc ;
 
 open_esc: %empty {
@@ -517,7 +512,7 @@ call: ID LPAREN Addr3_BeginCall args RPAREN {
 
 Addr3_BeginCall: %empty { 
 	semantico.pseudoassembly.emplace_back("begin call");
-	semantico.code.emplace_back(new Addr3::BeginCall);
+	semantico.code.emplace_back(new Addr3::SalvaRA);
 } ;
 
 args: arg_list | %empty ;
