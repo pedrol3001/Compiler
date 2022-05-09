@@ -31,6 +31,7 @@ namespace Addr3{
 			std::vector<long int> offsets;
 	};
 	
+	
 	// Label ========================================
 	struct Label: public Code::Label, public Instrucao {	// Label:
 		Label(Token _label);
@@ -54,6 +55,7 @@ namespace Addr3{
 		SetLocal(); 	
 	};
 	
+	
 	// Input/output =================================
 	
 	struct Read: public Instrucao {		// Read x;
@@ -69,13 +71,7 @@ namespace Addr3{
 	};
 
 	// Declaracoes ==================================
-
-	struct BeginArray: public Instrucao {	
-		Token op;			
-		std::list<std::shared_ptr<Assembly> > gera_codigo();	
-		BeginArray(Token _op); 
-	};
-
+	
 	struct AlocaGlobal: public Instrucao {	
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
@@ -163,27 +159,28 @@ namespace Addr3{
 	};
 	// Chamada de funcao============================
 	
-	struct BeginCall: public Instrucao {	// Begin_call;
-		BeginCall();
-		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+	struct SalvaRA: public Instrucao {	// Begin_call;
+		SalvaRA();
+		std::list<std::shared_ptr<Assembly> > gera_codigo();
+		void acao(Corretor& corretor);	
 	};
 	
 	struct Param: public Instrucao {	// Param param;
+		int param_offset=1;
 		Token parametro;		
 		Param(Token _parametro);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		void acao(Corretor& corretor);
 	};
 
 	struct Call: public Instrucao {		// Call function;
-		Token ret,funcao;		
-		Call(Token _ret, Token _funcao);
+		Token funcao;		
+		Call(Token _funcao);
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		void acao(Corretor& corretor);
 	};
 	
 	struct Return: public Instrucao {		// Return ;
-		Token ret;	
-		bool has_value=false;	
-		Return(Token _ret);
 		Return();
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 	};
@@ -216,6 +213,12 @@ namespace Addr3{
 	*/
 	
 	// Outros ===========================================
+	
+	struct Exit: public Instrucao {	// exit;
+		Exit();
+		std::list<std::shared_ptr<Assembly> > gera_codigo();
+	};
+	
 	
 	struct Comentario: public Instrucao {
 		std::string str;

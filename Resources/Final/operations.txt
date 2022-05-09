@@ -1,5 +1,8 @@
 int main(void) {
 	int a;
+	int b;
+	int c;
+	
 	input a;
 	/* booleanas */
 	output a<2;
@@ -13,4 +16,10 @@ int main(void) {
 	output a*2;
 	output a/2;
 	output a-2;
+	/* assign */
+	c = 100;
+	a = b = c;
+	output a;
+	output b;
+	output c;
 }
