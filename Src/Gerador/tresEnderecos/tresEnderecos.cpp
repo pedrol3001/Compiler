@@ -237,6 +237,26 @@ void Desaloca::acao(Corretor& corretor) {
 	corretor.sp -= Addr3ts[op].getAtt<VarLocal>("VarLocal")->size;
 }
 
+	
+list<shared_ptr<Assembly> > Declarar::gera_codigo() {
+	list<shared_ptr<Assembly> >  code;	
+	return code;
+}
+
+Declarar::Declarar(Token _op): op(_op), Instrucao("Declarar",_op) {}
+void Declarar::acao(Corretor& corretor) {
+	Instrucao::acao(corretor);
+}
+			
+list<shared_ptr<Assembly> > Retirar::gera_codigo() {
+	list<shared_ptr<Assembly> >  code;	
+	return code;
+}
+
+Retirar::Retirar(Token _op): op(_op), Instrucao("Retirar",_op) {}
+void Retirar::acao(Corretor& corretor) {
+	Instrucao::acao(corretor);
+}
 
 // Operacao ====================================
 Operacao::~Operacao() {}

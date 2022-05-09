@@ -97,6 +97,20 @@ namespace Addr3{
 		Desaloca(Token _op); 	
 		void acao(Corretor& corretor);
 	};
+	
+	struct Declarar: public Instrucao {	// Aloca x;
+		Token op;			
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		Declarar(Token _op); 	
+		void acao(Corretor& corretor);
+	};
+	
+	struct Retirar: public Instrucao {	// Desaloca x;
+		Token op;			
+		std::list<std::shared_ptr<Assembly> > gera_codigo();	
+		Retirar(Token _op); 	
+		void acao(Corretor& corretor);
+	};
 
 	// Operacao ====================================
 
