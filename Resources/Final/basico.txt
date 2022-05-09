@@ -13,4 +13,5 @@ int main(void) {
 	}
 	output a;
 	output b;
+	return 0;
 }

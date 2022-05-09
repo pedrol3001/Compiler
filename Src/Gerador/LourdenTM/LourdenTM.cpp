@@ -37,13 +37,16 @@ std::string Comentario::str() {
 }
 
 // Load label
-LoadLabel::LoadLabel(Reg _r1, Token _label): Instrucao("LoadLabel"), Code::Goto(_label), r1(_r1) {}	
+LoadLabel::LoadLabel(Reg _r1, Token _label): Instrucao("LoadLabel"), Code::Label(_label), r1(_r1) {}	
 std::string LoadLabel::str() {
 	stringstream ss;
-	long long int distance = readRef()-getLinha();		// Distancia ate a label
-	ss << "LDC " << r1 << ',' << distance << '(' << TM::zero << ')';	// LDC r1,LABEL(zero)
+	long long int label_val = TabSim::getInstance()[label].getAtt<LabelVal>("LabelVal")->getLinha();
+	ss << "LDC " << r1 << ',' << label_val << '(' << TM::zero << ')';	// LDC r1,LABEL(zero)
 	return ss.str();
 }
+void LoadLabel::update(long long int _linha) { // Atualiza linha
+	setRef(_linha);
+}	
 
 // Tipo RO
 tipoRO::tipoRO(string _nome, Reg _r1, Reg _r2, Reg _r3): Instrucao(_nome), r1(_r1), r2(_r2), r3(_r3) {}

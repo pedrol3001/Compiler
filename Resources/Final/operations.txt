@@ -22,4 +22,5 @@ int main(void) {
 	output a;
 	output b;
 	output c;
+	return 0;
 }

@@ -166,10 +166,10 @@ program: {
 
 	if(semantico.tabela.variaveis.find("main") != semantico.tabela.variaveis.end()) {
 		Token main_function = semantico.tabela.variaveis["main"].back().token;
-		semantico.code.emplace_back(new Addr3::Call(main_function));
+		semantico.init_code.emplace_back(new Addr3::Call(main_function));
 	}
 	
-	semantico.code.emplace_back(new Addr3::Exit());
+	semantico.init_code.emplace_back(new Addr3::Exit());
 
 	semantico.tabela.salvar_globais(semantico.pseudoassembly);
 

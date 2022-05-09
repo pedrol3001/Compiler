@@ -58,19 +58,26 @@ void loadReg(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg, long int o
 	TabSim &ts = TabSim::getInstance();
 	assert(ts[op].has("VarGlobal") || ts[op].has("VarLocal") || ts[op].has("IntVal") || ts[op].has("LabelVal"));
 	
+	int check_counter=0;
+	
 	if(ts[op].has("IntVal")) {
 		long long int imm =  ((IntVal*)ts[op]["IntVal"])->val;
 		code.emplace_back(new TM::LDC(reg,imm,TM::zero));	// loadl: LDC reg,val(zero) 
+		check_counter++;
 	}
 	if(ts[op].has("VarGlobal")) {
 		code.emplace_back(new TM::LD(reg,offset,TM::gp));	// loadl: LD reg,-offset(gp)
+		check_counter++;
 	}
 	if(ts[op].has("VarLocal")) {
 		code.emplace_back(new TM::LD(reg,offset,TM::sp));	// loadl: LD reg,-offset(sp)
+		check_counter++;
 	}
 	if(ts[op].has("LabelVal")) {
 		code.emplace_back(new TM::LoadLabel(reg,op));		// loadl: LD reg,LABEL(zero)
+		check_counter++;
 	}
+	assert(check_counter==1);
 }
 
 void storeReg(list<shared_ptr<Assembly> >& code, Token op,TM::Reg reg, long int offset) {
@@ -437,6 +444,7 @@ std::list<std::shared_ptr<Assembly> > SalvaRA::gera_codigo() {
 }
 SalvaRA::SalvaRA(): Instrucao("SalvaRA") {}
 void SalvaRA::acao(Corretor& corretor) {
+	Instrucao::acao(corretor);
 	corretor.param=0;
 }
 
@@ -452,6 +460,7 @@ std::list<std::shared_ptr<Assembly> > Param::gera_codigo() {
 }
 Param::Param(Token _parametro): parametro(_parametro), Instrucao("Param",_parametro) {}
 void Param::acao(Corretor& corretor) {
+	Instrucao::acao(corretor);
 	param_offset = corretor.param--;
 }
 
@@ -469,6 +478,7 @@ list<shared_ptr<Assembly> > Call::gera_codigo() {
 }
 Call::Call(Token _funcao): funcao(_funcao), Instrucao("Call",_funcao) {}
 void Call::acao(Corretor& corretor) {
+	Instrucao::acao(corretor);
 	corretor.param=0;
 }
 
@@ -524,6 +534,7 @@ Comentario::Comentario(std::string _str): Instrucao("Comentario",true), str(_str
 
 std::list<std::shared_ptr<Assembly> > Exit::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
+	code.emplace_back(new TM::Comentario("Exit"));	
 	code.emplace_back(new TM::HALT(TM::zero,TM::zero,TM::zero));		// HALT 0,0,0
 	return code;
 }

@@ -1,2 +1,9 @@
+int fat(void) {
+	output 1;
+	return 2;
+}
+
 int main(void) {
+	output fat();
+	return 1;
 }

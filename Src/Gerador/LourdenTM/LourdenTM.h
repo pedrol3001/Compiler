@@ -36,9 +36,10 @@ namespace TM {
 		std::string str();	
 	};
 	
-	struct LoadLabel: public Instrucao, public Code::Goto {
+	struct LoadLabel: public Instrucao, public Code::Label {
 		Reg r1;	
 		LoadLabel(Reg _r1, Token _label);	// LDC r1,LABEL(zero)
+		void update(long long int _linha);	// Atualiza linha
 		std::string str();	
 	};
 
