@@ -276,14 +276,14 @@ statement_list: statement_list statement | %empty ;
 statement: expression_stmt | compound_stmt | selection_stmt | iteration_stmt | input_stmt | output_stmt | return_stmt ;
 
 input_stmt: INPUT ID SEMICOLON {
-		semantico.tabela.verificar(tokenIdVal($2), Simb::Nat::VAR);
+		semantico.tabela.verificar(tokenIdVal($2), Simb::Nat::VAR, $2);
 		Token token = semantico.tabela.obter_token(tokenIdVal($2));
 
 		semantico.pseudoassembly.emplace_back("input " + tokenStrAtt(token));
 		semantico.code.emplace_back(new Addr3::Read(token));
 		
 	} | INPUT ID LBRACKET expression RBRACKET SEMICOLON {
-		semantico.tabela.verificar(tokenIdVal($2), Simb::Nat::ARRAY);
+		semantico.tabela.verificar(tokenIdVal($2), Simb::Nat::ARRAY, $2);
 		Token array = semantico.tabela.obter_token(tokenIdVal($2));
 	
 		pair<bool, Token> p1 = semantico.tempGen.obter();
@@ -400,7 +400,7 @@ return_stmt: RETURN SEMICOLON {
 
 expression: ID ASSIGN expression {
 		// usar atribuicao
-		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR);
+		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR, $1);
 		Token id_token = semantico.tabela.obter_token(tokenIdVal($1));
 
 		semantico.pseudoassembly.emplace_back(tokenIdVal(id_token) + " = " + tokenStrAtt($3));
@@ -408,7 +408,7 @@ expression: ID ASSIGN expression {
 		$$ = $3;
 	} | ID LBRACKET expression RBRACKET ASSIGN expression {
 		// usar storeinref
-		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::ARRAY);
+		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::ARRAY, $1);
 		Token array = semantico.tabela.obter_token(tokenIdVal($1));
 
 		pair<bool, Token> p = semantico.tempGen.obter();
@@ -431,13 +431,13 @@ expression: ID ASSIGN expression {
 	|  simple_expression ;
 
 var: ID {	
-		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR);
+		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR, $1);
 		
 		$$ = semantico.tabela.obter_token(tokenIdVal($1));
 		semantico.tabela.marcar_usado(tokenIdVal($1));
 
 	} | ID LBRACKET expression RBRACKET { 	
-		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::ARRAY);
+		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::ARRAY, $1);
 
 		$$ = semantico.tabela.obter_token(tokenIdVal($1));
 
@@ -536,7 +536,7 @@ mulop: MUL | DIV ;
 factor: LPAREN expression RPAREN {$$=$2;} | var | call | NUM ;
 
 call: ID LPAREN Addr3_BeginCall args RPAREN { 
-	semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::FUNCAO);
+	semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::FUNCAO, $1);
 
 	Token token_original = semantico.tabela.obter_token(tokenIdVal($1));
 

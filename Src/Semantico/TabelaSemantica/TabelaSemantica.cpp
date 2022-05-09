@@ -7,7 +7,21 @@
 
 using namespace std;
 
-//Simbolo ==============================================================================================================
+// Suporte ============================================================================================================
+
+long long int tokenLinha(Token t){
+	TabSim& tabsim = TabSim::getInstance();
+	assert(tabsim[t].has("StrAtt"));
+	return ((StrAtt*) tabsim[t]["StrAtt"])->linha;
+}
+
+long long int tokenColuna(Token t){
+	TabSim& tabsim = TabSim::getInstance();
+	assert(tabsim[t].has("StrAtt"));
+	return ((StrAtt*) tabsim[t]["StrAtt"])->coluna;
+}
+
+// Simbolo =============================================================================================================
 
 Simb::Simb(std::string _nome, Tipo _tipo, int _escopo, Nat _natureza, Token _token, long long int _tamanho) :
 	nome(_nome), tipo(_tipo), escopo(_escopo), natureza(_natureza), token(_token), tamanho(_tamanho) {}
@@ -39,10 +53,10 @@ void TabelaSemantica::updateTabSim(Token t) {
 
 void TabelaSemantica::adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, Token token, int tamanho, bool usado){
 	if(existe(nome) && (*this)[nome].escopo < escopo){
-		mensagens.push_back("Aviso: variável \"" + nome + "\" sendo substituída por variável local.");
+		mensagens.push_back({{tokenLinha(token), tokenColuna(token)}, "Aviso: variável \"" + nome + "\" sendo substituída por variável local."});
 		avisos_semantico++;
 	}else if(existe(nome) && (*this)[nome].escopo == escopo){
-		mensagens.push_back("Erro: variável \"" + nome + "\" sendo redeclarada.");
+		mensagens.push_back({{tokenLinha(token), tokenColuna(token)}, "Erro: variável \"" + nome + "\" sendo redeclarada."});
 		erros_semantico++;
 		return;
 	}
@@ -57,7 +71,7 @@ void TabelaSemantica::adicionar(std::string nome, int bison_tipo, Simb::Nat natu
 	}
 
 	if(natureza == Simb::Nat::VAR && tipo == Simb::Tipo::VOID){ // variavel com tipo void
-		mensagens.push_back("Erro: variável \"" + nome + "\" declarada como void.");
+		mensagens.push_back({{tokenLinha(token), tokenColuna(token)}, "Erro: variável \"" + nome + "\" declarada como void."});
 		erros_semantico++;
 		return;
 	}
@@ -85,9 +99,9 @@ Simb TabelaSemantica::operator[](string nome) {
 	return variaveis[nome].back();
 }
 
-bool TabelaSemantica::verificar(string nome, Simb::Nat natureza){
+bool TabelaSemantica::verificar(string nome, Simb::Nat natureza, Token token){
 	if(!existe(nome)) {
-		mensagens.push_back("Erro: variável \"" + nome + "\" não declarada.");
+		mensagens.push_back({{tokenLinha(token), tokenColuna(token)}, "Erro: variável \"" + nome + "\" não declarada."});
 		erros_semantico++;
 		return false;
 	}
@@ -99,7 +113,7 @@ bool TabelaSemantica::verificar(string nome, Simb::Nat natureza){
 	};
 	
 	if((*this)[nome].natureza != natureza) {
-		mensagens.push_back( "Erro: " + str[(*this)[nome].natureza] + " \"" + nome + "\" usado(a) como " + str[natureza] + ".");
+		mensagens.push_back({{tokenLinha(token), tokenColuna(token)}, "Erro: " + str[(*this)[nome].natureza] + " \"" + nome + "\" usado(a) como " + str[natureza] + "."});
 		erros_semantico++;
 		return false;
 	}
@@ -111,7 +125,7 @@ void TabelaSemantica::remover(){
 		list<Simb>& lista = p.second;
 		while(!lista.empty() && lista.back().escopo > escopo) {
 			if(lista.back().usado == false){
-				mensagens.push_back("Aviso: variável \"" + lista.back().nome + "\" não usada.");
+				mensagens.push_back({{tokenLinha(lista.back().token), tokenColuna(lista.back().token)}, "Aviso: variável \"" + lista.back().nome + "\" não usada."});
 				avisos_semantico++;
 			}
 			lista.pop_back();

@@ -2,6 +2,7 @@
 #include "../Sintatico/Sintatico.h"
 #include "../Util/Util.h"
 
+#include <algorithm>
 #include <iostream>
 #include <cassert>
 #include <fstream>
@@ -22,10 +23,22 @@ bool Semantico::analisar() {
 	return ok;
 }
 
+struct ordenar_mensagens {
+    bool operator()(const pair<pair<int, int>,string> &left, const pair<pair<int, int>,string> &right) {
+        if(left.first == right.first)
+			return left.second < right.second;
+		return left.first < right.first;
+    }
+};
+
+
 void Semantico::mostrar_analise() {
 
+	sort(tabela.mensagens.begin(), tabela.mensagens.end(), ordenar_mensagens());
+
+
 	for(auto &s : tabela.mensagens)
-		std::cout << s << endl;
+		std::cout << "Linha " << s.first.first+1 << ", coluna " << s.first.second+1 << ": " << s.second << endl;
 
 	if(!tabela.mensagens.empty())
 		std::cout << endl;

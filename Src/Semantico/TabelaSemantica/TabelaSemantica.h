@@ -42,13 +42,13 @@ struct TabelaSemantica {
 	std::map<std::string,std::list<Simb> > variaveis;
 
 	int erros_semantico = 0, avisos_semantico = 0, escopo = GLOBAL;
-	std::vector<std::string> mensagens;
+	std::vector<std::pair<std::pair<int, int>, std::string>> mensagens;
 	std::vector<std::pair<Token, Token>> funcoes;
 
 	TabelaSemantica();
 
 	void adicionar(std::string nome, int bison_tipo, Simb::Nat natureza, int escopo, Token token, int tamanho, bool usado = false);	// int tipo => bison.h
-	bool verificar(std::string nome, Simb::Nat natureza);
+	bool verificar(std::string nome, Simb::Nat natureza, Token token);
 	void remover();
 	void salvar_globais(std::list<std::string> pseudoassembly);
 

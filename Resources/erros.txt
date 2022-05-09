@@ -1,8 +1,35 @@
-int n;
+int substituida;
+
+int var_funcao(void){}
 
 int main(void){
-	int n;
-	{
-		int n;
-	}
+	int nao_usada;
+	int substituida;
+
+	int redeclarada;
+	int redeclarada;
+
+	void var_void;
+
+
+	int var_normal;
+	int var_array[5];
+	
+
+	nao_usada = substituida;
+	nao_usada = redeclarada + 1; 
+	nao_usada = var_normal;
+	nao_usada = var_array[3];
+	/* apenas atribuicoes nao contam como uso para o lado esquerdo, mas contam para o lado direito */
+
+	nao_usada = nao_declarada;
+
+	var_normal[3] = 2;
+	var_normal();
+
+	var_array = 5;
+	var_array();
+
+	var_funcao = 8;
+	var_funcao[7] = 1;
 }

@@ -22,3 +22,6 @@ Isso irá gerar o arquivo objeto "programa.tm". Um exemplo para o programa fator
 
     ./compiler Resources/fat.txt
 
+Compilar o arquivo Resources/erros.txt irá gerar todos os erros detectáveis pelo analisador semântico:
+
+    ./compiler Resources/erros.txt
