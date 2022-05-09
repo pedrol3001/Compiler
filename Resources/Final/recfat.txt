@@ -1,18 +1,12 @@
 int fat(int n) {
-	int aux;
-	int ans;
-	if(n<=0)
-		return 1;
-	aux = n-1;
-	ans = n*fat(aux);
-	return ans;
+	if(n<=0) return 1;
+	return n*fat(n-1);
 }
 
 int main(void){
 	int in;
-	int ans;
 	input in;
-	ans = fat(in); 
-	output ans; 
+	output fat(in); 
 	return 0;
 }
+

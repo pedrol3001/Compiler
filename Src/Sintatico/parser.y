@@ -535,10 +535,21 @@ mulop: MUL | DIV ;
 
 factor: LPAREN expression RPAREN {$$=$2;} | var | call | NUM ;
 
-call: ID LPAREN Addr3_BeginCall args RPAREN { 
+call: ID LPAREN { semantico.tabela.fparams.push_back(vector<Token>()); }
+	args RPAREN { 
 	semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::FUNCAO, $1);
 
 	Token token_original = semantico.tabela.obter_token(tokenIdVal($1));
+
+	semantico.pseudoassembly.emplace_back("begin call");
+	semantico.code.emplace_back(new Addr3::BeginCall);
+
+	for(auto token : semantico.tabela.fparams.back()){
+		semantico.pseudoassembly.emplace_back("Argumento " + tokenStrAtt(token));
+		semantico.code.emplace_back(new Addr3::Param(token));
+	}
+
+	semantico.tabela.fparams.pop_back();
 
 	semantico.pseudoassembly.emplace_back("call " + tokenStrAtt(token_original));
 	semantico.code.emplace_back(new Addr3::Call(token_original));
@@ -546,18 +557,12 @@ call: ID LPAREN Addr3_BeginCall args RPAREN {
 	$$ = TokenGlobal;
 };
 
-Addr3_BeginCall: %empty { 
-	semantico.pseudoassembly.emplace_back("begin call");
-	semantico.code.emplace_back(new Addr3::BeginCall);
-} ;
-
 args: arg_list | %empty ;
 
 arg_list: arg_list COMMA addr3_param | addr3_param ;
 	
-addr3_param: expression { 
-	semantico.pseudoassembly.emplace_back("Argumento " + tokenStrAtt($1));
-	semantico.code.emplace_back(new Addr3::Param($1));
+addr3_param: expression {
+	semantico.tabela.fparams.back().push_back($1);
 }
 
 NUM: C_INT | C_FLOAT ;
