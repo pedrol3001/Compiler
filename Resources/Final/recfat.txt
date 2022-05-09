@@ -1,7 +1,7 @@
 int fat(int n) {
 	int aux;
 	int ans;
-	if(n==0)
+	if(n<=0)
 		return 1;
 	aux = n-1;
 	ans = n*fat(aux);
