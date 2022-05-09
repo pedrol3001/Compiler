@@ -259,13 +259,16 @@ statement_list: statement_list statement | %empty ;
 statement: expression_stmt | compound_stmt | selection_stmt | iteration_stmt | input_stmt | output_stmt | return_stmt ;
 
 input_stmt: INPUT ID SEMICOLON {
-		semantico.pseudoassembly.emplace_back("input " + tokenStrAtt($2));
-		semantico.code.emplace_back(new Addr3::Read($2));
+		semantico.tabela.verificar(tokenIdVal($2), Simb::Nat::VAR);
+		Token token = semantico.tabela.obter_token(tokenIdVal($2));
+
+		semantico.pseudoassembly.emplace_back("input " + tokenStrAtt(token));
+		semantico.code.emplace_back(new Addr3::Read(token));
 		
 	} | INPUT ID LBRACKET expression RBRACKET SEMICOLON {
 		semantico.tabela.verificar(tokenIdVal($2), Simb::Nat::ARRAY);
 		Token array = semantico.tabela.obter_token(tokenIdVal($2));
-
+	
 		pair<bool, Token> p1 = semantico.tempGen.obter();
 		bool criado1 = p1.first;	
 		Token ponteiro = p1.second;
