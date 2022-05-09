@@ -225,7 +225,12 @@ fun_declaration: type_specifier ID {
 
 		semantico.tabela.funcoes.push_back({$2, token});
 
-	} LPAREN open_esc params RPAREN compound_stmt close_esc ;
+	} LPAREN open_esc params RPAREN compound_stmt close_esc forced-return ;
+
+forced-return: %empty {
+	semantico.pseudoassembly.emplace_back("retornar");
+	semantico.code.emplace_back(new Addr3::Return());
+}
 
 open_esc: %empty {
 	semantico.pseudoassembly.emplace_back("// abrindo escopo");
