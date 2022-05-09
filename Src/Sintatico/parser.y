@@ -165,6 +165,8 @@ program: {
 
 	if(semantico.tabela.variaveis.find("main") != semantico.tabela.variaveis.end()) {
 		Token main_function = semantico.tabela.variaveis["main"].back().token;
+		semantico.init_pseudoassembly.emplace_back("begin call main");
+		semantico.init_code.emplace_back(new Addr3::BeginCall);
 		semantico.init_pseudoassembly.emplace_back("call main");
 		semantico.init_code.emplace_back(new Addr3::Call(main_function));
 	}
@@ -507,7 +509,7 @@ mulop: MUL | DIV ;
 
 factor: LPAREN expression RPAREN {$$=$2;} | var | call | NUM ;
 
-call: ID LPAREN args RPAREN { 
+call: ID LPAREN Addr3_BeginCall args RPAREN { 
 	semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::FUNCAO);
 
 	Token token_original = semantico.tabela.obter_token(tokenIdVal($1));
@@ -517,6 +519,11 @@ call: ID LPAREN args RPAREN {
 
 	$$ = TokenGlobal;
 };
+
+Addr3_BeginCall: %empty { 
+	semantico.pseudoassembly.emplace_back("begin call");
+	semantico.code.emplace_back(new Addr3::BeginCall);
+} ;
 
 args: arg_list | %empty ;
 

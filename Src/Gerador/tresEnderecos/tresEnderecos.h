@@ -164,8 +164,8 @@ namespace Addr3{
 	};
 	// Chamada de funcao============================
 	
-	struct SalvaRA: public Instrucao {	// Begin_call;
-		SalvaRA();
+	struct BeginCall: public Instrucao {	// Begin_call;
+		BeginCall();
 		std::list<std::shared_ptr<Assembly> > gera_codigo();
 		void acao(Corretor& corretor);	
 	};

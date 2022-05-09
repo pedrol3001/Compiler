@@ -443,17 +443,17 @@ std::list<std::shared_ptr<Assembly> > StoreInRef::gera_codigo() {
 
 
 // Chamada de funcao============================
-std::list<std::shared_ptr<Assembly> > SalvaRA::gera_codigo() {
+std::list<std::shared_ptr<Assembly> > BeginCall::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
-	code.emplace_back(new TM::Comentario("SalvaRA"));
+	code.emplace_back(new TM::Comentario("BeginCall"));
 	// Aloca espaco para guardar o ra na pilha
 	alocar(code,1,TM::t0,TM::sp);
 	// Guarda ra na pilha
 	code.emplace_back(new TM::ST(TM::ra,1,TM::sp)); // ST ra,1(sp)
 	return code;
 }
-SalvaRA::SalvaRA(): Instrucao("SalvaRA") {}
-void SalvaRA::acao(Corretor& corretor) {
+BeginCall::BeginCall(): Instrucao("BeginCall") {}
+void BeginCall::acao(Corretor& corretor) {
 	corretor.param=0;
 }
 
@@ -477,10 +477,6 @@ void Param::acao(Corretor& corretor) {
 list<shared_ptr<Assembly> > Call::gera_codigo() {
 	list<shared_ptr<Assembly> > code;	
 	code.emplace_back(new TM::Comentario("Call"));
-	// Aloca espaco para ra
-	alocar(code,1,TM::t0,TM::sp);
-	// Salva ra
-	code.emplace_back(new TM::ST(TM::ra,1,TM::sp));	// ST ra,1(sp)
 	// Configurar ra
 	code.emplace_back(new TM::LDA(TM::ra,2,TM::pc));	// LA ra,2(pc) (pc+1) +2
 	// Carrega endereco do salto
