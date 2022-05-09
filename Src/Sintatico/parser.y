@@ -366,15 +366,24 @@ iteration_stmt: WHILE {
 	};
 
 return_stmt: RETURN SEMICOLON {
+
+		for(auto it = semantico.tabela.variaveis.rbegin(); it != semantico.tabela.variaveis.rend(); it++) {
+			if(!semantico.tabela.variaveis[it->first].empty() && semantico.tabela.variaveis[it->first].back().escopo > 0){
+				semantico.pseudoassembly.emplace_back("Desaloca " + it->first);
+				semantico.code.emplace_back(new Addr3::Desaloca(semantico.tabela.variaveis[it->first].back().token));
+			}
+		}
+
 		semantico.pseudoassembly.emplace_back("retornar");
 		semantico.code.emplace_back(new Addr3::Return());
+
 	}
 	| RETURN expression SEMICOLON {
 		semantico.pseudoassembly.emplace_back(tokenIdVal(TokenGlobal) + " = " + tokenStrAtt($2));
 		semantico.code.emplace_back(new Addr3::Atribuicao(TokenGlobal,$2));
 
 		for(auto it = semantico.tabela.variaveis.rbegin(); it != semantico.tabela.variaveis.rend(); it++) {
-			if(!semantico.tabela.variaveis[it->first].empty() && semantico.tabela.variaveis[it->first].back().escopo > semantico.escopo-1){
+			if(!semantico.tabela.variaveis[it->first].empty() && semantico.tabela.variaveis[it->first].back().escopo > 0){
 				semantico.pseudoassembly.emplace_back("Desaloca " + it->first);
 				semantico.code.emplace_back(new Addr3::Desaloca(semantico.tabela.variaveis[it->first].back().token));
 			}
