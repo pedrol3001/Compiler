@@ -1,0 +1,9 @@
+int func(int a) {
+	output a;
+	return 2;
+}
+
+int main(void) {
+	output func(3);
+	return 0;
+}

@@ -23,7 +23,6 @@ struct Variavel: public Atributo {
 
 struct VarLocal: public Variavel {	// Variaveis estaticas
 	VarLocal(int _size);	// space = 
-	long int offset();
 };
 
 struct VarGlobal: public Variavel {	// Variaveis globais

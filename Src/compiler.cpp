@@ -30,7 +30,7 @@ int main(int argn, char *argv[]) {
 		return 0;
 	}
 	// Lexico
-	Lexico lexico(source,stdout,true);	
+	Lexico lexico(source,stdout,false);	
 	fclose(source);
 	
 	if(!lexico.good()) {
