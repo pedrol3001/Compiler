@@ -1,9 +1,13 @@
-int func(int a) {
+int func(int a, int b, int c) {
 	output a;
-	return 2;
+	output b;
+	output c;
+	return 0-1;
 }
 
 int main(void) {
-	output func(3);
+	int n;
+	input n;
+	output func(n,2,3);
 	return 0;
 }
