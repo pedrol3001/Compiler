@@ -161,7 +161,7 @@ SetArray::SetArray(): Instrucao("SetArray") {}
 	
 list<shared_ptr<Assembly> > Read::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	code.emplace_back(new TM::Comentario("Read"));
+	code.emplace_back(new TM::Comentario("Read " + TabSim::getInstance()[op].getAtt<StrAtt>("StrAtt")->str));
 	// Le input
 	code.emplace_back(new TM::IN(TM::t0,TM::t0,TM::t0));		// IN t0,t0,t0	
 	// Armazena input	
@@ -188,7 +188,7 @@ Print::Print(Token _op): op(_op), Instrucao("Print",_op) {}
 
 list<shared_ptr<Assembly> > AlocaGlobal::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	code.emplace_back(new TM::Comentario("AlocaGlobal"));
+	code.emplace_back(new TM::Comentario("AlocaGlobal " + Addr3ts[op].getAtt<StrAtt>("StrAtt")->str));
 	assert(Addr3ts[op].has("VarGlobal"));
 	int space = ((VarGlobal*)Addr3ts[op]["VarGlobal"])->size;
 	alocar(code,space,TM::t0,TM::gp);		
@@ -206,7 +206,7 @@ void AlocaGlobal::acao(Corretor& corretor) {
 
 list<shared_ptr<Assembly> > Aloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	code.emplace_back(new TM::Comentario("Aloca"));
+	code.emplace_back(new TM::Comentario("Aloca " + Addr3ts[op].getAtt<StrAtt>("StrAtt")->str));
 	assert(Addr3ts[op].has("VarLocal"));
 	int space = ((VarLocal*)Addr3ts[op]["VarLocal"])->size;
 	alocar(code,space,TM::t0,TM::sp);		
@@ -216,7 +216,7 @@ Aloca::Aloca(Token _op): op(_op), Instrucao("Aloca",_op) {}
 
 list<shared_ptr<Assembly> > Desaloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
-	code.emplace_back(new TM::Comentario("Desaloca"));
+	code.emplace_back(new TM::Comentario("Desaloca " + Addr3ts[op].getAtt<StrAtt>("StrAtt")->str));
 	assert(Addr3ts[op].has("VarLocal"));
 	int space = ((VarLocal*)Addr3ts[op]["VarLocal"])->size;
 	desalocar(code,space,TM::t0,TM::sp);		
@@ -466,13 +466,16 @@ std::list<std::shared_ptr<Assembly> > BeginCall::gera_codigo() {
 }
 BeginCall::BeginCall(): Instrucao("BeginCall") {}
 void BeginCall::acao(Corretor& corretor) {
+	// Incrementa sp
+	corretor.sp++;
+	// Configurar
 	corretor.param=0;
 }
 
 
 std::list<std::shared_ptr<Assembly> > Param::gera_codigo() {
 	list<shared_ptr<Assembly> > code;
-	code.emplace_back(new TM::Comentario("Param"));
+	code.emplace_back(new TM::Comentario("Param " + Addr3ts[parametro].getAtt<StrAtt>("StrAtt")->str));
 	// Carrega operando
 	loadReg(code,parametro,TM::t0,offsets[0]);		
 	// Guarda operando alem da pilha
@@ -488,7 +491,7 @@ void Param::acao(Corretor& corretor) {
 
 list<shared_ptr<Assembly> > Call::gera_codigo() {
 	list<shared_ptr<Assembly> > code;	
-	code.emplace_back(new TM::Comentario("Call"));
+	code.emplace_back(new TM::Comentario("Call " + Addr3ts[funcao].getAtt<StrAtt>("StrAtt")->str));
 	// Configurar ra
 	code.emplace_back(new TM::LDA(TM::ra,2,TM::pc));	// LA ra,2(pc) (pc+1) +2
 	// Carrega endereco do salto
@@ -504,6 +507,7 @@ list<shared_ptr<Assembly> > Call::gera_codigo() {
 Call::Call(Token _funcao): funcao(_funcao), Instrucao("Call",_funcao) {}
 void Call::acao(Corretor& corretor) {
 	Instrucao::acao(corretor);
+	corretor.sp--;
 	corretor.param=0;
 }
 
