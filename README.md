@@ -18,10 +18,14 @@ Para recompilar por completo o projeto, use:
 Para executar, use:
 
     ./compiler [nome do programa.txt]
+
 Isso irá gerar o arquivo objeto "programa.tm". Um exemplo para o programa fatorial:
 
-    ./compiler Resources/fat.txt
+    ./compiler Resources/Final/fat.txt
 
-Compilar o arquivo Resources/erros.txt irá gerar todos os erros detectáveis pelo analisador semântico:
+Outros código de exemplo e que compilam estão em Resources/Final.
 
-    ./compiler Resources/erros.txt
+Exemplos de códigos que dão erro estão em Resources/Erros.
+O arquivo erros.txt gera todos os erros e avisos detectáveis pelo analisador semântico:
+
+    ./compiler Resources/Erros/erros.txt
