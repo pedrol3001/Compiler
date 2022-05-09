@@ -7,7 +7,8 @@
 struct StrAtt : public Atributo
 {
 	std::string str;
-	StrAtt(std::string _str);
+	long long int linha,coluna,posicao;
+	StrAtt(std::string _str, long long int _linha=-1, long long int _coluna=-1, long long int _posicao=-1);
 };
 
 struct NameAtt : public Atributo

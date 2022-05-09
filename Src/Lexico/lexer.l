@@ -13,19 +13,25 @@ bool verbose=false;
 Lexico* lex;	// Ponteiro aaaaaaaaaaaaaaaa
 TabSim &ts = TabSim::getInstance();
 
+long long int linha=0,coluna=0,posicao=0;
+
 string getToken() {
 	string token(yytext);
 	token = token.substr(0,yyleng);
 	return token;
 }
 
+void update() {
+	coluna += yyleng;
+	posicao += yyleng;
+}
+
 Token match(string str, int tipo) {
 	if(verbose)
-		fprintf(yyout," [%s] ",yytext); // Util para debug
+		fprintf(yyout," [%lld(l%lld,c%lld): %s] ",posicao,linha,coluna,yytext); // Util para debug
 	Token token = ts.insert(tipo);	// Insere na tabela de símbolos
 	lex->container.push_back(token);		// Insere no array de tokens
-	ts[token].insert((Atributo*)(new NameAtt(str)));	// Insere atributo de nome do tipo
-	ts[token].insert((Atributo*)(new StrAtt(getToken())));// Insere atributo de string lida
+	ts[token].insert((Atributo*)(new StrAtt(getToken(),linha,coluna)));// Insere atributo de string lida
 	return token;
 }
 
@@ -37,7 +43,7 @@ Token match(string str, int tipo) {
 Digito [0-9]
 Letra [a-zA-Z]
 Sinal [-+]
-Space [\n\t \r]
+Space [\t \r]
 
 %x INVALIDO_VARIAS_LINHAS
 %x INVALIDO_UMA_LINHA
@@ -46,113 +52,99 @@ Space [\n\t \r]
 
 %%
 
-"+" { match("Soma", SUM);}
+"+" {match("Soma", SUM); update(); }
 
-"-" {match("Subtracao", SUB);}
+"-" {match("Subtracao", SUB); update(); }
 
-"*" {match("Multiplicacao", MUL);}
+"*" {match("Multiplicacao", MUL); update(); }
 
-"/" {match("Divisao", DIV);}
+"/" {match("Divisao", DIV); update(); }
 
-"<" {match("Menor", LESS);}
+"<" {match("Menor", LESS); update(); }
 
-">" {match("Maior", GREATER);}
+">" {match("Maior", GREATER); update(); }
 
-"<=" {match("Menor ou igual", LESSEQUAL);}
+"<=" { match("Menor ou igual", LESSEQUAL); update(); }
 
-">=" {match("Maior ou igual", GREATEREQUAL);}
+">=" { match("Maior ou igual", GREATEREQUAL); update(); }
 
-"==" {match("Igualdade", EQUAL);}
+"==" { match("Igualdade", EQUAL); update(); }
 
-"!=" {match("Diferenca", NOTEQUAL);}
+"!=" { match("Diferenca", NOTEQUAL); update(); }
 
-"=" {match("Atribuicao", ASSIGN);}
+"=" { match("Atribuicao", ASSIGN); update(); }
 
-";" {match("Ponto e virgula", SEMICOLON);}
+";" { match("Ponto e virgula", SEMICOLON); update(); }
 
-"," {match("Virgula", COMMA);}
+"," { match("Virgula", COMMA); update(); }
 
-"if" {match("if", IF);}
+"if" { match("if", IF); update(); }
 
-"else" {match("else", ELSE);}
+"else" { match("else", ELSE); update(); }
 
-"return" {match("return", RETURN);}
+"return" { match("return", RETURN); update(); }
 
-"while" {match("while", WHILE);}
+"while" { match("while", WHILE); update(); }
 
-"void" {match("void", VOID);}
+"void" { match("void", VOID); update(); }
 
-"int" {match("int", INT);}
+"int" { match("int", INT); update(); }
 
-"float" {match("float", FLOAT);}
+"float" { match("float", FLOAT); update(); }
 
-"double" {match("double", DOUBLE);}
+"double" { match("double", DOUBLE); update(); }
 
-"char" {match("char", CHAR);}
+"char" { match("char", CHAR); update(); }
 
-"input" {match("input", INPUT);}
+"input" { match("input", INPUT); update(); }
 
-"output" {match("output", OUTPUT);}
+"output" { match("output", OUTPUT); update(); }
 
-"(" {match("(", LPAREN);}
+"(" { match("(", LPAREN); update(); }
 
-")" {match(")", RPAREN);}
+")" { match(")", RPAREN); update(); }
 
-"[" {match("[", LBRACKET);}
+"[" {match("[", LBRACKET); update(); }
 
-"]" {match("]", RBRACKET);}
+"]" {match("]", RBRACKET); update(); }
 
-"{" {match("{", LBRACE);}
+"{" {match("{", LBRACE); update(); }
 
-"}" {match("}", RBRACE);}
+"}" {match("}", RBRACE); update(); }
 
 {Letra}({Digito}|{Letra}|_)* {
 	Token token = match("Identificador", ID);
 	ts[token].insert((Atributo*)(new IdVal(getToken())));	
+	update(); 
 }
 
 {Digito}+ {
 	Token token = match("Inteiro", C_INT);
 	ts[token].insert((Atributo*)(new IntVal(getToken())));
+	update(); 
 }
 
-({Digito}+"."{Digito}*)|({Digito}*"."{Digito}+) {
+({Digito}+"."{Digito}*)|({Digito}*"."{Digito}+) {	
 	Token token = match("Ponto flutuante", C_FLOAT);
 	ts[token].insert((Atributo*)(new DoubleVal(getToken())));
+	update(); 
 }
 
 \"(\\\"|[^\"\n])*\" {
 	Token token = match("String", C_STRING);
 	ts[token].insert((Atributo*)(new StringVal(getToken())));
+	update(); 
 }
 
-"/*"[^*]*"*"+([^/][^*]*"*"+)*"/" { if(verbose) fprintf(yyout," [%s] ",yytext);} // Util para debug}
+"/*"[^*]*"*"+([^/][^*]*"*"+)*"/" { if(verbose) fprintf(yyout," [%lld(l%lld,c%lld): %s] ",posicao,linha,coluna,yytext);  update(); } // Util para debug}
 
-{Space}* {}
+{Space}* {update(); }
 
-. {
-	return -1;
-	BEGIN(INVALIDO_UMA_LINHA); 
-	yyless(yyleng-1);
-}
-"/*" {
-	BEGIN(INVALIDO_VARIAS_LINHAS);
-	yyless(yyleng-2);
-}
+\n {linha++; coluna=0; if(verbose) fprintf(yyout,"\n");}
+
+. { return -1; }	// Erro lexico
 
 <<EOF>> {return 0;}
-
-
-<INVALIDO_VARIAS_LINHAS>(.|\n)+ {
-	//match("Invalido",NOT_INITIALIZED);
-	BEGIN(INITIAL);
-}
-
-
-<INVALIDO_UMA_LINHA>.+ {
-	//match("Invalido",NOT_INITIALIZED);
-	BEGIN(INITIAL);
-}
 
 %%
 

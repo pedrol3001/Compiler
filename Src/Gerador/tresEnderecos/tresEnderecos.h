@@ -88,14 +88,12 @@ namespace Addr3{
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 		Aloca(Token _op); 	
-		void acao(Corretor& corretor);
 	};
 	
 	struct Desaloca: public Instrucao {	// Desaloca x;
 		Token op;			
 		std::list<std::shared_ptr<Assembly> > gera_codigo();	
 		Desaloca(Token _op); 	
-		void acao(Corretor& corretor);
 	};
 	
 	struct Declarar: public Instrucao {	// Aloca x;

@@ -212,15 +212,7 @@ list<shared_ptr<Assembly> > Aloca::gera_codigo() {
 	alocar(code,space,TM::t0,TM::sp);		
 	return code;
 }	
-
 Aloca::Aloca(Token _op): op(_op), Instrucao("Aloca",_op) {}
-void Aloca::acao(Corretor& corretor) {
-	assert(Addr3ts[op].has("VarLocal"));
-	// Incrementar sp
-	corretor.sp += Addr3ts[op].getAtt<VarLocal>("VarLocal")->size;
-	// Configurar distancia da variavel
-	Addr3ts[op].getAtt<VarLocal>("VarLocal")->setDist(corretor.sp-1);
-}
 
 list<shared_ptr<Assembly> > Desaloca::gera_codigo() {
 	list<shared_ptr<Assembly> >  code;
@@ -231,32 +223,32 @@ list<shared_ptr<Assembly> > Desaloca::gera_codigo() {
 	return code;
 }	
 Desaloca::Desaloca(Token _op): op(_op), Instrucao("Desaloca",_op) {}
-void Desaloca::acao(Corretor& corretor) {
+	
+list<shared_ptr<Assembly> > Declarar::gera_codigo() {
+	list<shared_ptr<Assembly> >  code;	
+	code.emplace_back(new TM::Comentario("Declarar " + Addr3ts[op].getAtt<StrAtt>("StrAtt")->str));
+	return code;
+}
+void Declarar::acao(Corretor& corretor) {
+	assert(Addr3ts[op].has("VarLocal"));
+	// Incrementar sp
+	corretor.sp += Addr3ts[op].getAtt<VarLocal>("VarLocal")->size;
+	// Configurar distancia da variavel
+	Addr3ts[op].getAtt<VarLocal>("VarLocal")->setDist(corretor.sp-1);
+}
+Declarar::Declarar(Token _op): op(_op), Instrucao("Declarar",_op) {}
+			
+list<shared_ptr<Assembly> > Retirar::gera_codigo() {
+	list<shared_ptr<Assembly> >  code;	
+	code.emplace_back(new TM::Comentario("Retirar " + Addr3ts[op].getAtt<StrAtt>("StrAtt")->str));
+	return code;
+}
+void Retirar::acao(Corretor& corretor) {
 	assert(Addr3ts[op].has("VarLocal"));
 	// Decrementar sp
 	corretor.sp -= Addr3ts[op].getAtt<VarLocal>("VarLocal")->size;
 }
-
-	
-list<shared_ptr<Assembly> > Declarar::gera_codigo() {
-	list<shared_ptr<Assembly> >  code;	
-	return code;
-}
-
-Declarar::Declarar(Token _op): op(_op), Instrucao("Declarar",_op) {}
-void Declarar::acao(Corretor& corretor) {
-	Instrucao::acao(corretor);
-}
-			
-list<shared_ptr<Assembly> > Retirar::gera_codigo() {
-	list<shared_ptr<Assembly> >  code;	
-	return code;
-}
-
 Retirar::Retirar(Token _op): op(_op), Instrucao("Retirar",_op) {}
-void Retirar::acao(Corretor& corretor) {
-	Instrucao::acao(corretor);
-}
 
 // Operacao ====================================
 Operacao::~Operacao() {}
