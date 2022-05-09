@@ -27,7 +27,6 @@ int main(void){
 	var_normal[3] = 2;
 	var_normal();
 
-	var_array = 5;
 	var_array();
 
 	var_funcao = 8;

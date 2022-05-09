@@ -112,7 +112,7 @@ bool TabelaSemantica::verificar(string nome, Simb::Nat natureza, Token token){
 		{Simb::Nat::ARRAY,"array"}
 	};
 	
-	if((*this)[nome].natureza != natureza) {
+	if((*this)[nome].natureza != natureza && !((*this)[nome].natureza == Simb::Nat::ARRAY && natureza == Simb::Nat::VAR)) {
 		mensagens.push_back({{tokenLinha(token), tokenColuna(token)}, "Erro: " + str[(*this)[nome].natureza] + " \"" + nome + "\" usado(a) como " + str[natureza] + "."});
 		erros_semantico++;
 		return false;

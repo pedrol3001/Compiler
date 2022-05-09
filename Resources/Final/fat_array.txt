@@ -1,0 +1,16 @@
+int fat(int n[]) {
+	int a;
+	if (n[0] == 1) return 1;
+	a = n[0];
+	n[0] = n[0] - 1;
+	
+	return a * fat(n);
+}
+
+int main(void){
+	int a[1];
+	input a[0];
+	output fat(a); 
+	return 0;
+}
+
