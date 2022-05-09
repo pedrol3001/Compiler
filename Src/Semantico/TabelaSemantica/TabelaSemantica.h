@@ -43,6 +43,7 @@ struct TabelaSemantica {
 
 	int erros_semantico = 0, avisos_semantico = 0, escopo = GLOBAL;
 	std::vector<std::string> mensagens;
+	std::vector<std::pair<std::pair<Token, Token>, Token>> funcoes;
 
 	TabelaSemantica();
 

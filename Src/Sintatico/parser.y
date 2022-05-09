@@ -76,7 +76,7 @@ void aloca_local(Token token, Semantico &semantico) {
 	};
 	Zero zero;
 	
-	Token condtoken;
+	Token TokenGlobal;
 
 %}
 
@@ -139,23 +139,47 @@ void aloca_local(Token token, Semantico &semantico) {
 %%
 
 program: {
+	semantico.pseudoassembly.emplace_back("SetGlobal");
 	semantico.init_code.emplace_back(new Addr3::SetGlobal);
 
-	condtoken = tabsim.insert(ID);
-	string name = "$cond";
-	tabsim[condtoken].insert((Atributo*)(new IdVal(name)));
-	tabsim[condtoken].insert((Atributo*)(new StrAtt(name)));
+	TokenGlobal = tabsim.insert(ID);
+	string name = "$G"; // Global
+	tabsim[TokenGlobal].insert((Atributo*)(new IdVal(name)));
+	tabsim[TokenGlobal].insert((Atributo*)(new StrAtt(name)));
 
-	aloca_global(condtoken,semantico);
-	semantico.tabela.adicionar(tokenIdVal(condtoken), INT, Simb::Nat::ARRAY, semantico.escopo, condtoken, 1, true);
+	aloca_global(TokenGlobal,semantico);
+	semantico.tabela.adicionar(tokenIdVal(TokenGlobal), INT, Simb::Nat::ARRAY, semantico.escopo, TokenGlobal, 1, true);
 
 	} declaration_list {
 	
+		//aloca_global($2, semantico);
+		//semantico.pseudoassembly.emplace_back("declarar " + tokenStrAtt($1) + " " + tokenStrAtt($2) + "()");
+		//semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, $2, 1, true);
+
+	for(auto &p : semantico.tabela.funcoes){
+		Token tipo = p.first.first, id = p.first.second, label = p.second;
+		aloca_global(id, semantico);
+		semantico.pseudoassembly.emplace_back("declarar " + tokenStrAtt(tipo) + " " + tokenStrAtt(id) + "()");
+		semantico.tabela.adicionar(tokenIdVal(id), tipo.tipo,  Simb::Nat::FUNCAO, semantico.escopo, id, 1, true);
+	
+		semantico.pseudoassembly.emplace_back(tokenIdVal(id) + " = " + tokenStrAtt(label));
+		semantico.code.emplace_back(new Addr3::Atribuicao(id,label));
+
+	}
+
+	semantico.pseudoassembly.emplace_back("SetLocal");
 	semantico.init_code.emplace_back(new Addr3::SetLocal);
+
+	if(semantico.tabela.variaveis.find("main") != semantico.tabela.variaveis.end()) {
+		Token main_function = semantico.tabela.variaveis["main"].back();
+		semantico.code.emplace_back(new Addr3::Call(main_function));
+	}
+	semantico.code.emplace_back(new Addr3::Halt());
 
 	semantico.tabela.salvar_globais(semantico.pseudoassembly);
 
 	semantico.code.insert(semantico.code.begin(),semantico.init_code.begin(), semantico.init_code.end());
+
 	semantico.analisar();	// Setar como ok
 };
 
@@ -185,9 +209,17 @@ var_declaration: type_specifier ID SEMICOLON {
 type_specifier: INT | VOID ;
 
 fun_declaration: type_specifier ID {
-		aloca_global($2, semantico);
-		semantico.pseudoassembly.emplace_back("declarar " + tokenStrAtt($1) + " " + tokenStrAtt($2) + "()");
-		semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, $2, 1, true);
+		
+		Token token = semantico.labelGen.gerar();
+
+		semantico.pseudoassembly.emplace_back("Label " + tokenStrAtt(token));
+		semantico.code.emplace_back(new Addr3::Label(token));
+
+		semantico.tabela.funcoes.insert({{$1, $2}, token});
+
+		//aloca_global($2, semantico);
+		//semantico.pseudoassembly.emplace_back("declarar " + tokenStrAtt($1) + " " + tokenStrAtt($2) + "()");
+		//semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, $2, 1, true);
 	} LPAREN open_esc params RPAREN compound_stmt close_esc ;
 
 open_esc: %empty {
@@ -231,9 +263,40 @@ statement_list: statement_list statement | %empty ;
 
 statement: expression_stmt | compound_stmt | selection_stmt | iteration_stmt | input_stmt | output_stmt | return_stmt ;
 
-input_stmt: INPUT var SEMICOLON {
+input_stmt: INPUT ID SEMICOLON {
 		semantico.pseudoassembly.emplace_back("input " + tokenStrAtt($2));
 		semantico.code.emplace_back(new Addr3::Read($2));
+		
+	} | INPUT ID LBRACKET expression RBRACKET SEMICOLON {
+		semantico.tabela.verificar(tokenIdVal($2), Simb::Nat::ARRAY);
+		Token array = semantico.tabela.obter_token(tokenIdVal($2));
+
+		pair<bool, Token> p1 = semantico.tempGen.obter();
+		bool criado1 = p1.first;	
+		Token ponteiro = p1.second;
+
+		if(criado1){
+			aloca_local(ponteiro,semantico);
+			semantico.tabela.adicionar(tokenIdVal(ponteiro), INT, Simb::Nat::ARRAY, semantico.escopo, ponteiro, 1, true);
+		}
+		
+		semantico.pseudoassembly.emplace_back(tokenStrAtt(ponteiro) + " = " + tokenStrAtt(array) + " + " + tokenStrAtt($4));
+		semantico.code.emplace_back(new Addr3::Adicao(ponteiro,array,$4));	// token = $2 + $4
+
+		pair<bool, Token> p2 = semantico.tempGen.obter();
+		bool criado2 = p2.first;	
+		Token entrada = p2.second;
+
+		if(criado2){
+			aloca_local(entrada,semantico);
+			semantico.tabela.adicionar(tokenIdVal(entrada), INT, Simb::Nat::ARRAY, semantico.escopo, entrada, 1, true);
+		}
+
+		semantico.pseudoassembly.emplace_back("input " + tokenStrAtt(entrada));
+		semantico.code.emplace_back(new Addr3::Read(entrada));
+
+		semantico.pseudoassembly.emplace_back("*" + tokenStrAtt(ponteiro) + " = " + tokenStrAtt(entrada));
+		semantico.code.emplace_back(new Addr3::StoreInRef(ponteiro, entrada)); // *ponteiro = entrada
 	};
 
 output_stmt: OUTPUT expression SEMICOLON {
@@ -265,13 +328,13 @@ selection_stmt: IF LPAREN condition RPAREN statement {
 condition: open_esc expression {
 		Token token = semantico.labelGen.gerar();
 
-		semantico.pseudoassembly.emplace_back(tokenIdVal(condtoken) + " = " + tokenStrAtt($2));
-		semantico.code.emplace_back(new Addr3::Atribuicao(condtoken,$2));
+		semantico.pseudoassembly.emplace_back(tokenIdVal(TokenGlobal) + " = " + tokenStrAtt($2));
+		semantico.code.emplace_back(new Addr3::Atribuicao(TokenGlobal,$2));
 
 		$$ = token;
 	} close_esc {
-		semantico.pseudoassembly.emplace_back("Se " + tokenIdVal(condtoken) + " == " + tokenStrAtt(zero.get()) + " ir para " + tokenStrAtt($3));
-		semantico.code.emplace_back(new Addr3::Beq(condtoken, zero.get(), $3));
+		semantico.pseudoassembly.emplace_back("Se " + tokenIdVal(TokenGlobal) + " == " + tokenStrAtt(zero.get()) + " ir para " + tokenStrAtt($3));
+		semantico.code.emplace_back(new Addr3::Beq(TokenGlobal, zero.get(), $3));
 		$$ = $3;
 	};
 
@@ -297,24 +360,28 @@ return_stmt: RETURN SEMICOLON {
 		semantico.code.emplace_back(new Addr3::Return());
 	}
 	| RETURN expression SEMICOLON {
-		semantico.pseudoassembly.emplace_back("retornar " + tokenStrAtt($2));
-		semantico.code.emplace_back(new Addr3::Return($2));
+		semantico.pseudoassembly.emplace_back(tokenIdVal(TokenGlobal) + " = " + tokenStrAtt($2));
+		semantico.code.emplace_back(new Addr3::Atribuicao(TokenGlobal,$2));
+
+		semantico.pseudoassembly.emplace_back("Retornar");
+		semantico.code.emplace_back(new Addr3::Return());
 	};
 
-expression: var ASSIGN expression {
+expression: ID ASSIGN expression {
 		// usar atribuicao
-		semantico.pseudoassembly.emplace_back(tokenIdVal($1) + " = " + tokenStrAtt($3));
-		semantico.code.emplace_back(new Addr3::Atribuicao($1,$3));
+		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::VAR);
+		Token id_token = semantico.tabela.obter_token(tokenIdVal($1));
+
+		semantico.pseudoassembly.emplace_back(tokenIdVal(id_token) + " = " + tokenStrAtt($3));
+		semantico.code.emplace_back(new Addr3::Atribuicao(id_token,$3));
 		$$ = $3;
 	} | ID LBRACKET expression RBRACKET ASSIGN expression {
 		// usar storeinref
 		semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::ARRAY);
-
-		$$ = semantico.tabela.obter_token(tokenIdVal($1));
-		semantico.tabela.marcar_usado(tokenIdVal($1));
+		Token array = semantico.tabela.obter_token(tokenIdVal($1));
 
 		pair<bool, Token> p = semantico.tempGen.obter();
-		bool criado = p.first;
+		bool criado = p.first;	
 		Token token = p.second;
 
 		if(criado){
@@ -322,11 +389,11 @@ expression: var ASSIGN expression {
 			semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1, true);
 		}
 		
-		semantico.pseudoassembly.emplace_back(tokenStrAtt(token) + " = " + tokenStrAtt($$) + " + " + tokenStrAtt($3));
-		semantico.code.emplace_back(new Addr3::Adicao(token,$$,$3));	// token = $1 + $3
+		semantico.pseudoassembly.emplace_back(tokenStrAtt(token) + " = " + tokenStrAtt(array) + " + " + tokenStrAtt($3));
+		semantico.code.emplace_back(new Addr3::Adicao(token,array,$3));	// token = $1 + $3
 
 		semantico.pseudoassembly.emplace_back("*" + tokenStrAtt(token) + " = " + tokenStrAtt($6));
-		semantico.code.emplace_back(new Addr3::StoreInRef(token, $6)); // *token = token
+		semantico.code.emplace_back(new Addr3::StoreInRef(token, $6)); // *token = $6
 
 		$$ = $6;
 	}
@@ -440,21 +507,12 @@ factor: LPAREN expression RPAREN {$$=$2;} | var | call | NUM ;
 call: ID LPAREN Addr3_BeginCall args RPAREN { 
 	semantico.tabela.verificar(tokenIdVal($1), Simb::Nat::FUNCAO);
 
-	pair<bool, Token> p = semantico.tempGen.obter();
-	bool criado = p.first;
-	Token token = p.second;
-
-	if(criado){
-		aloca_local(token,semantico);
-		semantico.tabela.adicionar(tokenIdVal(token), INT, Simb::Nat::ARRAY, semantico.escopo, token, 1, true);
-	}
-
 	Token token_original = semantico.tabela.obter_token(tokenIdVal($1));
 
-	semantico.pseudoassembly.emplace_back(tokenStrAtt(token) + " = call " + tokenStrAtt(token_original));
-	semantico.code.emplace_back(new Addr3::Call(token, token_original));
+	semantico.pseudoassembly.emplace_back("call " + tokenStrAtt(token_original));
+	semantico.code.emplace_back(new Addr3::Call(token_original));
 
-	$$ = token;
+	$$ = TokenGlobal;
 };
 
 Addr3_BeginCall: %empty { 

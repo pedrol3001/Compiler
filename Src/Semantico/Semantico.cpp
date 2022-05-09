@@ -35,11 +35,11 @@ void Semantico::mostrar_analise() {
 }
 
 void Semantico::salvar_pseudoassembly() {
-	std::ofstream out("codigo3enderecos.txt");
+	std::ofstream out("TresEnderecos.txt");
 	for(auto &s : pseudoassembly)
 		out << s << endl;
     out.close();
-	std::cout << "Arquivo codigo3enderecos.txt criado com o código de 3 endereços." << endl;
+	std::cout << "Arquivo TresEnderecos.txt criado com o código de 3 endereços." << endl;
 }
 
 void Semantico::gerarIntermediario() {

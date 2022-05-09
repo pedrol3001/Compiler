@@ -1,0 +1,19 @@
+declarar int main()
+// abrindo escopo
+// abrindo escopo
+Aloca local x
+declarar int x
+Aloca local n
+declarar int n[4]
+Aloca local $t0
+$t0 = 2 + 3
+Aloca local $t1
+$t1 = n + $t0
+$t1 = *$t1
+x = $t1
+// fechando escopo
+desalocar x
+desalocar n
+desalocar $t1
+desalocar $t0
+// fechando escopo
