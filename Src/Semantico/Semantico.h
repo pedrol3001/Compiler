@@ -27,6 +27,7 @@ struct Semantico {
 	int &escopo;
 	
 	std::list<std::string> pseudoassembly;
+	std::list<std::string> init_pseudoassembly;
 
 	std::list<std::shared_ptr<Addr3::Instrucao> > code;
 	

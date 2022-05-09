@@ -39,7 +39,7 @@ long long int tokenIntVal(Token t){
 }
 
 void aloca_global(Token token, Semantico &semantico) {
-	//semantico.pseudoassembly.emplace_front("Aloca global " + tokenIdVal(token));
+	semantico.init_pseudoassembly.emplace_back("Aloca global " + tokenIdVal(token));
 	semantico.init_code.emplace_back(new Addr3::AlocaGlobal(token));
 }
 
@@ -139,6 +139,7 @@ void aloca_local(Token token, Semantico &semantico) {
 %%
 
 program: {
+	semantico.init_pseudoassembly.emplace_back("SetGlobal");
 	semantico.init_code.emplace_back(new Addr3::SetGlobal);
 
 	TokenGlobal = tabsim.insert(ID);
@@ -151,28 +152,29 @@ program: {
 
 	} declaration_list {
 	
-		//aloca_global($2, semantico);
-		//semantico.pseudoassembly.emplace_back("declarar " + tokenStrAtt($1) + " " + tokenStrAtt($2) + "()");
-		//semantico.tabela.adicionar(tokenIdVal($2), $1.tipo,  Simb::Nat::FUNCAO, semantico.escopo, $2, 1, true);
-
 	for(auto &p : semantico.tabela.funcoes){
 		Token token = p.first, label = p.second;
 		aloca_global(token, semantico);
+		semantico.init_pseudoassembly.emplace_back(tokenIdVal(token) + " = " + tokenIdVal(label));
 		semantico.init_code.emplace_back(new Addr3::Atribuicao(token,label));
 
 	}
 
+	semantico.init_pseudoassembly.emplace_back("SetLocal");
 	semantico.init_code.emplace_back(new Addr3::SetLocal);
 
 	if(semantico.tabela.variaveis.find("main") != semantico.tabela.variaveis.end()) {
 		Token main_function = semantico.tabela.variaveis["main"].back().token;
+		semantico.init_pseudoassembly.emplace_back("call main");
 		semantico.init_code.emplace_back(new Addr3::Call(main_function));
 	}
 	
+	semantico.init_pseudoassembly.emplace_back("Exit");
 	semantico.init_code.emplace_back(new Addr3::Exit());
 
 	semantico.tabela.salvar_globais(semantico.pseudoassembly);
 
+	semantico.pseudoassembly.insert(semantico.pseudoassembly.begin(), semantico.init_pseudoassembly.begin(), semantico.init_pseudoassembly.end());
 	semantico.code.insert(semantico.code.begin(),semantico.init_code.begin(), semantico.init_code.end());
 
 	semantico.analisar();	// Setar como ok
