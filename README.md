@@ -25,7 +25,7 @@ Isso irá gerar o arquivo objeto "programa.tm". Um exemplo para o programa fator
 
 Outros códigos de exemplo e que compilam sem erros estão em Resources/Final.
 
-Exemplos de códigos que dão erro estão em Resources/Erros.
+Exemplos de códigos que reportam erros estão em Resources/Erros.
 O arquivo erros.txt gera todos os erros e avisos detectáveis pelo analisador semântico:
 
     ./compiler Resources/Erros/erros.txt
