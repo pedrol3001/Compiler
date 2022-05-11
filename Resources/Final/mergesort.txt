@@ -1,0 +1,74 @@
+/* Ordena um array. A entrada é composta por um inteiro n (n < 100), que é o tamanho do array, seguido por n números, os elementos do array. */
+void merge(int v[], int l, int m, int r){ 
+    int s[100]; 
+    int i; 
+    int p1; 
+    int p2; 
+
+    i = l; 
+    p1 = l;
+    p2 = m+1;
+    while( (p1 <= m)*(p2 <= r) ){ 
+        if(v[p1] < v[p2]){ 
+            s[i] = v[p1]; 
+            p1 = p1 + 1; 
+        } else{ 
+            s[i] = v[p2]; 
+            p2 = p2 + 1; 
+        } 
+        i = i + 1; 
+    } 
+    
+    while(p1 <= m){ 
+        s[i] = v[p1]; 
+        p1 = p1 + 1; 
+        i = i + 1; 
+    } 
+    
+    while(p2 <= r){ 
+        s[i] = v[p2]; 
+        p2 = p2 + 1; 
+        i = i + 1; 
+    } 
+    
+    i = l;
+    while(i <= r){ 
+        v[i] = s[i]; 
+        i = i + 1; 
+    } 
+} 
+ 
+void merge_sort(int v[], int l, int r){ 
+    int m; 
+
+    if(l == r)
+        return; 
+
+    m = (l+r)/2; 
+
+    merge_sort(v, l, m); 
+    merge_sort(v, m+1, r); 
+
+    merge(v, l, m, r); 
+} 
+ 
+int main(void){ 
+    int n; 
+    int i; 
+    int v[100]; 
+
+    input n; 
+    i = 0; 
+    while(i < n){ 
+    input v[i]; 
+    i = i + 1; 
+    } 
+
+    merge_sort(v, 0, n - 1); 
+
+    i = 0; 
+    while(i < n){ 
+        output v[i]; 
+        i = i + 1; 
+    } 
+}
