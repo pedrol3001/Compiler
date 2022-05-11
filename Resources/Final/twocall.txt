@@ -1,3 +1,4 @@
+/* Teste de várias chamadas. Imprime 2 e 2. */
 int func2(int a) {
 	output a;
 	return a;

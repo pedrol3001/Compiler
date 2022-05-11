@@ -1,3 +1,4 @@
+/* Recebe n como entrada, e imprive n! */
 void main(void) {
 	int n;
 	int fat;

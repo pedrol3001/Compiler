@@ -1,3 +1,4 @@
+/* Recebe um inteiro n como entrada, e imprime n, 2, 3 e -1 */
 int func(int a, int b, int c) {
 	output a;
 	output b;

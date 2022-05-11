@@ -1,0 +1,8 @@
+/* Recebe um inteiro como entrada, e imprime esse inteiro se ele for menor que 2. */
+int main(void){
+	int a;
+	input a;
+	if(a<2) {
+		output a;
+	}
+} 

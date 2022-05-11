@@ -1,3 +1,4 @@
+/* Recebe um array de tamanho 5 como entrada, e então printa o mesmo array */
 void print(int array[], int n) {
 	int i;
 	i=0;

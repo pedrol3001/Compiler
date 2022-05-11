@@ -1,3 +1,4 @@
+/* Teste de operações booleanas. */
 int main(void) {
 	int a;
 	int b;

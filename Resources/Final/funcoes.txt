@@ -1,3 +1,4 @@
+/* Imprime 1 e 2 até receber 0 como entrada. */
 int func(void) {
 	output 1;
 	return 2;

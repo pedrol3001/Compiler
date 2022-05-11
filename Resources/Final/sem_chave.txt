@@ -1,13 +1,16 @@
+/* Teste de if e while sem chaves. Imprime 0. */ 
 int func(int a) {
-	if(a==0) 
+	if(a == 0)
 		return 0;
-	
-	while(a>0)
+
+	while(a > 0)
 		a = a - 1;
 	return func(a);
 }
 
 
 int main(void) {
-	output func(5);
+	int n;
+	input n;
+	output func(n);
 }

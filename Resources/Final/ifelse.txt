@@ -1,3 +1,4 @@
+/* Recebe um inteiro como entrada, e imprime -1 se for negativo, 0 se for nulo, ou 1 se for positivo. */
 int main(void) {
 	int a;
 	input a;

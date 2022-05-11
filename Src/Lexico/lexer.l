@@ -13,7 +13,7 @@ bool verbose=false;
 Lexico* lex;	// Ponteiro aaaaaaaaaaaaaaaa
 TabSim &ts = TabSim::getInstance();
 
-long long int linha=0,coluna=0,posicao=0;
+long long int linha=0,coluna=0,posicao=0,erros_lexico=0;
 
 string getToken() {
 	string token(yytext);
@@ -142,9 +142,19 @@ Space [\t \r]
 
 \n {linha++; coluna=0; if(verbose) fprintf(yyout,"\n");}
 
-. { return -1; }	// Erro lexico
+. { 
+	fprintf(yyout,"Erro léxico na linha %lld, coluna %lld: %s\n",linha+1,coluna+1,yytext);
+	update();
+	erros_lexico++;
+	}	// Erro lexico
 
-<<EOF>> {return 0;}
+<<EOF>> {
+	if(erros_lexico){
+		fprintf(yyout,"%lld erros léxico encontrados.\n", erros_lexico);
+		return -1;
+	}
+	return 0;
+	}
 
 %%
 
