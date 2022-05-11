@@ -23,7 +23,13 @@ Isso irá gerar o arquivo objeto "programa.tm". Um exemplo para o programa fator
 
     ./compiler Resources/Final/fat.txt
 
-Outros códigos de exemplo e que compilam sem erros estão em Resources/Final.
+### Exemplos
+
+Exemplos de código que são compilados sem erros ou avisos estão em Resources/Final. Alguns dos algoritmos implementados:
+
+    Mergesort (Resources/Final/mergesort.txt)
+    Exponenciação binária (Resources/Final/exponenciacao.txt)
+    Maior divisior comum (Resources/Final/gcd.txt)
 
 Exemplos de códigos que reportam erros estão em Resources/Erros.
 O arquivo erros.txt gera todos os erros e avisos detectáveis pelo analisador semântico:
