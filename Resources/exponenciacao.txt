@@ -1,21 +1,21 @@
-/* Calcula a^b em complexidade O(log(b)) */
-int pow(int a, int b){
-    int res;
-    int d;
-    int r;
+/* Calcula base^exp em complexidade O(log(exp)) */
+int pow(int base, int exp){
+	int res;
+	int q;
+	int r;
 
-    if(b == 0)
-        return 1;
-    
-    res = pow(a, b/2);
+	if(exp == 0) 
+		return 1;	/* base^0 = 1 */
+		
+	res = pow(base, exp/2);
 
-    d = a/2;
-    r = a - d*2;
+	q = exp/2;	
+	r = exp - 2*q;		/* D = d*q + r -> r = D - d*q (q = D/d) */	
 
-    if(r)
-        return res*res*a;
-    else
-        return res*res;
+	if(r)
+		return res*res*base;
+	else 
+		return res*res;
 }
 
 int main(void){
