@@ -269,11 +269,15 @@ param: type_specifier ID {
 
 compound_stmt: LBRACE open_esc local_declarations statement_list close_esc RBRACE ;
 
+simple_stmt:  expression_stmt | selection_stmt | iteration_stmt | input_stmt | output_stmt | return_stmt ;
+
 local_declarations: local_declarations var_declaration | %empty ;
 
 statement_list: statement_list statement | %empty ;
 
-statement: expression_stmt | compound_stmt | selection_stmt | iteration_stmt | input_stmt | output_stmt | return_stmt ;
+statement: compound_stmt | open_esc simple_stmt close_esc; 
+
+
 
 input_stmt: INPUT ID SEMICOLON {
 		semantico.tabela.verificar(tokenIdVal($2), Simb::Nat::VAR, $2);

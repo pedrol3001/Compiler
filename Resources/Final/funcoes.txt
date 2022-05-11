@@ -1,4 +1,4 @@
-int fat(void) {
+int func(void) {
 	output 1;
 	return 2;
 }
@@ -7,7 +7,7 @@ int main(void) {
 	int a;
 	input a;
 	while(a!=0) {
-		output fat();
+		output func();
 		input a;
 	}
 	return 1;

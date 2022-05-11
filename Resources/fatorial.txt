@@ -1,6 +1,10 @@
 int fat(int n) {
+	int aux;
+	output n;
 	if (n == 1) return 1;
-	return n * fat(n - 1);
+	aux = n * fat(n - 1);
+	output aux;
+	return aux;
 }
 
 int main(void){

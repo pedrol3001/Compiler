@@ -1,0 +1,13 @@
+int func(int a) {
+	if(a==0) 
+		return 0;
+	
+	while(a>0)
+		a = a - 1;
+	return func(a);
+}
+
+
+int main(void) {
+	output func(5);
+}

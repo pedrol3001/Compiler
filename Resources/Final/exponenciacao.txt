@@ -6,16 +6,16 @@ int pow(int base, int exp){
 
 	if(exp == 0) 
 		return 1;	/* base^0 = 1 */
-		
+
 	res = pow(base, exp/2);
 
 	q = exp/2;	
 	r = exp - 2*q;		/* D = d*q + r -> r = D - d*q (q = D/d) */	
 
-	if(r)
+	if(r) 
 		return res*res*base;
 	else 
-		return res*res;
+		return res*res;	
 }
 
 int main(void){

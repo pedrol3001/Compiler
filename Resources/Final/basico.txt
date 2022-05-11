@@ -7,10 +7,12 @@ int main(void) {
 		c=2;
 		b = (2 + 2)*5;
 		c = b==20;
+		/* testando retorno de expressoes booleanas */
 		output c;
 		c = b<0;
 		output c;
 	}
+	/* Testando expressoes aritmeticas */
 	output a;
 	output b;
 	return 0;
