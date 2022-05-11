@@ -1,0 +1,22 @@
+void print(int array[], int n) {
+	int i;
+	i=0;
+	while(i<n) {
+		output array[i];
+		i = i+1;
+	}
+	return;
+}
+
+int main(void) {
+	int v[5];
+	int i;
+	i=0;
+	while(i<5) {
+		input v[i];
+		i = i + 1;
+	}
+	print(v,5);
+
+	return 0;
+}
